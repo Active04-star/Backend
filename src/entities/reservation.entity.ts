@@ -1,0 +1,42 @@
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { User } from './user.entity';
+import { ReservationStatus } from 'src/enums/reservationStatus.enum';
+import { Field } from './field.entity';
+import { Payment } from './payment.entity';
+
+@Entity({
+  name: 'reservations',
+})
+export class Reservation {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({ type: 'timestamp' })
+  date: Date;
+
+  @Column({
+    type: 'enum',
+    enum: ReservationStatus,
+    default: ReservationStatus.PENDING,
+  })
+  status: ReservationStatus;
+
+  /**esta en true para que sea null porque cuando se crea la reserva va a tener un estado de pending y al completarse el pago, la reserva va a apsar a completarse y tener un pago asociado ,esa fecha va a estar marcada como ocupada por un momente hasta quese complete el pago por un tiempo determinado*/
+  @OneToOne(() => Payment, (payment) => payment.reservation, { nullable: true })
+  @JoinColumn()
+  payment: Payment;
+
+  @ManyToOne(() => User, (user) => user.reservations, { nullable: false })
+  user: User;
+
+   @ManyToOne(() => Field, (field) => field.reservation, { nullable: false })
+    field: Field;
+  
+}
