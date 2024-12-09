@@ -4,7 +4,7 @@ import { SportCenter } from "./sportcenter.entity"
 
 @Entity()
 export class Photos {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn('uuid')
     id: number
 
     @Column()
