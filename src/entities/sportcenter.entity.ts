@@ -10,6 +10,7 @@ import { User } from './user.entity';
 import { Field } from './field.entity';
 import { Sport_Category } from './sport_category.entity';
 import { Photos } from './photos.entity';
+import { SportCenterStatus } from 'src/enums/sportCenterStatus.enum';
 
 @Entity()
 export class SportCenter {
@@ -21,6 +22,13 @@ export class SportCenter {
 
   @Column()
   address: string;
+
+  @Column({
+    type: 'enum',
+    enum: SportCenterStatus,
+    default: SportCenterStatus.DRAFT,
+  })
+  status: SportCenterStatus;
 
   @OneToMany(() => Review, (review) => review.sportcenter, { nullable: true })
   reviews: Review[];
@@ -35,12 +43,11 @@ export class SportCenter {
   )
   sport_category: Sport_Category[];
 
-  @OneToMany(()=>Photos,(photos)=>photos.sportcenter,{nullable:true})
-  photos:Photos[]
+  @OneToMany(() => Photos, (photos) => photos.sportcenter, { nullable: true })
+  photos: Photos[];
 
   @ManyToOne(() => User, (user) => user.managed_centers, {
     nullable: false,
   })
   manager: User;
-
 }
