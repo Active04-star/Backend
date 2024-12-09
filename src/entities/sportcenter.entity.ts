@@ -38,10 +38,9 @@ export class SportCenter {
   @OneToMany(()=>Photos,(photos)=>photos.sportcenter,{nullable:true})
   photos:Photos[]
 
-  @ManyToOne(() => User, (user) => user.managedSportCenters, {
+  @ManyToOne(() => User, (user) => user.managed_centers, {
     nullable: false,
   })
   manager: User;
 
- 
 }
