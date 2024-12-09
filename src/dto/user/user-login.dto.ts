@@ -1,4 +1,4 @@
 import { PickType } from "@nestjs/swagger";
-import { UserRegister } from "./user-register.dto";
+import { LocalRegister } from "./local-register.dto";
 
-export class UserLogin extends PickType(UserRegister, ["email", "password"] as const) { }
+export class UserLogin extends PickType(LocalRegister, ["email", "password"] as const) { }
