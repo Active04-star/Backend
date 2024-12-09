@@ -2,7 +2,7 @@ import { Body, Controller, Post } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { ApiBody, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { UserClean } from "src/dto/user/user-clean.dto";
-import { UserRegister } from "src/dto/user/user-register.dto";
+import { LocalRegister } from "src/dto/user/local-register.dto";
 import { UserLogin } from "src/dto/user/user-login.dto";
 import { LoginResponse } from "src/dto/user/login-response.dto";
 
@@ -25,7 +25,7 @@ export class AuthController {
         },
     })
     @ApiOperation({ summary: 'Registro de usuario' })
-    async userRegistration(@Body() userObject: UserRegister): Promise<UserClean> {
+    async userRegistration(@Body() userObject: LocalRegister): Promise<UserClean> {
 
         const created_user = await this.authService.userRegistration(userObject);
         return created_user;

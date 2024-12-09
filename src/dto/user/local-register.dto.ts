@@ -1,14 +1,16 @@
-import { IsNotEmpty, Length, IsString, IsEmail, Matches, Validate, IsOptional, IsUrl } from "class-validator";
+import { File } from "buffer";
+import { IsNotEmpty, Length, IsString, IsEmail, Matches, Validate, IsOptional } from "class-validator";
 import { MatchPassword } from "src/validator/matchPassword";
 
-export class UserRegister  { 
+export class LocalRegister  { 
     @IsNotEmpty()
-    @Length(3, 80)
+    @Length(3, 50)
     @IsString()
     name: string;
   
     @IsNotEmpty()
     @IsEmail()
+    @Length(3, 50)
     email: string;
   
     @IsNotEmpty()
@@ -29,6 +31,6 @@ export class UserRegister  {
     confirm_password: string;
   
     @IsOptional()
-    @IsUrl()
-    profile_image?: string;
+    // @IsBuf()
+    profile_image?: File;
 }
