@@ -16,10 +16,10 @@ export class SportCenter {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, length: 50 })
   name: string;
 
-  @Column()
+  @Column({ length: 120 })
   address: string;
 
   @OneToMany(() => Review, (review) => review.sportcenter, { nullable: true })
@@ -35,8 +35,8 @@ export class SportCenter {
   )
   sport_category: Sport_Category[];
 
-  @OneToMany(()=>Photos,(photos)=>photos.sportcenter,{nullable:true})
-  photos:Photos[]
+  @OneToMany(() => Photos, (photos) => photos.sportcenter, { nullable: true })
+  photos: Photos[]
 
   @ManyToOne(() => User, (user) => user.managed_centers, {
     nullable: false,

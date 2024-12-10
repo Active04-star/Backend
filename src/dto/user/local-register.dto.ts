@@ -31,6 +31,5 @@ export class LocalRegister  {
     confirm_password: string;
   
     @IsOptional()
-    // @IsBuf()
     profile_image?: File;
 }
