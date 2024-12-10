@@ -1,30 +1,27 @@
-import { Type } from '@nestjs/class-transformer';
-import { IsNotEmpty, IsOptional, IsString, IsUUID, Length, ValidateNested } from 'class-validator';
-import { CreateSportCategoryDto } from '../sportcategory/createSportCategory.dto';
-import { CreatePhotoDto } from '../photos/createPhotos.dto';
+import { IsNotEmpty, IsString, IsUUID, Length } from 'class-validator';
 
 export class CreateSportCenterDto {
   @IsNotEmpty()
   @IsString()
-  @Length(3, 80)
+  @Length(3, 50)
   name: string;
 
   @IsNotEmpty()
-  @Length(5, 30)
+  @Length(5, 120)
   address: string;
 
   @IsUUID() 
   @IsNotEmpty()
   manager: string;
 
-  @ValidateNested({ each: true })
-  @Type(() => CreateSportCategoryDto)
-  @IsOptional()
-  sport_category?: CreateSportCategoryDto[];
+  // @ValidateNested({ each: true })
+  // @Type(() => CreateSportCategoryDto)
+  // @IsOptional()
+  // sport_category?: CreateSportCategoryDto[];
 
-  @ValidateNested({ each: true })
-  @Type(() => CreatePhotoDto)
-  @IsOptional()
-  photos?: CreatePhotoDto[];
+  // @ValidateNested({ each: true })
+  // @Type(() => CreatePhotoDto)
+  // @IsOptional()
+  // photos?: CreatePhotoDto[];
 
 }
