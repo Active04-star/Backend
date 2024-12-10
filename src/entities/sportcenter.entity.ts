@@ -17,10 +17,10 @@ export class SportCenter {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, length: 50 })
   name: string;
 
-  @Column()
+  @Column({ length: 120 })
   address: string;
 
   @Column({
