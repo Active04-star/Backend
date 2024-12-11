@@ -21,7 +21,10 @@ export class User {
   @Column({ unique: true, length: 50, nullable: false })
   email: string;
 
-  @Column({ nullable: true })
+  @Column({ 
+    default:
+      'https://res.cloudinary.com/dvgvcleky/image/upload/f_auto,q_auto/v1/RestO/ffgx6ywlaix0mb3jghux',
+  })
   profile_image: string;
 
   @Column({ length: 128, nullable: true })
