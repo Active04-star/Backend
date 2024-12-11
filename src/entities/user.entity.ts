@@ -25,7 +25,10 @@ export class User {
   profile_image: string;
 
   @Column({ length: 128, nullable: true })
-  password: string;
+  password?: string;
+
+  @Column({nullable: true})
+  authtoken?: string;
 
   @Column({
     type: 'enum',

@@ -9,7 +9,7 @@ import { LoginResponse } from 'src/dtos/user/login-response.dto';
 @ApiTags('Autenticacion')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @Post('register')
   @ApiBody({
@@ -24,9 +24,7 @@ export class AuthController {
     },
   })
   @ApiOperation({ summary: 'Registro de usuario' })
-  async userRegistration(
-    @Body() userObject: LocalRegister,
-  ): Promise<UserClean> {
+  async userRegistration(@Body() userObject: LocalRegister): Promise<UserClean> {
     const created_user = await this.authService.userRegistration(userObject);
     return created_user;
   }
