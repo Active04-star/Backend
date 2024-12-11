@@ -1,5 +1,8 @@
 export enum SportCenterStatus {
-    DRAFT = 'draft', //significa que el sportcenter todavia el usuario consumer no  va a poder ver este  porque esta en borrador,solamente el que lo este creando, falta asociar deportes canchas y fotos para que este pase a published
-    PUBLISHED = 'published',
-    BANNED = 'banned',
-  }
+  /** Centro deportivo en edicion, NO puede ser observado por usuarios comunes; SOLO EL MANAGER, 
+   * hasta que este decida publicarlo
+   */
+  DRAFT = 'draft',
+  PUBLISHED = 'published',
+  BANNED = 'banned',
+}

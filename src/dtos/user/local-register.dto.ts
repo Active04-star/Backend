@@ -1,4 +1,3 @@
-import { File } from "buffer";
 import { IsNotEmpty, Length, IsString, IsEmail, Matches, Validate, IsOptional } from "class-validator";
 import { MatchPassword } from "src/validator/matchPassword";
 
@@ -30,6 +29,10 @@ export class LocalRegister  {
     @Validate(MatchPassword, ['password'])
     confirm_password: string;
   
+    // @IsOptional()
+    // profile_image?: File;
+    
     @IsOptional()
-    profile_image?: File;
+    @IsString()
+    profile_image: string;
 }
