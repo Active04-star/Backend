@@ -4,7 +4,6 @@ export class SportcenterWithCategories1733935497650 implements MigrationInterfac
     name = 'SportcenterWithCategories1733935497650'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`CREATE TABLE "rating" ("id" SERIAL NOT NULL, "value" integer NOT NULL, "userId" uuid, "sportCenterId" uuid, CONSTRAINT "PK_ecda8ad32645327e4765b43649e" PRIMARY KEY ("id"))`);
         await queryRunner.query(`ALTER TABLE "users" ADD "authtoken" character varying`);
         await queryRunner.query(`ALTER TABLE "sport_center" DROP COLUMN "name"`);
         await queryRunner.query(`ALTER TABLE "sport_center" ADD "name" character varying(50) NOT NULL`);
