@@ -10,6 +10,7 @@ import { User } from './user.entity';
 import { Field } from './field.entity';
 import { Photos } from './photos.entity';
 import { SportCenterStatus } from 'src/enums/sportCenterStatus.enum';
+import { Sport_Category } from './sport_category.entity';
 
 @Entity()
 export class SportCenter {
@@ -35,13 +36,12 @@ export class SportCenter {
   @OneToMany(() => Field, (field) => field.sportcenter, { nullable: true })
   field: Field[];
 
-  // NO VA AQUI
-  // @OneToMany(
-  //   () => Sport_Category,
-  //   (sportCategory) => sportCategory.sportcenter,
-  //   { nullable: true },
-  // )
-  // sport_category: Sport_Category[];
+  @OneToMany(
+    () => Sport_Category,
+    (sportCategory) => sportCategory.sportcenter,
+    { nullable: true },
+  )
+  sport_category: Sport_Category[];
 
   @OneToMany(() => Photos, (photos) => photos.sportcenter, { nullable: true })
   photos: Photos[];

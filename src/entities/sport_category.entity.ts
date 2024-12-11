@@ -1,10 +1,12 @@
 import {
   Column,
   Entity,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Field } from './field.entity';
+import { SportCenter } from './sportcenter.entity';
 
 @Entity()
 export class Sport_Category {
@@ -20,9 +22,8 @@ export class Sport_Category {
   @OneToMany(() => Field, (field) => field.sportCategory, { nullable: true })
   field: Field[];
 
-  //NO VA AQUI
-  // @ManyToOne(() => SportCenter, (sportcenter) => sportcenter.sport_category, {
-  //   nullable: false,
-  // })
-  // sportcenter: SportCenter;
+  @ManyToOne(() => SportCenter, (sportcenter) => sportcenter.sport_category, {
+    nullable: false,
+  })
+  sportcenter: SportCenter;
 }
