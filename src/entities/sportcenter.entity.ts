@@ -8,7 +8,6 @@ import {
 import { Review } from './review.entity';
 import { User } from './user.entity';
 import { Field } from './field.entity';
-import { Sport_Category } from './sport_category.entity';
 import { Photos } from './photos.entity';
 import { SportCenterStatus } from 'src/enums/sportCenterStatus.enum';
 
@@ -17,10 +16,10 @@ export class SportCenter {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, length: 50 })
   name: string;
 
-  @Column()
+  @Column({ length: 120 })
   address: string;
 
   @Column({
@@ -36,12 +35,13 @@ export class SportCenter {
   @OneToMany(() => Field, (field) => field.sportcenter, { nullable: true })
   field: Field[];
 
-  @OneToMany(
-    () => Sport_Category,
-    (sportCategory) => sportCategory.sportcenter,
-    { nullable: true },
-  )
-  sport_category: Sport_Category[];
+  // NO VA AQUI
+  // @OneToMany(
+  //   () => Sport_Category,
+  //   (sportCategory) => sportCategory.sportcenter,
+  //   { nullable: true },
+  // )
+  // sport_category: Sport_Category[];
 
   @OneToMany(() => Photos, (photos) => photos.sportcenter, { nullable: true })
   photos: Photos[];
