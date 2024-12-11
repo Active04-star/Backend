@@ -14,7 +14,7 @@ import { CreateSportCenterDto } from 'src/dtos/sportcenter/createSportCenter.dto
 import { SportCenter } from 'src/entities/sportcenter.entity';
 import { UpdateSportCenterDto } from 'src/dtos/sportcenter/updateSportCenter.dto';
 
-@ApiTags('Sport_Center')
+@ApiTags('Sport Center')
 @Controller('sportcenter')
 export class SportCenterController {
   constructor(private readonly sportcenterService: SportCenterService) {}
