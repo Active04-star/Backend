@@ -7,12 +7,14 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiBody,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { SportCenterService } from './sport-center.service';
@@ -26,9 +28,32 @@ export class SportCenterController {
   constructor(private readonly sportcenterService: SportCenterService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Obtiene lista de sportcenter' })
-  async getSportCenters() {
-    return await this.sportcenterService.getSportCenters();
+  @ApiQuery({
+    name: 'page',
+    required: true,
+    type: Number,
+    example: 1,
+    description: 'Numero de la pagina',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: true,
+    type: Number,
+    example: 10,
+    description: 'Objetos por pagina',
+  })
+  @ApiQuery({ name: "rating", required: false, type: Number, example: 5, description: "Rating de centros deportivos" })
+  @ApiQuery({ name: "search", required: false, type: String, description: "Palabra de busqueda" })
+  @ApiOperation({
+    summary:
+      'Obtiene lista de sportcenter ordenados por rating de mayor a menor',
+  })
+  async getSportCenters(
+    @Query('page') page: number=1,
+    @Query('limit') limit: number=10,
+    @Query("rating") rating?: number, @Query("search") search?: string
+  ) {
+    return await this.sportcenterService.getSportCenters(page,limit,rating,search);
   }
 
   @Post('create')
