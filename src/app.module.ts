@@ -33,6 +33,7 @@ import { UploadModule } from './uploads/upload.module';
       signOptions: { expiresIn: '1h' },
       secret: process.env.JWT_SECRET,
     }),
+    
     MailerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -62,8 +63,6 @@ import { UploadModule } from './uploads/upload.module';
         },
       }),
     }),
-
-
     
     UploadModule,
     Sport_Center_Module,
