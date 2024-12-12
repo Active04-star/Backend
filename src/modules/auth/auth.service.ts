@@ -10,10 +10,11 @@ import { UserClean } from 'src/dtos/user/user-clean.dto';
 import { StatusEnum } from 'src/enums/HttpStatus.enum';
 import { LoginResponse } from 'src/dtos/user/login-response.dto';
 import { ApiError } from 'src/helpers/api-error-class';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UserService, private readonly jwtService: JwtService) { }
+  constructor(private readonly userService: UserService, private readonly jwtService: JwtService, private readonly mailService: MailerService) { }
 
   async userRegistration(userObject: LocalRegister): Promise<UserClean> {
     const { email, password, confirm_password, ...rest_user } = userObject;
@@ -39,6 +40,17 @@ export class AuthService {
       email,
       password: hashed_password,
     });
+
+    await this.mailService.sendMail({
+      from: 'ActiveProject <activeproject04@gmail.com>', 
+      to: email, 
+      subject: 'Welcome to our app',
+      template: 'welcome',
+      context: {
+        name:rest_user.name, // Aquí pasamos el userData al template
+      }
+      
+    })
 
     return user;
   }

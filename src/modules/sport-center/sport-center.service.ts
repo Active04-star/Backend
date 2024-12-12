@@ -19,7 +19,6 @@ import { UserRole } from 'src/enums/roles.enum';
 
 @Injectable()
 export class SportCenterService {
-  
   constructor(
     private readonly sportcenterRepository: SportCenterRepository,
     private readonly userService: UserService,
@@ -29,21 +28,22 @@ export class SportCenterService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-
-  async getSportCenters():Promise<SportCenter[]> {
-    const found_SportCenters:SportCenter[]=await this.sportcenterRepository.getSportCenters()
+  async getSportCenters(): Promise<SportCenter[]> {
+    const found_SportCenters: SportCenter[] =
+      await this.sportcenterRepository.getSportCenters();
 
     if (found_SportCenters.length === 0) {
-        throw new BadRequestException('no existe ningun centro deportivo')
-      }
-  
-      return found_SportCenters;
-  }
+      throw new BadRequestException('no existe ningun centro deportivo');
+    }
 
+    return found_SportCenters;
+  }
 
   async createSportCenter(createSportCenter: CreateSportCenterDto) {
     const { manager, photos, ...sportCenterData } = createSportCenter;
-    const future_manager: User = await this.userRepository.findOneBy({id:manager});
+    const future_manager: User = await this.userRepository.findOneBy({
+      id: manager,
+    });
     const created_sportcenter: SportCenter | undefined =
       await this.sportcenterRepository.createSportCenter(
         future_manager,
@@ -100,49 +100,50 @@ export class SportCenterService {
         sportCenter,
         updateData,
       );
-    return updatedSportCenter
+    return updatedSportCenter;
   }
 
-  async deleteSportCenter(id:string,email:string) {
-// Obtener el usuario por email
-const user = await this.userRepository.findOne({
-    where: { email },
-    relations: ['sportCenters'],
-  });
+  async deleteSportCenter(id: string, email: string) {
+    // Obtener el usuario por email
+    const user = await this.userRepository.findOne({
+      where: { email },
+      relations: ['sportCenters'],
+    });
 
-  if (!user) {
-    throw new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND);
+    if (!user) {
+      throw new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND);
+    }
+
+    // Verificar si el SportCenter pertenece al usuario
+    const sportCenter = await this.findOne(id);
+
+    if (sportCenter.manager.email == user.email) {
+      throw new HttpException(
+        'El SportCenter no pertenece al usuario o no existe',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    // Eliminar el SportCenter
+    await this.sportcenterRepository.deleteSportCenter(sportCenter);
+
+    // Verificar si el usuario tiene otros SportCenters publicados
+    const publishedSportCenters =
+      await this.sportcenterRepository.countPublishedSportCenters(user.id);
+
+    if (publishedSportCenters === 0) {
+      // Si no tiene más SportCenters publicados, eliminar el rol de manager
+      user.role = UserRole.USER; // Ajustar según la lógica de roles de tu aplicación
+      await this.userRepository.save(user);
+    }
+
+    return `SportCenter con ID ${id} eliminado correctamente.`;
   }
 
-  // Verificar si el SportCenter pertenece al usuario
-  const sportCenter = await this.findOne(id);
-
-  if (sportCenter.manager.email==user.email) {
-    throw new HttpException(
-      'El SportCenter no pertenece al usuario o no existe',
-      HttpStatus.NOT_FOUND,
-    );
-  }
-
-  // Eliminar el SportCenter
-  await this.sportcenterRepository.deleteSportCenter(sportCenter);
-
-  // Verificar si el usuario tiene otros SportCenters publicados
-  const publishedSportCenters = await this.sportcenterRepository.countPublishedSportCenters(user.id);
-
-  if (publishedSportCenters === 0) {
-    // Si no tiene más SportCenters publicados, eliminar el rol de manager
-    user.role = UserRole.USER; // Ajustar según la lógica de roles de tu aplicación
-    await this.userRepository.save(user);
-  }
-
-  return `SportCenter con ID ${id} eliminado correctamente.`;
-  }
-
-
-
-async activateSportCenter(userId: string,
-  sportCenterId: string): Promise<SportCenter>{
+  async activateSportCenter(
+    userId: string,
+    sportCenterId: string,
+  ): Promise<SportCenter> {
     const user = await this.userRepository.findOne({
       where: { id: userId },
       relations: ['managed_centers'],
@@ -163,11 +164,13 @@ async activateSportCenter(userId: string,
       );
     }
 
+    if (found_sportcenter.sport_category.length===0 || found_sportcenter.field.length===0)
+      throw new BadRequestException('Faltan rellenar campos');
+
     return await this.sportcenterRepository.activateSportCenter(
       found_sportcenter,
     );
-}
-
+  }
 
   async disableSportCenter(
     userId: string,
