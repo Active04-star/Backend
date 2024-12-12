@@ -17,5 +17,14 @@ if(!sportCategory)
 return sportCategory
 }
 
+
+async filterSportCategories(page:number,limit:number){}
+
+
+
+getSportCategories(){
+
+}
+
     
 }

@@ -12,7 +12,7 @@ export class SportCenterRepository {
   constructor(
     @InjectRepository(SportCenter)
     private sportCenterRepository: Repository<SportCenter>,
-  ) { }
+  ) {}
 
   async deleteSportCenter(sportCenter: SportCenter): Promise<void> {
     await this.sportCenterRepository.remove(sportCenter);
@@ -27,10 +27,38 @@ export class SportCenterRepository {
     });
   }
 
-  async getSportCenters(): Promise<SportCenter[]> {
-    return await this.sportCenterRepository.find({where:{
-      status:SportCenterStatus.PUBLISHED
-    }});
+  async getSportCenters(page: number, limit: number,rating?:number,keyword?:string): Promise<SportCenter[]> {
+    const queryBuilder = this.sportCenterRepository
+    .createQueryBuilder('sportcenter')
+    .leftJoinAndSelect('sportcenter.reviews', 'review')
+    .where('sportcenter.status = :status', {
+      status: SportCenterStatus.PUBLISHED,
+    })
+    .addSelect('AVG(review.rating)', 'averageRating') // Calcula el promedio de ratings
+    .groupBy('sportcenter.id') // Agrupa por cada SportCenter
+    .orderBy('averageRating', 'DESC', 'NULLS LAST'); // Ordena por promedio de rating (NULLS al final)
+
+  // Filtro por keyword (nombre o dirección)
+  if (keyword) {
+    queryBuilder.andWhere(
+      '(sportcenter.name LIKE :keyword OR sportcenter.address LIKE :keyword)',
+      { keyword: `%${keyword}%` }
+    );
+  }
+
+  // Filtro por rating (si se proporciona)
+  if (rating !== undefined) {
+    queryBuilder.andHaving('averageRating >= :rating', { rating });
+  }
+
+  // Aplica paginación si se proporcionan page y limit
+  if (page && limit) {
+    queryBuilder.skip((page - 1) * limit).take(limit);
+  }
+
+  // Ejecuta el query y devuelve los resultados
+  const results = await queryBuilder.getRawAndEntities();
+  return results.entities;
   }
 
   async createSportCenter(
@@ -46,7 +74,6 @@ export class SportCenterRepository {
       );
     return saved_sportcenter === null ? undefined : saved_sportcenter;
   }
-
 
   async findOne(id: string): Promise<SportCenter | undefined> {
     const found_sportcenter = await this.sportCenterRepository

@@ -27,9 +27,21 @@ export class SportCenterService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async getSportCenters(): Promise<SportCenter[]> {
+  async getSportCenters(
+    page: number,
+    limit: number,
+    rating?: number,
+    search?: string,
+  ): Promise<SportCenter[]> {
+
+
+    if (rating < 1 || rating > 5) throw new
+      BadRequestException('rating must be between 1 and 5')
+      
+    
+
     const found_SportCenters: SportCenter[] =
-      await this.sportcenterRepository.getSportCenters();
+      await this.sportcenterRepository.getSportCenters(page, limit,rating,search);
 
     if (found_SportCenters.length === 0) {
       throw new BadRequestException('no existe ningun centro deportivo');
@@ -139,10 +151,9 @@ export class SportCenterService {
     return `SportCenter con ID ${id} eliminado correctamente.`;
   }
 
-
-  async rankUp(userInstance:User,role: UserRole): Promise<void> {
-    userInstance.role =role ;
-    await this.userRepository.save(userInstance)
+  async rankUp(userInstance: User, role: UserRole): Promise<void> {
+    userInstance.role = role;
+    await this.userRepository.save(userInstance);
   }
 
   async publishSportCenter(
@@ -169,10 +180,13 @@ export class SportCenterService {
       );
     }
 
-    if (found_sportcenter.sport_category.length===0 || found_sportcenter.field.length===0)
+    if (
+      found_sportcenter.sport_category.length === 0 ||
+      found_sportcenter.field.length === 0
+    )
       throw new BadRequestException('Faltan rellenar campos');
 
-    await this.rankUp(user,UserRole.MANAGER)
+    await this.rankUp(user, UserRole.MANAGER);
 
     return await this.sportcenterRepository.publishSportCenter(
       found_sportcenter,

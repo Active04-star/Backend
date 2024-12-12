@@ -30,7 +30,7 @@ export class Sport_Category_Controller {
     type: CreateSportCategoryDto,
   })
   @ApiParam({
-    name: 'id',
+    name: 'sportCenterId',
     description:
       'ID del SportCenter para sincronizar el deporte con el centro deportivo',
     example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
