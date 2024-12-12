@@ -1,0 +1,40 @@
+doctype html
+html
+  head
+    title Bienvenido a nuestra app
+    style.
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        padding: 20px;
+      }
+      .container {
+        background: white;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        color: #333;
+      }
+      p {
+        color: #666;
+      }
+      a {
+        color: #007bff;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+  body
+    .container
+      h1 ¡Bienvenido a nuestra app!
+      p Hola #{name},
+      p Gracias por registrarte. Estamos emocionados de tenerte con nosotros.
+      p Para comenzar, visita nuestra página haciendo clic en el siguiente enlace:
+      p
+        a(href='http://localhost:4000') Ir a la app
+      p Si tienes alguna pregunta, no dudes en contactarnos.
+      p Saludos,
+      p El equipo de nuestra app

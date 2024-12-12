@@ -128,7 +128,7 @@ export class SportCenterController {
     description: 'ID del usuario asociado al SportCenter',
     example: 'a1b2c3d4-5678-9101-1121-abcdef654321',
   })
-  async activeSportCenter(
+  async publishSportCenter(
     @Param('userId', ParseUUIDPipe) userId: string,
     @Param('sportCenterId', ParseUUIDPipe) sportCenterId: string,
   ) {
