@@ -5,10 +5,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import TypeOrmConfig from './config/database.config';
 import { JwtModule } from '@nestjs/jwt';
+import { UploadModule } from './uploads/upload.module';
 
 @Module({
   imports: [
-    
     ConfigModule.forRoot({
       isGlobal: true,
       load: [TypeOrmConfig],
@@ -25,9 +25,10 @@ import { JwtModule } from '@nestjs/jwt';
       signOptions: { expiresIn: '1h' },
       secret: process.env.JWT_SECRET,
     }),
-    
+
     AuthModule,
     UserModule,
+    UploadModule,
   ],
   controllers: [],
   providers: [],
