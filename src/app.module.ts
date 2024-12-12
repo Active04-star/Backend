@@ -5,15 +5,14 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import TypeOrmConfig from './config/database.config';
 import { JwtModule } from '@nestjs/jwt';
+import { UploadModule } from './uploads/upload.module';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { join } from 'path';
+import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
 import { Sport_Center_Module } from './modules/sport-center/sport-center.module';
 import { Sport_Cateogry_Module } from './modules/sport-category/sport-category.module';
 import { Field_Module } from './modules/field/field.module';
-import { MailerModule } from '@nestjs-modules/mailer';
-import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
-import { join } from 'path';
-import { config as dotenvConfig } from 'dotenv';
-dotenvConfig({ path: './env' });
-import { UploadModule } from './uploads/upload.module';
+
 
 @Module({
   imports: [
@@ -70,6 +69,9 @@ import { UploadModule } from './uploads/upload.module';
     UserModule,
     Sport_Cateogry_Module,
     Field_Module,
+    UploadModule,
+      
+
   ],
   controllers: [],
   providers: [],

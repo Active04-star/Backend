@@ -7,8 +7,16 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { SportCenterService } from './sport-center.service';
 import { CreateSportCenterDto } from 'src/dtos/sportcenter/createSportCenter.dto';
 import { SportCenter } from 'src/entities/sportcenter.entity';
@@ -17,18 +25,41 @@ import { UpdateSportCenterDto } from 'src/dtos/sportcenter/updateSportCenter.dto
 @ApiTags('Sport Center')
 @Controller('sportcenter')
 export class SportCenterController {
-  constructor(private readonly sportcenterService: SportCenterService) { }
+  constructor(private readonly sportcenterService: SportCenterService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Obtiene lista de sportcenter' })
-  async getSportCenters() {
-    return await this.sportcenterService.getSportCenters();
+  @ApiQuery({
+    name: 'page',
+    required: true,
+    type: Number,
+    example: 1,
+    description: 'Numero de la pagina',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: true,
+    type: Number,
+    example: 10,
+    description: 'Objetos por pagina',
+  })
+  @ApiQuery({ name: "rating", required: false, type: Number, example: 5, description: "Rating de centros deportivos" })
+  @ApiQuery({ name: "search", required: false, type: String, description: "Palabra de busqueda" })
+  @ApiOperation({
+    summary:
+      'Obtiene lista de sportcenter ordenados por rating de mayor a menor',
+  })
+  async getSportCenters(
+    @Query('page') page: number=1,
+    @Query('limit') limit: number=10,
+    @Query("rating") rating?: number, @Query("search") search?: string
+  ) {
+    return await this.sportcenterService.getSportCenters(page,limit,rating,search);
   }
 
   @Post('create')
   //   @Roles(UserRole.CONSUMER)
   //   @UseGuards(AuthGuard)
-  //   @ApiBearerAuth()
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Registra un nuevo centro deportivo',
     description: 'Crea un nuevo registro de SportCenter en el sistema.',
@@ -60,7 +91,7 @@ export class SportCenterController {
   @Put('update/:id')
   //   @Roles(UserRole.CONSUMER,UserRole.MANAGER)
   //   @UseGuards(AuthGuard)
-  //   @ApiBearerAuth()
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Actualiza un SportCenter por su ID',
     description: 'Permite actualizar los datos de un SportCenter existente.',
@@ -81,10 +112,10 @@ export class SportCenterController {
     return await this.sportcenterService.updateSportCenter(id, data);
   }
 
-  @Put('sportCenter/:sportCenterId/disable/:userId')
+  @Put('disable/:sportCenterId/:userId')
   //   @Roles(UserRole.MANAGER)
   //   @UseGuards(AuthGuard)
-  //   @ApiBearerAuth()
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Desactiva un SportCenter',
     description: 'Desactiva un centro deportivo asociado a un usuario.',
@@ -109,10 +140,10 @@ export class SportCenterController {
     );
   }
 
-  @Put('sportCenter/:sportCenterId/active/:userId')
+  @Put('active/:sportCenterId/:userId')
   //   @Roles(UserRole.MANAGER)
   //   @UseGuards(AuthGuard)
-  //   @ApiBearerAuth()
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Activa un SportCenter',
     description: 'Activa un centro deportivo asociado a un usuario.',
@@ -131,13 +162,16 @@ export class SportCenterController {
     @Param('userId', ParseUUIDPipe) userId: string,
     @Param('sportCenterId', ParseUUIDPipe) sportCenterId: string,
   ) {
-    return await this.sportcenterService.activateSportCenter(
+    return await this.sportcenterService.publishSportCenter(
       userId,
       sportCenterId,
     );
   }
 
   @Delete(':id')
+  //   @Roles(UserRole.MANAGER)
+  //   @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Elimina un Centro deportivo',
     description:
@@ -149,8 +183,7 @@ export class SportCenterController {
     example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
   })
   @ApiBody({
-    description:
-      'Email del usuario relacionado con la eliminación del Centro',
+    description: 'Email del usuario relacionado con la eliminación del Centro',
     schema: {
       type: 'object',
       properties: {
@@ -161,7 +194,10 @@ export class SportCenterController {
       },
     },
   })
-  async deleteSportCenter(@Param('id', ParseUUIDPipe) id: string, @Body('email') email: string) {
+  async deleteSportCenter(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body('email') email: string,
+  ) {
     return await this.sportcenterService.deleteSportCenter(id, email);
   }
 }
