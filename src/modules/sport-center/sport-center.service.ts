@@ -33,15 +33,16 @@ export class SportCenterService {
     rating?: number,
     search?: string,
   ): Promise<SportCenter[]> {
-
-
-    if (rating < 1 || rating > 5) throw new
-      BadRequestException('rating must be between 1 and 5')
-      
-    
+    if (rating < 1 || rating > 5)
+      throw new BadRequestException('rating must be between 1 and 5');
 
     const found_SportCenters: SportCenter[] =
-      await this.sportcenterRepository.getSportCenters(page, limit,rating,search);
+      await this.sportcenterRepository.getSportCenters(
+        page,
+        limit,
+        rating,
+        search,
+      );
 
     if (found_SportCenters.length === 0) {
       throw new BadRequestException('no existe ningun centro deportivo');
@@ -114,41 +115,29 @@ export class SportCenterService {
     return updatedSportCenter;
   }
 
-  async deleteSportCenter(id: string, email: string) {
-    // Obtener el usuario por email
-    const user = await this.userRepository.findOne({
-      where: { email },
-      relations: ['sportCenters'],
-    });
+  async deleteSportCenter(id: string) {
+    const sportCenter = await this.sportcenterRepository.findOne(id);
 
-    if (!user) {
-      throw new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND);
+    if (!sportCenter) {
+      throw new NotFoundException(`SportCenter with ID ${id} not found`);
     }
 
-    // Verificar si el SportCenter pertenece al usuario
-    const sportCenter = await this.findOne(id);
+    const { manager } = sportCenter;
 
-    if (sportCenter.manager.email == user.email) {
-      throw new HttpException(
-        'El SportCenter no pertenece al usuario o no existe',
-        HttpStatus.NOT_FOUND,
-      );
+    // Si el usuario no tiene el rol de MANAGER, no hacemos nada con el rol
+    if (manager.role !== UserRole.MANAGER) {
+      return await this.sportcenterRepository.deleteSportCenter(sportCenter);
     }
 
-    // Eliminar el SportCenter
     await this.sportcenterRepository.deleteSportCenter(sportCenter);
 
-    // Verificar si el usuario tiene otros SportCenters publicados
-    const publishedSportCenters =
-      await this.sportcenterRepository.countPublishedSportCenters(user.id);
+    const remainigSportCenters: SportCenter[] =
+      await this.sportcenterRepository.countActiveAndDisable(manager);
 
-    if (publishedSportCenters === 0) {
-      // Si no tiene más SportCenters publicados, eliminar el rol de manager
-      user.role = UserRole.USER; // Ajustar según la lógica de roles de tu aplicación
-      await this.userRepository.save(user);
+    if (remainigSportCenters.length === 0) {
+      manager.role = UserRole.USER;
+      await this.userRepository.save(manager);
     }
-
-    return `SportCenter con ID ${id} eliminado correctamente.`;
   }
 
   async rankUp(userInstance: User, role: UserRole): Promise<void> {
@@ -160,6 +149,8 @@ export class SportCenterService {
     userId: string,
     sportCenterId: string,
   ): Promise<SportCenter> {
+    //publcias un sportcenter que esta en draft, si el usuario con rol de consumer publica el sportcenter se convierte en manager
+
     const user = await this.userRepository.findOne({
       where: { id: userId },
       relations: ['managed_centers'],
@@ -186,7 +177,7 @@ export class SportCenterService {
     )
       throw new BadRequestException('Faltan rellenar campos');
 
-    await this.rankUp(user, UserRole.MANAGER);
+    if (user.role !== 'manager') await this.rankUp(user, UserRole.MANAGER);
 
     return await this.sportcenterRepository.publishSportCenter(
       found_sportcenter,
@@ -197,6 +188,8 @@ export class SportCenterService {
     userId: string,
     sportCenterId: string,
   ): Promise<SportCenter> {
+    //se desabilita un sportcenter , el usuario sigue siendo manager . el sportcenter no se va a ver por otros usuarios
+
     // Buscar el usuario
     const user = await this.userRepository.findOne({
       where: { id: userId },
