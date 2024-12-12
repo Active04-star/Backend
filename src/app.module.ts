@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import TypeOrmConfig from './config/database.config';
 import { JwtModule } from '@nestjs/jwt';
 import { Sport_Center_Module } from './modules/sport-center/sport-center.module';
+import { UploadModule } from './uploads/upload.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { Sport_Center_Module } from './modules/sport-center/sport-center.module'
       secret: process.env.JWT_SECRET,
     }),
     
+    UploadModule,
     Sport_Center_Module,
     AuthModule,
     UserModule,
