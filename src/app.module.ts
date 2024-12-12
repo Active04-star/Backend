@@ -26,9 +26,47 @@ import { UploadModule } from './uploads/upload.module';
       secret: process.env.JWT_SECRET,
     }),
 
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        transport: {
+          host: 'smtp.gmail.com',
+          port: 465,
+          secure: true,
+          auth: {
+            user: configService.get('NODEMAILER_USER'),
+            pass: configService.get('NODEMAILER_PASSWORD'),
+          },
+        },
+        defaults: {
+          from: '"nest-modules" <modules@nestjs.com>',
+        },
+        template: {
+         // Para desarrollo
+          dir: join(__dirname, '..', 'src/templates'),
+
+          // Para producción
+          // dir: process.env.NODEMAILER_TEMPLATE_PATH,
+          adapter: new PugAdapter(),
+          options: {
+            strict: true,
+          },
+        },
+      }),
+    }),
+
+
+    
+    UploadModule,
+    Sport_Center_Module,
     AuthModule,
     UserModule,
+    Sport_Cateogry_Module,
+    Field_Module,
     UploadModule,
+      
+
   ],
   controllers: [],
   providers: [],

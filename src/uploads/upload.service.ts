@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import cloudinary from '../config/cloudinary.config';
+import cloudinary from 'src/config/cloudinary.config';
 
 @Injectable()
 export class UploadService {
+
   async uploadToCloudinary(file: Express.Multer.File): Promise<string> {
     return new Promise((resolve, reject) => {
-      const stream = cloudinary.uploader.upload_stream(
-        { folder: 'ActiveProject' },
+      const stream = cloudinary.uploader.upload_stream({ folder: 'ActiveProject' },
         (error, result) => {
           if (error) {
             reject(error);

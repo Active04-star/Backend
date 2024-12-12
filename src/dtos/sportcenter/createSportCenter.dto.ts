@@ -1,6 +1,14 @@
 import { Type } from '@nestjs/class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { ArrayMaxSize, IsArray, IsNotEmpty, IsOptional, IsString, IsUUID, Length } from 'class-validator';
+import {
+  ArrayMaxSize,
+  IsArray,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Length,
+} from 'class-validator';
 
 export class CreateSportCenterDto {
   @ApiProperty({
@@ -20,16 +28,13 @@ export class CreateSportCenterDto {
   @Length(5, 30)
   address: string;
 
-
   @ApiProperty({
     description: 'ID del usuario que va a crear el centro',
     example: 'id-del-usuario',
   })
-  @IsUUID() 
+  @IsUUID()
   @IsNotEmpty()
   manager: string;
-  
-
 
   @ApiPropertyOptional({
     description: 'Array de fotos del centro deportivo',
@@ -38,8 +43,7 @@ export class CreateSportCenterDto {
   })
   @IsArray()
   @ArrayMaxSize(5)
-  @IsString({ each: true }) 
+  @IsString({ each: true })
   @IsOptional()
-  photos?: string[]
-
+  photos?: string[];
 }

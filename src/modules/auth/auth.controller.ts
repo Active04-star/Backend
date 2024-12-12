@@ -6,7 +6,7 @@ import { LocalRegister } from 'src/dtos/user/local-register.dto';
 import { UserLogin } from 'src/dtos/user/user-login.dto';
 import { LoginResponse } from 'src/dtos/user/login-response.dto';
 
-@ApiTags('Autenticacion')
+@ApiTags('Autentication')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
