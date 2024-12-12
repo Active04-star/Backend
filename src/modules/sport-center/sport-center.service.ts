@@ -21,7 +21,6 @@ import { UserRole } from 'src/enums/roles.enum';
 export class SportCenterService {
   constructor(
     private readonly sportcenterRepository: SportCenterRepository,
-    private readonly userService: UserService,
     @InjectRepository(Photos)
     private photoRepository: Repository<Photos>,
     @InjectRepository(User)
@@ -140,7 +139,13 @@ export class SportCenterService {
     return `SportCenter con ID ${id} eliminado correctamente.`;
   }
 
-  async activateSportCenter(
+
+  async rankUp(userInstance:User,role: UserRole): Promise<void> {
+    userInstance.role =role ;
+    await this.userRepository.save(userInstance)
+  }
+
+  async publishSportCenter(
     userId: string,
     sportCenterId: string,
   ): Promise<SportCenter> {
@@ -167,7 +172,9 @@ export class SportCenterService {
     if (found_sportcenter.sport_category.length===0 || found_sportcenter.field.length===0)
       throw new BadRequestException('Faltan rellenar campos');
 
-    return await this.sportcenterRepository.activateSportCenter(
+    await this.rankUp(user,UserRole.MANAGER)
+
+    return await this.sportcenterRepository.publishSportCenter(
       found_sportcenter,
     );
   }

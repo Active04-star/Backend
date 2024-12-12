@@ -28,7 +28,9 @@ export class SportCenterRepository {
   }
 
   async getSportCenters(): Promise<SportCenter[]> {
-    return await this.sportCenterRepository.find();
+    return await this.sportCenterRepository.find({where:{
+      status:SportCenterStatus.PUBLISHED
+    }});
   }
 
   async createSportCenter(
@@ -45,7 +47,6 @@ export class SportCenterRepository {
     return saved_sportcenter === null ? undefined : saved_sportcenter;
   }
 
-  async;
 
   async findOne(id: string): Promise<SportCenter | undefined> {
     const found_sportcenter = await this.sportCenterRepository
@@ -72,7 +73,7 @@ export class SportCenterRepository {
     return await this.sportCenterRepository.save(updatedSportCenter);
   }
 
-  async activateSportCenter(found_sportcenter: SportCenter) {
+  async publishSportCenter(found_sportcenter: SportCenter) {
     found_sportcenter.status = SportCenterStatus.PUBLISHED;
     return await this.sportCenterRepository.save(found_sportcenter);
   }
