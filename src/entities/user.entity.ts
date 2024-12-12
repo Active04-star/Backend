@@ -30,7 +30,7 @@ export class User {
   @Column({ length: 128, nullable: true })
   password?: string;
 
-  @Column({nullable: true})
+  @Column({nullable: true, unique: true})
   authtoken?: string;
 
   @Column({

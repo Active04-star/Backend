@@ -5,6 +5,7 @@ import { UserClean } from 'src/dtos/user/user-clean.dto';
 import { LocalRegister } from 'src/dtos/user/local-register.dto';
 import { UserLogin } from 'src/dtos/user/user-login.dto';
 import { LoginResponse } from 'src/dtos/user/login-response.dto';
+import { AuthRegister } from 'src/dtos/user/auth-register.dto';
 
 @ApiTags('Autentication')
 @Controller('auth')
@@ -19,13 +20,19 @@ export class AuthController {
         email: 'TomHoward@mail.com',
         password: 'Password!1',
         confirm_password: 'Password!1',
-        profile_image: '(OPCIONAL)',
       },
     },
   })
   @ApiOperation({ summary: 'Registro de usuario' })
   async userRegistration(@Body() userObject: LocalRegister): Promise<UserClean> {
-    const created_user = await this.authService.userRegistration(userObject);
+    const created_user: UserClean = await this.authService.userRegistration(userObject);
+    return created_user;
+  }
+
+  @Post("auth-register")
+  @ApiOperation({ summary: 'Registro de terceros Auth0' })
+  async authZeroRegistration(@Body() userObject: AuthRegister): Promise<UserClean> {
+    const created_user: UserClean = await this.authService.authZeroRegistration(userObject);
     return created_user;
   }
 

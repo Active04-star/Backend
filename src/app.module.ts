@@ -32,7 +32,7 @@ import { Field_Module } from './modules/field/field.module';
       signOptions: { expiresIn: '1h' },
       secret: process.env.JWT_SECRET,
     }),
-
+    
     MailerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -62,8 +62,6 @@ import { Field_Module } from './modules/field/field.module';
         },
       }),
     }),
-
-
     
     UploadModule,
     Sport_Center_Module,
