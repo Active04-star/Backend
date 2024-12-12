@@ -11,7 +11,8 @@ import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 @ApiTags('upload')
 @Controller('upload')
 export class UploadController {
-  constructor(private readonly uploadService: UploadService) {}
+
+  constructor(private readonly uploadService: UploadService) { }
 
   @Post()
   @UseInterceptors(FileInterceptor('image')) // 'image' debe coincidir con el nombre del campo en el frontend
@@ -28,8 +29,8 @@ export class UploadController {
       },
     },
   })
-  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+  async uploadFile(@UploadedFile() file: Express.Multer.File): Promise<{ url: string }> {
     const url = await this.uploadService.uploadToCloudinary(file);
-    return { url }; // Retorna la URL del archivo subido
+    return { url };
   }
 }

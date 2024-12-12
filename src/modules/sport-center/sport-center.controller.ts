@@ -17,7 +17,7 @@ import { UpdateSportCenterDto } from 'src/dtos/sportcenter/updateSportCenter.dto
 @ApiTags('Sport Center')
 @Controller('sportcenter')
 export class SportCenterController {
-  constructor(private readonly sportcenterService: SportCenterService) {}
+  constructor(private readonly sportcenterService: SportCenterService) { }
 
   @Get()
   @ApiOperation({ summary: 'Obtiene lista de sportcenter' })
@@ -43,11 +43,10 @@ export class SportCenterController {
     return await this.sportcenterService.createSportCenter(data);
   }
 
-  @Get('findOne/:id')
+  @Get(':id')
   @ApiOperation({
-    summary: 'Obtiene un SportCenter por su ID',
-    description:
-      'Proporciona toda la información de un SportCenter específico.',
+    summary: 'Obtiene un Centro deportivo por su ID',
+    description: 'Proporciona toda la información de un Centro específico.',
   })
   @ApiParam({
     name: 'id',
@@ -140,18 +139,18 @@ export class SportCenterController {
 
   @Delete(':id')
   @ApiOperation({
-    summary: 'Elimina un SportCenter',
+    summary: 'Elimina un Centro deportivo',
     description:
-      'Elimina un SportCenter y actualiza el rol del usuario si es necesario.',
+      'Elimina un Centro deportivo y actualiza el rol del usuario si es necesario.',
   })
   @ApiParam({
     name: 'id',
-    description: 'ID del SportCenter a eliminar',
+    description: 'ID del Centro deportivo a eliminar',
     example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
   })
   @ApiBody({
     description:
-      'Email del usuario relacionado con la eliminación del SportCenter',
+      'Email del usuario relacionado con la eliminación del Centro',
     schema: {
       type: 'object',
       properties: {
@@ -162,10 +161,7 @@ export class SportCenterController {
       },
     },
   })
-  async deleteSportCenter(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body('email') email: string,
-  ) {
+  async deleteSportCenter(@Param('id', ParseUUIDPipe) id: string, @Body('email') email: string) {
     return await this.sportcenterService.deleteSportCenter(id, email);
   }
 }

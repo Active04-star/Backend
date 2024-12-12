@@ -13,6 +13,7 @@ import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
 import { join } from 'path';
 import { config as dotenvConfig } from 'dotenv';
 dotenvConfig({ path: './env' });
+import { UploadModule } from './uploads/upload.module';
 
 @Module({
   imports: [
@@ -62,6 +63,9 @@ dotenvConfig({ path: './env' });
       }),
     }),
 
+
+    
+    UploadModule,
     Sport_Center_Module,
     AuthModule,
     UserModule,
