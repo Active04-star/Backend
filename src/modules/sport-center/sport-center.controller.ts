@@ -175,29 +175,16 @@ export class SportCenterController {
   @ApiOperation({
     summary: 'Elimina un Centro deportivo',
     description:
-      'Elimina un Centro deportivo y actualiza el rol del usuario si es necesario.',
+      'Esta ruta permite eliminar un centro deportivo (SportCenter) de la base de datos. Si el usuario que lo gestiona (manager) tiene el rol de MANAGER, su rol puede ser afectado dependiendo del estado del SportCenter eliminado y de los otros SportCenters que gestione.El rol del manager solo se modifica si, tras la eliminación, no tiene otros centros en estado PUBLISHED o DISABLE.',
   })
   @ApiParam({
     name: 'id',
     description: 'ID del Centro deportivo a eliminar',
     example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
   })
-  @ApiBody({
-    description: 'Email del usuario relacionado con la eliminación del Centro',
-    schema: {
-      type: 'object',
-      properties: {
-        email: {
-          type: 'string',
-          example: 'user@example.com',
-        },
-      },
-    },
-  })
   async deleteSportCenter(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body('email') email: string,
   ) {
-    return await this.sportcenterService.deleteSportCenter(id, email);
+    return await this.sportcenterService.deleteSportCenter(id);
   }
 }
