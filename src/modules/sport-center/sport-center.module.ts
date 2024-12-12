@@ -12,6 +12,6 @@ import { User } from "src/entities/user.entity";
     imports: [UserModule, TypeOrmModule.forFeature([SportCenter, Photos, User])],
     controllers: [SportCenterController],
     providers: [SportCenterService, SportCenterRepository],
-    exports: [],
+    exports: [SportCenterService],
 })
 export class Sport_Center_Module { }
