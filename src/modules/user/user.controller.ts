@@ -7,7 +7,7 @@ import { isNotEmpty, isNotEmptyObject } from "class-validator";
 import { UpdateUser } from "src/dtos/user/update-user.dto";
 import { ApiError } from "src/helpers/api-error-class";
 
-@ApiTags("Usuario")
+@ApiTags("User")
 @Controller("user")
 export class UserController {
     constructor(private readonly userService: UserService) { }
