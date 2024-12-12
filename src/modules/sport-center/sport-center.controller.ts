@@ -132,7 +132,7 @@ export class SportCenterController {
     @Param('userId', ParseUUIDPipe) userId: string,
     @Param('sportCenterId', ParseUUIDPipe) sportCenterId: string,
   ) {
-    return await this.sportcenterService.activateSportCenter(
+    return await this.sportcenterService.publishSportCenter(
       userId,
       sportCenterId,
     );
