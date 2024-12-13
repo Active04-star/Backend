@@ -13,7 +13,7 @@ import { Sport_Center_Module } from './modules/sport-center/sport-center.module'
 import { Sport_Cateogry_Module } from './modules/sport-category/sport-category.module';
 import { Field_Module } from './modules/field/field.module';
 import { ReviewModule } from './modules/review/review.module';
-
+//
 
 @Module({
   imports: [
@@ -71,9 +71,7 @@ import { ReviewModule } from './modules/review/review.module';
     Sport_Cateogry_Module,
     Field_Module,
     UploadModule,
-    ReviewModule,
-      
-
+    ReviewModule, 
   ],
   controllers: [],
   providers: [],
