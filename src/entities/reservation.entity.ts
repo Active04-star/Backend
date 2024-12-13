@@ -3,6 +3,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -10,6 +11,7 @@ import { User } from './user.entity';
 import { ReservationStatus } from 'src/enums/reservationStatus.enum';
 import { Field } from './field.entity';
 import { Payment } from './payment.entity';
+import { Review } from './review.entity';
 
 @Entity({
   name: 'reservations',
@@ -36,7 +38,9 @@ export class Reservation {
   @ManyToOne(() => User, (user) => user.reservations, { nullable: false })
   user: User;
 
-   @ManyToOne(() => Field, (field) => field.reservation, { nullable: false })
-    field: Field;
+  @ManyToOne(() => Field, (field) => field.reservation, { nullable: false })
+  field: Field;
   
+  @OneToMany(() => Review, (review) => review.reservation)
+  reviews: Review[];
 }
