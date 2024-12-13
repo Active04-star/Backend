@@ -1,15 +1,11 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateSportCenterDto } from 'src/dtos/sportcenter/createSportCenter.dto';
 import { UpdateSportCenterDto } from 'src/dtos/sportcenter/updateSportCenter.dto';
 import { SportCenter } from 'src/entities/sportcenter.entity';
 import { User } from 'src/entities/user.entity';
 import { SportCenterStatus } from 'src/enums/sportCenterStatus.enum';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 @Injectable()
 export class SportCenterRepository {
@@ -22,17 +18,50 @@ export class SportCenterRepository {
     await this.sportCenterRepository.remove(sportCenter);
   }
 
-  async countPublishedSportCenters(managerId: string): Promise<number> {
-    return await this.sportCenterRepository.count({
-      where: {
-        manager: { id: managerId },
-        status: SportCenterStatus.PUBLISHED,
-      },
-    });
+ async countActiveAndDisable(manager:User){
+  const remainingActiveCenters = await this.sportCenterRepository.find({
+    where: {
+      manager: { id: manager.id },
+      status: In([SportCenterStatus.PUBLISHED, SportCenterStatus.DISABLE]),
+    },
+  });
+  return remainingActiveCenters
+ }
+
+
+
+  async getSportCenters(page: number, limit: number,rating?:number,keyword?:string): Promise<SportCenter[]> {
+    const queryBuilder = this.sportCenterRepository
+    .createQueryBuilder('sportcenter')
+    .leftJoinAndSelect('sportcenter.reviews', 'review')
+    .where('sportcenter.status = :status', {
+      status: SportCenterStatus.PUBLISHED,
+    })
+    .addSelect('AVG(review.rating)', 'averageRating') // Calcula el promedio de ratings
+    .groupBy('sportcenter.id') // Agrupa por cada SportCenter
+    .orderBy('averageRating', 'DESC', 'NULLS LAST'); // Ordena por promedio de rating (NULLS al final)
+
+  // Filtro por keyword (nombre o dirección)
+  if (keyword) {
+    queryBuilder.andWhere(
+      '(sportcenter.name LIKE :keyword OR sportcenter.address LIKE :keyword)',
+      { keyword: `%${keyword}%` }
+    );
   }
 
-  async getSportCenters(): Promise<SportCenter[]> {
-    return await this.sportCenterRepository.find();
+  // Filtro por rating (si se proporciona)
+  if (rating !== undefined) {
+    queryBuilder.andHaving('averageRating >= :rating', { rating });
+  }
+
+  // Aplica paginación si se proporcionan page y limit
+  if (page && limit) {
+    queryBuilder.skip((page - 1) * limit).take(limit);
+  }
+
+  // Ejecuta el query y devuelve los resultados
+  const results = await queryBuilder.getRawAndEntities();
+  return results.entities;
   }
 
   async createSportCenter(
@@ -48,8 +77,6 @@ export class SportCenterRepository {
       );
     return saved_sportcenter === null ? undefined : saved_sportcenter;
   }
-
-  async;
 
   async findOne(id: string): Promise<SportCenter | undefined> {
     const found_sportcenter = await this.sportCenterRepository
@@ -76,7 +103,7 @@ export class SportCenterRepository {
     return await this.sportCenterRepository.save(updatedSportCenter);
   }
 
-  async activateSportCenter(found_sportcenter: SportCenter) {
+  async publishSportCenter(found_sportcenter: SportCenter) {
     found_sportcenter.status = SportCenterStatus.PUBLISHED;
     return await this.sportCenterRepository.save(found_sportcenter);
   }

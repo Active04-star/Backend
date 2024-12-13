@@ -10,10 +10,13 @@ import { UserClean } from 'src/dtos/user/user-clean.dto';
 import { StatusEnum } from 'src/enums/HttpStatus.enum';
 import { LoginResponse } from 'src/dtos/user/login-response.dto';
 import { ApiError } from 'src/helpers/api-error-class';
+import { MailerService } from '@nestjs-modules/mailer';
+import { AuthRegister } from 'src/dtos/user/auth-register.dto';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UserService, private readonly jwtService: JwtService) { }
+
+  constructor(private readonly userService: UserService, private readonly jwtService: JwtService, private readonly mailService: MailerService) { }
 
   async userRegistration(userObject: LocalRegister): Promise<UserClean> {
     const { email, password, confirm_password, ...rest_user } = userObject;
@@ -40,7 +43,22 @@ export class AuthService {
       password: hashed_password,
     });
 
+    // await this.mailService.sendMail({
+    //   from: 'ActiveProject <activeproject04@gmail.com>', 
+    //   to: email, 
+    //   subject: 'Welcome to our app',
+    //   template: 'welcome',
+    //   context: {
+    //     name:rest_user.name, // Aquí pasamos el userData al template
+    //   }
+      
+    // })
+
     return user;
+  }
+
+  async authZeroRegistration(userObject: AuthRegister): Promise<UserClean> {
+    return new UserClean
   }
 
   async userLogin(userCredentials: UserLogin): Promise<LoginResponse> {
@@ -48,7 +66,7 @@ export class AuthService {
 
     const user: User | undefined = await this.userService.getUserByMail(email);
 
-    if (user.was_banned) {
+    if (isNotEmpty(user) && user.was_banned) {
       throw new ApiError(StatusEnum.USER_DELETED, UnauthorizedException);
     }
 

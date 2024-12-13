@@ -19,31 +19,43 @@ import { UserRole } from 'src/enums/roles.enum';
 
 @Injectable()
 export class SportCenterService {
-  
   constructor(
     private readonly sportcenterRepository: SportCenterRepository,
-    private readonly userService: UserService,
     @InjectRepository(Photos)
     private photoRepository: Repository<Photos>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {}
 
+  async getSportCenters(
+    page: number,
+    limit: number,
+    rating?: number,
+    search?: string,
+  ): Promise<SportCenter[]> {
+    if (rating < 1 || rating > 5)
+      throw new BadRequestException('rating must be between 1 and 5');
 
-  async getSportCenters():Promise<SportCenter[]> {
-    const found_SportCenters:SportCenter[]=await this.sportcenterRepository.getSportCenters()
+    const found_SportCenters: SportCenter[] =
+      await this.sportcenterRepository.getSportCenters(
+        page,
+        limit,
+        rating,
+        search,
+      );
 
     if (found_SportCenters.length === 0) {
-        throw new BadRequestException('no existe ningun centro deportivo')
-      }
-  
-      return found_SportCenters;
-  }
+      throw new BadRequestException('no existe ningun centro deportivo');
+    }
 
+    return found_SportCenters;
+  }
 
   async createSportCenter(createSportCenter: CreateSportCenterDto) {
     const { manager, photos, ...sportCenterData } = createSportCenter;
-    const future_manager: User = await this.userRepository.findOneBy({id:manager});
+    const future_manager: User = await this.userRepository.findOneBy({
+      id: manager,
+    });
     const created_sportcenter: SportCenter | undefined =
       await this.sportcenterRepository.createSportCenter(
         future_manager,
@@ -100,49 +112,45 @@ export class SportCenterService {
         sportCenter,
         updateData,
       );
-    return updatedSportCenter
+    return updatedSportCenter;
   }
 
-  async deleteSportCenter(id:string,email:string) {
-// Obtener el usuario por email
-const user = await this.userRepository.findOne({
-    where: { email },
-    relations: ['sportCenters'],
-  });
+  async deleteSportCenter(id: string) {
+    const sportCenter = await this.sportcenterRepository.findOne(id);
 
-  if (!user) {
-    throw new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND);
+    if (!sportCenter) {
+      throw new NotFoundException(`SportCenter with ID ${id} not found`);
+    }
+
+    const { manager } = sportCenter;
+
+    // Si el usuario no tiene el rol de MANAGER, no hacemos nada con el rol
+    if (manager.role !== UserRole.MANAGER) {
+      return await this.sportcenterRepository.deleteSportCenter(sportCenter);
+    }
+
+    await this.sportcenterRepository.deleteSportCenter(sportCenter);
+
+    const remainigSportCenters: SportCenter[] =
+      await this.sportcenterRepository.countActiveAndDisable(manager);
+
+    if (remainigSportCenters.length === 0) {
+      manager.role = UserRole.USER;
+      await this.userRepository.save(manager);
+    }
   }
 
-  // Verificar si el SportCenter pertenece al usuario
-  const sportCenter = await this.findOne(id);
-
-  if (sportCenter.manager.email==user.email) {
-    throw new HttpException(
-      'El SportCenter no pertenece al usuario o no existe',
-      HttpStatus.NOT_FOUND,
-    );
+  async rankUp(userInstance: User, role: UserRole): Promise<void> {
+    userInstance.role = role;
+    await this.userRepository.save(userInstance);
   }
 
-  // Eliminar el SportCenter
-  await this.sportcenterRepository.deleteSportCenter(sportCenter);
+  async publishSportCenter(
+    userId: string,
+    sportCenterId: string,
+  ): Promise<SportCenter> {
+    //publcias un sportcenter que esta en draft, si el usuario con rol de consumer publica el sportcenter se convierte en manager
 
-  // Verificar si el usuario tiene otros SportCenters publicados
-  const publishedSportCenters = await this.sportcenterRepository.countPublishedSportCenters(user.id);
-
-  if (publishedSportCenters === 0) {
-    // Si no tiene más SportCenters publicados, eliminar el rol de manager
-    user.role = UserRole.USER; // Ajustar según la lógica de roles de tu aplicación
-    await this.userRepository.save(user);
-  }
-
-  return `SportCenter con ID ${id} eliminado correctamente.`;
-  }
-
-
-
-async activateSportCenter(userId: string,
-  sportCenterId: string): Promise<SportCenter>{
     const user = await this.userRepository.findOne({
       where: { id: userId },
       relations: ['managed_centers'],
@@ -163,16 +171,25 @@ async activateSportCenter(userId: string,
       );
     }
 
-    return await this.sportcenterRepository.activateSportCenter(
+    if (
+      found_sportcenter.sport_category.length === 0 ||
+      found_sportcenter.field.length === 0
+    )
+      throw new BadRequestException('Faltan rellenar campos');
+
+    if (user.role !== 'manager') await this.rankUp(user, UserRole.MANAGER);
+
+    return await this.sportcenterRepository.publishSportCenter(
       found_sportcenter,
     );
-}
-
+  }
 
   async disableSportCenter(
     userId: string,
     sportCenterId: string,
   ): Promise<SportCenter> {
+    //se desabilita un sportcenter , el usuario sigue siendo manager . el sportcenter no se va a ver por otros usuarios
+
     // Buscar el usuario
     const user = await this.userRepository.findOne({
       where: { id: userId },

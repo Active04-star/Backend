@@ -23,4 +23,4 @@ export class CloudinaryService {
   }
 }
 
-export default cloudinary; // Exportación por defecto
+export default cloudinary;
