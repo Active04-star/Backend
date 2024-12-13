@@ -15,5 +15,10 @@ export class reviewCreate {
     @IsNotEmpty()
     @IsString()
     @IsUUID()
-    reservationId: string
+    fieldId: string
+
+    @IsNotEmpty()
+    @IsString()
+    @IsUUID()
+    userId: string
 }

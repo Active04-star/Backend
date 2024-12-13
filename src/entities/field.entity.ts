@@ -9,6 +9,7 @@ import {
 import { Sport_Category } from './sport_category.entity';
 import { SportCenter } from './sportcenter.entity';
 import { Reservation } from './reservation.entity';
+import { Review } from './review.entity';
 
 @Entity()
 export class Field {
@@ -39,4 +40,8 @@ export class Field {
     onDelete: 'CASCADE',
   })
   sportcenter: SportCenter;
+
+    // Relación uno a muchos con Review
+    @OneToMany(() => Review, (review) => review.field)
+    reviews: Review[];
 }
