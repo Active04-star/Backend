@@ -16,11 +16,7 @@ export class Sport_Category_Repository {
     sportCenter: SportCenter,
     data: CreateSportCategoryDto,
   ): Promise<Sport_Category | undefined> {
-    const saved_category: Sport_Category = await this.sportCategoryRepository.save(this.sportCategoryRepository.create({
-        ...data,
-        sportcenter: sportCenter,
-       
-      }),
+    const saved_category: Sport_Category = await this.sportCategoryRepository.save(this.sportCategoryRepository.create(data),
       );
       return saved_category === null ? undefined : saved_category;
   }

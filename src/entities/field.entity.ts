@@ -1,4 +1,3 @@
-import { FieldStatus } from 'src/enums/fieldStatus.enum';
 import {
   Column,
   Entity,
@@ -9,7 +8,12 @@ import {
 import { Sport_Category } from './sport_category.entity';
 import { SportCenter } from './sportcenter.entity';
 import { Reservation } from './reservation.entity';
+import { Field_Schedule } from './field_schedule.entity';
+import { Image } from './image.entity';
+import Decimal from 'decimal.js';
+import { Payment } from './payment.entity';
 import { Review } from './review.entity';
+import { Payment_History } from './payment_hisotry.entity';
 
 @Entity()
 export class Field {
@@ -20,28 +24,49 @@ export class Field {
   number: number;
 
   @Column({
-    type: 'enum',
-    enum: FieldStatus,
-    default: FieldStatus.AVAILABLE,
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    nullable: false,
+    transformer: {
+      to: (value: Decimal) => value.toNumber(),
+      from: (value: string) => new Decimal(value),
+    },
   })
-  status: FieldStatus;
+  price: Decimal;
 
+
+ 
   @OneToMany(() => Reservation, (reservation) => reservation.field, {
     nullable: true,
   })
   reservation: Reservation[];
 
+  @OneToMany(()=>Payment,(payment)=>payment.field)
+  payments:Payment[]
+
+  @OneToMany(()=>Payment_History,(history)=>history.payment)
+  paymentsHistory:Payment_History
+
+  @OneToMany(() => Field_Schedule, (fieldSchedule) => fieldSchedule.field, {
+    cascade: true,
+  })
+  schedules: Field_Schedule[];
+
+  @OneToMany(() => Image, (photos) => photos.field , { nullable: true })
+
+  @OneToMany(() => Review, (review) => review.sportcenter, { nullable: true })
+  reviews: Review[];
+  photos: Image[];
+
+
   @ManyToOne(() => Sport_Category, (sportCategory) => sportCategory.field, {
-    onDelete: 'CASCADE',
+    onDelete: 'CASCADE'
   })
   sportCategory: Sport_Category;
 
-  @ManyToOne(() => SportCenter, (sportcenter) => sportcenter.field, {
+  @ManyToOne(() => SportCenter, (sportcenter) => sportcenter.fields, {
     onDelete: 'CASCADE',
   })
   sportcenter: SportCenter;
-
-    // Relación uno a muchos con Review
-    @OneToMany(() => Review, (review) => review.field)
-    reviews: Review[];
 }

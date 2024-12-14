@@ -19,4 +19,4 @@ export class LoginResponse {
     user: InnerResponseInfo;
 }
 
-class InnerResponseInfo extends OmitType(User, ["managed_centers", "password", "reservations", "reviews"]) { }
+class InnerResponseInfo extends OmitType(User, ["managed_centers", "password", "reservations", "reviews","paymentHistory","paymentHistory"]) { }

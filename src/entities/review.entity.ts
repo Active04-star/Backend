@@ -4,11 +4,14 @@ import {
   Column,
   ManyToOne,
   BeforeUpdate,
+  OneToOne,
 } from 'typeorm';
 import { User } from './user.entity';
 import { SportCenter } from './sportcenter.entity';
-import { Reservation } from './reservation.entity'; // relacion con reservation
+import { Reservation } from './reservation.entity';
 import { Field } from './field.entity';
+
+//la reseña es flexible
 
 @Entity()
 export class Review {
@@ -30,23 +33,26 @@ export class Review {
   @Column({ type: 'timestamp', nullable: true })
   updatedAt: Date;
 
+  @OneToOne(() => Reservation, (reservation) => reservation.review, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
+  reservation: Reservation;
+
   @ManyToOne(() => User, (user) => user.reviews, { onDelete: 'CASCADE' })
   user: User;
 
   @ManyToOne(() => SportCenter, (sportcenter) => sportcenter.reviews, {
     onDelete: 'CASCADE',
+    nullable: true,
   })
   sportcenter: SportCenter;
 
-//columna agregada para relacionar reseñas con reservas
- @ManyToOne(() => Reservation, (reservation) => reservation.reviews, { onDelete: 'CASCADE' }) 
- reservation: Reservation;
-
- @ManyToOne(() => Field, (field) => field.reviews, {
-  onDelete: 'CASCADE',
-  nullable: true, 
-})
- field: Field;
+  @ManyToOne(() => Field, (field) => field.reviews, {
+    onDelete: 'CASCADE',
+    nullable: true,
+  })
+  field: Field;
 
   // Este hook se ejecuta antes de que la entidad se actualice
   @BeforeUpdate()
