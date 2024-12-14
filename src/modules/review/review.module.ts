@@ -7,9 +7,10 @@ import { User } from "src/entities/user.entity";
 import { Review } from "src/entities/review.entity";
 import { ReviewRepository } from "./review.repository";
 import { UserRepository } from "../user/user.repository";
+import { Reservation } from "src/entities/reservation.entity";
 
 @Module({
-    imports: [UserModule, TypeOrmModule.forFeature([User, Review])],
+    imports: [UserModule, TypeOrmModule.forFeature([User, Review, Reservation])],
     controllers: [ReviewController], 
     providers: [ReviewService, ReviewRepository, UserRepository], //reservationRepository,
     exports: []

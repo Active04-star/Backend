@@ -4,12 +4,10 @@ import {
     HttpStatus,
     Injectable,
     NotFoundException,
-    UnauthorizedException,
   } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { User } from 'src/entities/user.entity';
 import { Review } from 'src/entities/review.entity';
-import { Field } from 'src/entities/field.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { reviewCreate } from 'src/dtos/review/review-create.dto';
