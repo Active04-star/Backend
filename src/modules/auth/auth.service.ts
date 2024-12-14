@@ -90,9 +90,7 @@ export class AuthService {
             profile_image: user.profile_image,
             role: user.role,
             was_banned: user.was_banned,
-            subscription_status: user.subscription_status,
-            // payments: user.,
-            // managers_list:user.managers_list
+            subscription_status: user.subscription_status
           },
         };
       }
