@@ -5,7 +5,7 @@ import { UpdateSportCenterDto } from 'src/dtos/sportcenter/updateSportCenter.dto
 import { SportCenter } from 'src/entities/sportcenter.entity';
 import { User } from 'src/entities/user.entity';
 import { SportCenterStatus } from 'src/enums/sportCenterStatus.enum';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 @Injectable()
 export class SportCenterRepository {
@@ -18,14 +18,17 @@ export class SportCenterRepository {
     await this.sportCenterRepository.remove(sportCenter);
   }
 
-  async countPublishedSportCenters(managerId: string): Promise<number> {
-    return await this.sportCenterRepository.count({
-      where: {
-        manager: { id: managerId },
-        status: SportCenterStatus.PUBLISHED,
-      },
-    });
-  }
+ async countActiveAndDisable(manager:User){
+  const remainingActiveCenters = await this.sportCenterRepository.find({
+    where: {
+      main_manager: { id: manager.id },
+      status: In([SportCenterStatus.PUBLISHED, SportCenterStatus.DISABLE]),
+    },
+  });
+  return remainingActiveCenters
+ }
+
+
 
   async getSportCenters(page: number, limit: number,rating?:number,keyword?:string): Promise<SportCenter[]> {
     const queryBuilder = this.sportCenterRepository
@@ -69,7 +72,7 @@ export class SportCenterRepository {
       await this.sportCenterRepository.save(
         this.sportCenterRepository.create({
           ...sportCenterData,
-          manager: future_manager,
+          main_manager: future_manager,
         }),
       );
     return saved_sportcenter === null ? undefined : saved_sportcenter;

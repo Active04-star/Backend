@@ -11,18 +11,18 @@ import { CreateSportCenterDto } from 'src/dtos/sportcenter/createSportCenter.dto
 import { UserService } from '../user/user.service';
 import { User } from 'src/entities/user.entity';
 import { SportCenter } from 'src/entities/sportcenter.entity';
-import { Photos } from 'src/entities/photos.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UpdateSportCenterDto } from 'src/dtos/sportcenter/updateSportCenter.dto';
 import { UserRole } from 'src/enums/roles.enum';
+import { Image } from 'src/entities/image.entity';
 
 @Injectable()
 export class SportCenterService {
   constructor(
     private readonly sportcenterRepository: SportCenterRepository,
-    @InjectRepository(Photos)
-    private photoRepository: Repository<Photos>,
+    @InjectRepository(Image)
+    private imageRepository: Repository<Image>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {}
@@ -33,15 +33,16 @@ export class SportCenterService {
     rating?: number,
     search?: string,
   ): Promise<SportCenter[]> {
-
-
-    if (rating < 1 || rating > 5) throw new
-      BadRequestException('rating must be between 1 and 5')
-      
-    
+    if (rating < 1 || rating > 5)
+      throw new BadRequestException('rating must be between 1 and 5');
 
     const found_SportCenters: SportCenter[] =
-      await this.sportcenterRepository.getSportCenters(page, limit,rating,search);
+      await this.sportcenterRepository.getSportCenters(
+        page,
+        limit,
+        rating,
+        search,
+      );
 
     if (found_SportCenters.length === 0) {
       throw new BadRequestException('no existe ningun centro deportivo');
@@ -70,13 +71,13 @@ export class SportCenterService {
 
     if (photos && photos.length > 0) {
       const photoEntitites = photos.map((url) => {
-        const photo = new Photos();
-        photo.url = url;
+        const photo = new Image();
+        photo.image_url = url;
         photo.sportcenter = created_sportcenter;
         return photo;
       });
 
-      const saved_photos = await this.photoRepository.save(photoEntitites);
+      const saved_photos = await this.imageRepository.save(photoEntitites);
 
       if (!saved_photos)
         throw new HttpException(
@@ -114,41 +115,29 @@ export class SportCenterService {
     return updatedSportCenter;
   }
 
-  async deleteSportCenter(id: string, email: string) {
-    // Obtener el usuario por email
-    const user = await this.userRepository.findOne({
-      where: { email },
-      relations: ['sportCenters'],
-    });
+  async deleteSportCenter(id: string) {
+    const sportCenter = await this.sportcenterRepository.findOne(id);
 
-    if (!user) {
-      throw new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND);
+    if (!sportCenter) {
+      throw new NotFoundException(`SportCenter with ID ${id} not found`);
     }
 
-    // Verificar si el SportCenter pertenece al usuario
-    const sportCenter = await this.findOne(id);
+    const { main_manager } = sportCenter;
 
-    if (sportCenter.manager.email == user.email) {
-      throw new HttpException(
-        'El SportCenter no pertenece al usuario o no existe',
-        HttpStatus.NOT_FOUND,
-      );
+    // Si el usuario no tiene el rol de MANAGER, no hacemos nada con el rol
+    if (main_manager.role !== UserRole.MANAGER) {
+      return await this.sportcenterRepository.deleteSportCenter(sportCenter);
     }
 
-    // Eliminar el SportCenter
     await this.sportcenterRepository.deleteSportCenter(sportCenter);
 
-    // Verificar si el usuario tiene otros SportCenters publicados
-    const publishedSportCenters =
-      await this.sportcenterRepository.countPublishedSportCenters(user.id);
+    const remainigSportCenters: SportCenter[] =
+      await this.sportcenterRepository.countActiveAndDisable(main_manager);
 
-    if (publishedSportCenters === 0) {
-      // Si no tiene más SportCenters publicados, eliminar el rol de manager
-      user.role = UserRole.USER; // Ajustar según la lógica de roles de tu aplicación
-      await this.userRepository.save(user);
+    if (remainigSportCenters.length === 0) {
+      main_manager.role = UserRole.USER;
+      await this.userRepository.save(main_manager);
     }
-
-    return `SportCenter con ID ${id} eliminado correctamente.`;
   }
 
   async rankUp(userInstance: User, role: UserRole): Promise<void> {
@@ -160,6 +149,8 @@ export class SportCenterService {
     userId: string,
     sportCenterId: string,
   ): Promise<SportCenter> {
+    //publcias un sportcenter que esta en draft, si el usuario con rol de consumer publica el sportcenter se convierte en manager
+
     const user = await this.userRepository.findOne({
       where: { id: userId },
       relations: ['managed_centers'],
@@ -174,19 +165,19 @@ export class SportCenterService {
     if (found_sportcenter.status === 'published')
       throw new BadRequestException('El centro deportivo ya esta publicado');
 
-    if (found_sportcenter.manager.id !== user.id) {
+    if (found_sportcenter.main_manager.id !== user.id) {
       throw new UnauthorizedException(
         `You are not authorized to disable this SportCenter.`,
       );
     }
 
     if (
-      found_sportcenter.sport_category.length === 0 ||
-      found_sportcenter.field.length === 0
+      found_sportcenter.sport_categories.length === 0 ||
+      found_sportcenter.fields.length === 0
     )
       throw new BadRequestException('Faltan rellenar campos');
 
-    await this.rankUp(user, UserRole.MANAGER);
+    if (user.role !== 'manager') await this.rankUp(user, UserRole.MANAGER);
 
     return await this.sportcenterRepository.publishSportCenter(
       found_sportcenter,
@@ -197,6 +188,8 @@ export class SportCenterService {
     userId: string,
     sportCenterId: string,
   ): Promise<SportCenter> {
+    //se desabilita un sportcenter , el usuario sigue siendo manager . el sportcenter no se va a ver por otros usuarios
+
     // Buscar el usuario
     const user = await this.userRepository.findOne({
       where: { id: userId },
@@ -212,7 +205,7 @@ export class SportCenterService {
     if (found_sportcenter.status === 'disable')
       throw new BadRequestException('El centro deportivo ya fue desabilitado');
 
-    if (found_sportcenter.manager.id !== userId) {
+    if (found_sportcenter.main_manager.id !== userId) {
       throw new UnauthorizedException(
         `You are not authorized to disable this SportCenter.`,
       );
