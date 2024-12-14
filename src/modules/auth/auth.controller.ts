@@ -16,7 +16,7 @@ export class AuthController {
   @ApiBody({
     schema: {
       example: {
-        name: 'Tim howard',
+        name: 'Tom howard',
         email: 'TomHoward@mail.com',
         password: 'Password!1',
         confirm_password: 'Password!1',
