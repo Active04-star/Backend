@@ -5,7 +5,7 @@ import { UserModule } from "../user/user.module";
 import { MailerModule } from "@nestjs-modules/mailer";
 
 @Module({
-    imports: [MailerModule,UserModule],
+    imports: [MailerModule, UserModule],
     controllers: [AuthController],
     providers: [AuthService],
     exports: []
