@@ -91,8 +91,8 @@ export class AuthService {
             role: user.role,
             was_banned: user.was_banned,
             subscription_status: user.subscription_status,
-            payments:user.payments,
-            managers_list:user.managers_list
+            // payments: user.,
+            // managers_list:user.managers_list
           },
         };
       }

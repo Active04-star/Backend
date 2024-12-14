@@ -6,6 +6,7 @@ import { SportCenterService } from './sport-center.service';
 import { SportCenterRepository } from './sport-center.repository';
 import { UserModule } from '../user/user.module';
 import { User } from 'src/entities/user.entity';
+import { Image } from 'src/entities/image.entity'
 
 @Module({
   imports: [UserModule, TypeOrmModule.forFeature([SportCenter, Image, User])],
