@@ -11,18 +11,18 @@ import { CreateSportCenterDto } from 'src/dtos/sportcenter/createSportCenter.dto
 import { UserService } from '../user/user.service';
 import { User } from 'src/entities/user.entity';
 import { SportCenter } from 'src/entities/sportcenter.entity';
-import { Photos } from 'src/entities/photos.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UpdateSportCenterDto } from 'src/dtos/sportcenter/updateSportCenter.dto';
 import { UserRole } from 'src/enums/roles.enum';
+import { Image } from 'src/entities/image.entity';
 
 @Injectable()
 export class SportCenterService {
   constructor(
     private readonly sportcenterRepository: SportCenterRepository,
-    @InjectRepository(Photos)
-    private photoRepository: Repository<Photos>,
+    @InjectRepository(Image)
+    private imageRepository: Repository<Image>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {}
@@ -71,13 +71,13 @@ export class SportCenterService {
 
     if (photos && photos.length > 0) {
       const photoEntitites = photos.map((url) => {
-        const photo = new Photos();
-        photo.url = url;
+        const photo = new Image();
+        photo.image_url = url;
         photo.sportcenter = created_sportcenter;
         return photo;
       });
 
-      const saved_photos = await this.photoRepository.save(photoEntitites);
+      const saved_photos = await this.imageRepository.save(photoEntitites);
 
       if (!saved_photos)
         throw new HttpException(
@@ -122,21 +122,21 @@ export class SportCenterService {
       throw new NotFoundException(`SportCenter with ID ${id} not found`);
     }
 
-    const { manager } = sportCenter;
+    const { main_manager } = sportCenter;
 
     // Si el usuario no tiene el rol de MANAGER, no hacemos nada con el rol
-    if (manager.role !== UserRole.MANAGER) {
+    if (main_manager.role !== UserRole.MANAGER) {
       return await this.sportcenterRepository.deleteSportCenter(sportCenter);
     }
 
     await this.sportcenterRepository.deleteSportCenter(sportCenter);
 
     const remainigSportCenters: SportCenter[] =
-      await this.sportcenterRepository.countActiveAndDisable(manager);
+      await this.sportcenterRepository.countActiveAndDisable(main_manager);
 
     if (remainigSportCenters.length === 0) {
-      manager.role = UserRole.USER;
-      await this.userRepository.save(manager);
+      main_manager.role = UserRole.USER;
+      await this.userRepository.save(main_manager);
     }
   }
 
@@ -165,15 +165,15 @@ export class SportCenterService {
     if (found_sportcenter.status === 'published')
       throw new BadRequestException('El centro deportivo ya esta publicado');
 
-    if (found_sportcenter.manager.id !== user.id) {
+    if (found_sportcenter.main_manager.id !== user.id) {
       throw new UnauthorizedException(
         `You are not authorized to disable this SportCenter.`,
       );
     }
 
     if (
-      found_sportcenter.sport_category.length === 0 ||
-      found_sportcenter.field.length === 0
+      found_sportcenter.sport_categories.length === 0 ||
+      found_sportcenter.fields.length === 0
     )
       throw new BadRequestException('Faltan rellenar campos');
 
@@ -205,7 +205,7 @@ export class SportCenterService {
     if (found_sportcenter.status === 'disable')
       throw new BadRequestException('El centro deportivo ya fue desabilitado');
 
-    if (found_sportcenter.manager.id !== userId) {
+    if (found_sportcenter.main_manager.id !== userId) {
       throw new UnauthorizedException(
         `You are not authorized to disable this SportCenter.`,
       );

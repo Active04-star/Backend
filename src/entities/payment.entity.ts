@@ -1,8 +1,20 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToOne,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+} from 'typeorm';
 import { Reservation } from './reservation.entity';
 import { PaymentStatus } from 'src/enums/paymentStatus.enum';
 import { PaymentMethod } from 'src/enums/paymentMethod.enum';
 import Decimal from 'decimal.js';
+import { Field } from './field.entity';
+import { SportCenter } from './sportcenter.entity';
+import { User } from './user.entity';
+import { Payment_History } from './payment_hisotry.entity';
 
 @Entity()
 export class Payment {
@@ -19,7 +31,9 @@ export class Payment {
       from: (value: string) => new Decimal(value),
     },
   })
-  price: Decimal;
+  amount: Decimal;
+
+  
 
   @Column({
     type: 'enum',
@@ -35,6 +49,29 @@ export class Payment {
   })
   paymentMethod: PaymentMethod;
 
-  @OneToOne(() => Reservation, (reservation) => reservation.payment)
+  @OneToMany(()=>Payment_History,(history)=>history.payment)
+  history:Payment_History
+
+  // Relación con la cancha asociada al pago
+  @ManyToOne(() => Field, (field) => field.payments, { nullable: false })
+  field: Field;
+
+  // Relación con el centro deportivo asociado al pago
+  @ManyToOne(() => SportCenter, (sportCenter) => sportCenter.payments, {
+    nullable: false,
+  })
+  sportCenter: SportCenter;
+
+  @ManyToOne(() => User, (user) => user.payments, {
+    nullable: false,
+  })
+  user: User;
+
+  // Relación con la reserva asociada al pago
+  @OneToOne(() => Reservation, (reservation) => reservation.payment, {
+    nullable: true,
+    cascade: true,
+  })
+  @JoinColumn()
   reservation: Reservation;
 }

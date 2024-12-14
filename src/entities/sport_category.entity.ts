@@ -1,6 +1,7 @@
 import {
   Column,
   Entity,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -22,8 +23,6 @@ export class Sport_Category {
   @OneToMany(() => Field, (field) => field.sportCategory, { nullable: true })
   field: Field[];
 
-  @ManyToOne(() => SportCenter, (sportcenter) => sportcenter.sport_category, {
-    nullable: false,
-  })
-  sportcenter: SportCenter;
+  @ManyToMany(() => SportCenter, (sportcenter) => sportcenter.sport_categories)
+  sportcenters: SportCenter;
 }

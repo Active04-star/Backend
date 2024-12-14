@@ -3,6 +3,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -10,6 +11,8 @@ import { User } from './user.entity';
 import { ReservationStatus } from 'src/enums/reservationStatus.enum';
 import { Field } from './field.entity';
 import { Payment } from './payment.entity';
+import { Review } from './review.entity';
+import { Payment_History } from './payment_hisotry.entity';
 
 @Entity({
   name: 'reservations',
@@ -33,10 +36,19 @@ export class Reservation {
   @JoinColumn()
   payment: Payment;
 
+  @OneToOne(() => Review, (review) => review.reservation, { cascade: true })
+  @JoinColumn()
+  review: Review;
+
+  @OneToMany(
+    () => Payment_History,
+    (paymentHistory) => paymentHistory.reservation,
+  )
+  paymentsHistory: Payment_History[];
+
   @ManyToOne(() => User, (user) => user.reservations, { nullable: false })
   user: User;
 
-   @ManyToOne(() => Field, (field) => field.reservation, { nullable: false })
-    field: Field;
-  
+  @ManyToOne(() => Field, (field) => field.reservation, { nullable: false })
+  field: Field;
 }

@@ -21,7 +21,7 @@ export class SportCenterRepository {
  async countActiveAndDisable(manager:User){
   const remainingActiveCenters = await this.sportCenterRepository.find({
     where: {
-      manager: { id: manager.id },
+      main_manager: { id: manager.id },
       status: In([SportCenterStatus.PUBLISHED, SportCenterStatus.DISABLE]),
     },
   });
@@ -72,7 +72,7 @@ export class SportCenterRepository {
       await this.sportCenterRepository.save(
         this.sportCenterRepository.create({
           ...sportCenterData,
-          manager: future_manager,
+          main_manager: future_manager,
         }),
       );
     return saved_sportcenter === null ? undefined : saved_sportcenter;

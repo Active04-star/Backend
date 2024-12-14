@@ -10,7 +10,7 @@ export class CreateSportCategoryDto{
     @IsString()
     logo?: string; 
   
-    @IsNotEmpty()
-    @IsUUID()
-    sportCenterId: string; 
+ 
+
+
 }
