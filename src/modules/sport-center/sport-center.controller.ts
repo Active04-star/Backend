@@ -140,7 +140,7 @@ export class SportCenterController {
     );
   }
 
-  @Put('active/:sportCenterId/:userId')
+  @Put('publish/:sportCenterId/:userId')
   //   @Roles(UserRole.MANAGER)
   //   @UseGuards(AuthGuard)
   @ApiBearerAuth()
