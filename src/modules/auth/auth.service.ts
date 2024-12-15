@@ -43,16 +43,17 @@ export class AuthService {
       password: hashed_password,
     });
 
-    // await this.mailService.sendMail({
-    //   from: 'ActiveProject <activeproject04@gmail.com>', 
-    //   to: email, 
-    //   subject: 'Welcome to our app',
-    //   template: 'welcome',
-    //   context: {
-    //     name:rest_user.name, // Aquí pasamos el userData al template
-    //   }
+    await this.mailService.sendMail({
+      from: 'ActiveProject <activeproject04@gmail.com>', 
+      to: email, 
+      subject: 'Welcome to our app',
+      template: 'registration',
+      context: {
+        name:rest_user.name, 
+        contactEmail: 'activeproject04@gmail.com', 
+      }
       
-    // })
+    })
 
     return user;
   }

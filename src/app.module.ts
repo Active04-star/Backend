@@ -51,12 +51,7 @@ import { ReviewModule } from './modules/review/review.module';
           from: '"nest-modules" <modules@nestjs.com>',
         },
         template: {
-         // Para desarrollo
-          dir: join(__dirname, '..', 'src/templates'),
-
-          // Para producción
-          // dir: process.env.NODEMAILER_TEMPLATE_PATH,
-          adapter: new PugAdapter(),
+          dir: join(__dirname, 'templates'),          adapter: new PugAdapter(),
           options: {
             strict: true,
           },
