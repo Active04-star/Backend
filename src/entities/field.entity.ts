@@ -61,12 +61,12 @@ export class Field {
 
 
   @ManyToOne(() => Sport_Category, (sportCategory) => sportCategory.field, {
-    onDelete: 'CASCADE'
+    onDelete: 'CASCADE',nullable:true
   })
   sportCategory: Sport_Category;
 
   @ManyToOne(() => SportCenter, (sportcenter) => sportcenter.fields, {
-    onDelete: 'CASCADE',
+    onDelete: 'CASCADE',nullable:false
   })
   sportcenter: SportCenter;
 }
