@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateSportCenterDto } from 'src/dtos/sportcenter/createSportCenter.dto';
 import { UpdateSportCenterDto } from 'src/dtos/sportcenter/updateSportCenter.dto';
+import { Sport_Category } from 'src/entities/sport_category.entity';
 import { SportCenter } from 'src/entities/sportcenter.entity';
 import { User } from 'src/entities/user.entity';
 import { SportCenterStatus } from 'src/enums/sportCenterStatus.enum';
@@ -9,14 +10,23 @@ import { In, Repository } from 'typeorm';
 
 @Injectable()
 export class SportCenterRepository {
+  
   constructor(
     @InjectRepository(SportCenter)
     private sportCenterRepository: Repository<SportCenter>,
   ) {}
 
-  async deleteSportCenter(sportCenter: SportCenter): Promise<void> {
-    await this.sportCenterRepository.remove(sportCenter);
+  async assignCategoriesToSportCenter(sportCategories:Sport_Category[], sportCenter: SportCenter):Promise<SportCenter|undefined> {
+    sportCenter.sport_categories = [
+      ...new Set([...sportCenter.sport_categories, ...sportCategories]),
+    ];
+
+    const saved_sportcenter:SportCenter=await this.sportCenterRepository.save(sportCenter)
+
+    return saved_sportcenter === null ? undefined : saved_sportcenter;
+
   }
+
 
  async countActiveAndDisable(manager:User){
   const remainingActiveCenters = await this.sportCenterRepository.find({
@@ -113,5 +123,13 @@ export class SportCenterRepository {
   ): Promise<SportCenter> {
     found_sportcenter.status = SportCenterStatus.DISABLE;
     return await this.sportCenterRepository.save(found_sportcenter);
+  }
+
+
+
+  async deleteSportCenter(sportCenter: SportCenter): Promise<void> {
+    await this.sportCenterRepository.remove(sportCenter);
+
+
   }
 }
