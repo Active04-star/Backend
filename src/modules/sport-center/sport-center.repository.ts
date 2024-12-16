@@ -40,28 +40,30 @@ export class SportCenterRepository {
 
 
 
-  async getSportCenters(page: number, limit: number,rating?:number,keyword?:string): Promise<SportCenter[]> {
-    const queryBuilder = this.sportCenterRepository
+ async getSportCenters(
+  page: number,
+  limit: number,
+  rating?: number,
+  keyword?: string,
+): Promise<SportCenter[]> {
+  const queryBuilder = this.sportCenterRepository
     .createQueryBuilder('sportcenter')
-    .leftJoinAndSelect('sportcenter.averageRating', 'averageRating')
     .where('sportcenter.status = :status', {
       status: SportCenterStatus.PUBLISHED,
     })
-    .addSelect('AVG(averageRating)', 'ratingProm') // Calcula el promedio de ratings
-    .groupBy('sportcenter.id') // Agrupa por cada SportCenter
-    .orderBy('ratingProm', 'DESC', 'NULLS LAST'); // Ordena por promedio de rating (NULLS al final)
+    .orderBy('sportcenter.averageRating', 'DESC', 'NULLS LAST'); // Ordena por averageRating directamente
 
   // Filtro por keyword (nombre o dirección)
   if (keyword) {
     queryBuilder.andWhere(
       '(sportcenter.name LIKE :keyword OR sportcenter.address LIKE :keyword)',
-      { keyword: `%${keyword}%` }
+      { keyword: `%${keyword}%` },
     );
   }
 
   // Filtro por rating (si se proporciona)
   if (rating !== undefined) {
-    queryBuilder.andHaving('ratingProm >= :rating', { rating });
+    queryBuilder.andWhere('sportcenter.averageRating >= :rating', { rating });
   }
 
   // Aplica paginación si se proporcionan page y limit
@@ -70,9 +72,9 @@ export class SportCenterRepository {
   }
 
   // Ejecuta el query y devuelve los resultados
-  const results = await queryBuilder.getRawAndEntities();
-  return results.entities;
-  }
+  return queryBuilder.getMany();
+}
+
 
   async createSportCenter(
     future_manager: User,
