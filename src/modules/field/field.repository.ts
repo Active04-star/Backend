@@ -14,7 +14,7 @@ export class Field_Repository{
         private fieldRepository:Repository<Field>){}
 
 
-        async createSportCenter(sportCenter: SportCenter,
+        async createField(sportCenter: SportCenter,
              fieldData: FieldDto): Promise<Field|undefined> {
             const saved_field:Field=await this.fieldRepository.save(this.fieldRepository.create({
                 ...fieldData,

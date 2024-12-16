@@ -24,7 +24,7 @@ export class Field_Service {
 
 
     const created_field: Field | undefined =
-      await this.fieldRepository.createSportCenter(
+      await this.fieldRepository.createField(
         sportCenter,
         fieldData,
       );
