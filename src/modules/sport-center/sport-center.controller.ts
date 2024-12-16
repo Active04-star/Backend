@@ -88,6 +88,36 @@ export class SportCenterController {
     return await this.sportcenterService.findOne(id);
   }
 
+
+  @Post('assign-categories/:id')
+  @ApiOperation({
+    summary: 'Asigna categorías a un centro deportivo',
+    description: 'Permite asignar categorías específicas a un centro deportivo.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID del SportCenter',
+    example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
+  })
+  @ApiBody({
+    description: 'Lista de categorías a asignar',
+    type: [String],
+    examples: {
+      example1: {
+        value: ['Fútbol', 'Basketball', 'Natación'],
+      },
+    },
+  })
+  async assignCategoriesToSportCenter(
+    @Param('id') sportCenterId: string, // SportCenter ID
+    @Body('categories') categories: string[], // Array de nombres de categorías
+  ) {
+    return await this.sportcenterService.assignCategoriesToSportCenter(categories,sportCenterId)
+  }
+
+
+
+
   @Put('update/:id')
   //   @Roles(UserRole.CONSUMER,UserRole.MANAGER)
   //   @UseGuards(AuthGuard)

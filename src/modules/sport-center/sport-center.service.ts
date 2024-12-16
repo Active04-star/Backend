@@ -1,14 +1,15 @@
 import {
   BadRequestException,
+  forwardRef,
   HttpException,
   HttpStatus,
+  Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { SportCenterRepository } from './sport-center.repository';
 import { CreateSportCenterDto } from 'src/dtos/sportcenter/createSportCenter.dto';
-import { UserService } from '../user/user.service';
 import { User } from 'src/entities/user.entity';
 import { SportCenter } from 'src/entities/sportcenter.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -16,6 +17,8 @@ import { Repository } from 'typeorm';
 import { UpdateSportCenterDto } from 'src/dtos/sportcenter/updateSportCenter.dto';
 import { UserRole } from 'src/enums/roles.enum';
 import { Image } from 'src/entities/image.entity';
+import { Sport_Category } from 'src/entities/sport_category.entity';
+import { Sport_Category_Service } from '../sport-category/sport-category.service';
 
 @Injectable()
 export class SportCenterService {
@@ -25,6 +28,8 @@ export class SportCenterService {
     private imageRepository: Repository<Image>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @Inject(forwardRef(() => Sport_Category_Service))
+    private sportCategoryService: Sport_Category_Service,
   ) {}
 
   async getSportCenters(
@@ -214,5 +219,22 @@ export class SportCenterService {
     return await this.sportcenterRepository.disableSportCenter(
       found_sportcenter,
     );
+  }
+
+  async assignCategoriesToSportCenter(
+    categories: string[],
+    sportCenterId: string,
+  ) {
+    const sportCenter: SportCenter = await this.findOne(sportCenterId);
+    const sportCategories: Sport_Category[] =
+      await this.sportCategoryService.searchCategories(categories);
+    const updatedSportcenter:SportCenter|undefined=await this.sportcenterRepository.assignCategoriesToSportCenter(sportCategories,sportCenter)
+    if (updatedSportcenter === undefined) {
+      throw new HttpException(
+        'problema de servidor',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+    return updatedSportcenter
   }
 }

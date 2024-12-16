@@ -13,7 +13,7 @@ export class Sport_Category {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({unique:true})
   name: string;
 
   @Column({ type: 'varchar', nullable: true })
@@ -23,5 +23,5 @@ export class Sport_Category {
   field: Field[];
 
   @ManyToMany(() => SportCenter, (sportcenter) => sportcenter.sport_categories)
-  sportcenters: SportCenter;
+  sportcenters: SportCenter[];
 }

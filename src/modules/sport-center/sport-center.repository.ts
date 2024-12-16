@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateSportCenterDto } from 'src/dtos/sportcenter/createSportCenter.dto';
 import { UpdateSportCenterDto } from 'src/dtos/sportcenter/updateSportCenter.dto';
+import { Sport_Category } from 'src/entities/sport_category.entity';
 import { SportCenter } from 'src/entities/sportcenter.entity';
 import { User } from 'src/entities/user.entity';
 import { SportCenterStatus } from 'src/enums/sportCenterStatus.enum';
@@ -9,14 +10,23 @@ import { In, Repository } from 'typeorm';
 
 @Injectable()
 export class SportCenterRepository {
+  
   constructor(
     @InjectRepository(SportCenter)
     private sportCenterRepository: Repository<SportCenter>,
   ) {}
 
-  async deleteSportCenter(sportCenter: SportCenter): Promise<void> {
-    await this.sportCenterRepository.remove(sportCenter);
+  async assignCategoriesToSportCenter(sportCategories:Sport_Category[], sportCenter: SportCenter):Promise<SportCenter|undefined> {
+    sportCenter.sport_categories = [
+      ...new Set([...sportCenter.sport_categories, ...sportCategories]),
+    ];
+
+    const saved_sportcenter:SportCenter=await this.sportCenterRepository.save(sportCenter)
+
+    return saved_sportcenter === null ? undefined : saved_sportcenter;
+
   }
+
 
  async countActiveAndDisable(manager:User){
   const remainingActiveCenters = await this.sportCenterRepository.find({
@@ -30,28 +40,30 @@ export class SportCenterRepository {
 
 
 
-  async getSportCenters(page: number, limit: number,rating?:number,keyword?:string): Promise<SportCenter[]> {
-    const queryBuilder = this.sportCenterRepository
+ async getSportCenters(
+  page: number,
+  limit: number,
+  rating?: number,
+  keyword?: string,
+): Promise<SportCenter[]> {
+  const queryBuilder = this.sportCenterRepository
     .createQueryBuilder('sportcenter')
-    .leftJoinAndSelect('sportcenter.averageRating', 'averageRating')
     .where('sportcenter.status = :status', {
       status: SportCenterStatus.PUBLISHED,
     })
-    .addSelect('AVG(averageRating)', 'ratingProm') // Calcula el promedio de ratings
-    .groupBy('sportcenter.id') // Agrupa por cada SportCenter
-    .orderBy('ratingProm', 'DESC', 'NULLS LAST'); // Ordena por promedio de rating (NULLS al final)
+    .orderBy('sportcenter.averageRating', 'DESC', 'NULLS LAST'); // Ordena por averageRating directamente
 
   // Filtro por keyword (nombre o dirección)
   if (keyword) {
     queryBuilder.andWhere(
       '(sportcenter.name LIKE :keyword OR sportcenter.address LIKE :keyword)',
-      { keyword: `%${keyword}%` }
+      { keyword: `%${keyword}%` },
     );
   }
 
   // Filtro por rating (si se proporciona)
   if (rating !== undefined) {
-    queryBuilder.andHaving('ratingProm >= :rating', { rating });
+    queryBuilder.andWhere('sportcenter.averageRating >= :rating', { rating });
   }
 
   // Aplica paginación si se proporcionan page y limit
@@ -60,9 +72,9 @@ export class SportCenterRepository {
   }
 
   // Ejecuta el query y devuelve los resultados
-  const results = await queryBuilder.getRawAndEntities();
-  return results.entities;
-  }
+  return queryBuilder.getMany();
+}
+
 
   async createSportCenter(
     future_manager: User,
@@ -113,5 +125,13 @@ export class SportCenterRepository {
   ): Promise<SportCenter> {
     found_sportcenter.status = SportCenterStatus.DISABLE;
     return await this.sportCenterRepository.save(found_sportcenter);
+  }
+
+
+
+  async deleteSportCenter(sportCenter: SportCenter): Promise<void> {
+    await this.sportCenterRepository.remove(sportCenter);
+
+
   }
 }
