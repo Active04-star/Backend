@@ -71,7 +71,14 @@ export class Sport_Category_Service {
     return categories;
   }
 
-  async deleteSportCategorie(id:string){
+  async deleteSportCategory(id:string){
+    const found_sport: Sport_Category = await this.findById(id);
+    const was_deleted: Sport_Category = await this.sportCategoryRepository.deleteSportCategory(found_sport);
 
+    if (!was_deleted) {
+      throw { error: "Something went wrong" };
+    }
+
+    return { message: `Deporte eliminado correctamente` };
   }
 }

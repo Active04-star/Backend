@@ -1,9 +1,19 @@
-import { Body, Controller, Param, ParseUUIDPipe, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  Query,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiBody,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { Sport_Category_Service } from './sport-category.service';
@@ -43,5 +53,50 @@ export class Sport_Category_Controller {
       sportCenterId,
       data,
     );
+  }
+
+  @Get()
+  @ApiOperation({
+    summary: 'Obtiene lista de deportes ordenados alfabeticamente',
+  })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    type: String,
+    description: 'Palabra de busqueda',
+  })
+  async filterSportCategories(@Query('search') search?: string) {
+    return await this.sport_category_service.filterSportCategories(search);
+  }
+
+  @Get(':id')
+  @ApiOperation({
+    summary: 'Obtiene un deporte por su ID',
+    description: 'Proporciona toda la información de un Deporte.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID del Sport_Category que se desea obtener',
+    example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
+  })
+  async findById(@Param('id', ParseUUIDPipe) id: string) {
+    return await this.sport_category_service.findById(id);
+  }
+
+  @Delete(':id')
+  // @ApiBearerAuth()
+  // @Roles(UserRole.MANAGER, UserRole.CONSUMER)
+  // @UseGuards(AuthGuard)
+  @ApiOperation({
+    summary: 'Elimina un deporte',
+    description: 'recibe el id del deporte por parametro y lo remueve',
+})
+@ApiParam({
+  name: 'id',
+  description: 'ID del Sport_Category que se desea eliminar',
+  example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
+})
+  async deleteSportCategory(@Param('id', ParseUUIDPipe) id: string) {
+    return await this.sport_category_service.deleteSportCategory(id);
   }
 }
