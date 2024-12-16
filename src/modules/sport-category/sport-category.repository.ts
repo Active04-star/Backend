@@ -17,6 +17,7 @@ export class Sport_Category_Repository {
     sportCenter: SportCenter,
     data: CreateSportCategoryDto,
   ): Promise<Sport_Category | undefined> {
+
     const saved_category: Sport_Category =
       this.sportCategoryRepository.create(data);
 
