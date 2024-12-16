@@ -6,26 +6,25 @@ import { ApiStatusEnum } from "src/enums/HttpStatus.enum";
 import { isNotEmpty, isNotEmptyObject } from "class-validator";
 import { UpdateUser } from "src/dtos/user/update-user.dto";
 import { ApiError } from "src/helpers/api-error-class";
+import { UserList } from "src/dtos/user/users-list.dto";
 
 @ApiTags("User")
 @Controller("user")
 export class UserController {
     constructor(private readonly userService: UserService) { }
 
-    @Get('all')
-    // @ApiBearerAuth()
-    // @Roles(UserRole.ADMIN)
+
+    @Get('list')
     @ApiOperation({
         summary: 'Obtiene una lista de usuarios',
-        // description: 'debe ser ejecutado por un usuario con rol admin',
+        description: 'debe ser ejecutado por un usuario con rol admin',
     })
-    async getUsers(@Query('page') page: number = 1, @Query('limit') limit: number = 100): Promise<UserClean[]> {
+    async getUsers(@Query('page') page: number = 1, @Query('limit') limit: number = 10): Promise<UserList> {
         return await this.userService.getUsers(page, limit);
     }
 
+
     @Put('ban-unban/:id')
-    // @ApiBearerAuth()
-    // @Roles(UserRole.ADMIN)
     @ApiOperation({
         summary: 'Banea o desbanea con un softdelete',
         description:
@@ -35,18 +34,14 @@ export class UserController {
         return this.userService.banOrUnbanUser(id);
     }
 
+
     @Put(':id')
-    // @ApiBearerAuth()
     @ApiOperation({
         summary: 'actualiza la informacion de un usuario, por id y body',
-        description: 'uuid de user y objeto a actualizar (por ahora solo funciona con nombre)',
+        description: 'uuid de user y objeto a actualizar (por ahora solo con nombre)',
     })
     @ApiBody({
-        schema: {
-            example: {
-                name: 'Al paccino',
-            },
-        },
+        type: UpdateUser,
     })
     async updateUser(@Param('id', ParseUUIDPipe) id: string, @Body() modified_user: UpdateUser): Promise<UserClean> {
 

@@ -5,63 +5,73 @@ import { User } from 'src/entities/user.entity';
 import { isNotEmpty } from 'class-validator';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { BadRequestException, ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { UserClean } from 'src/dtos/user/user-clean.dto';
 import { ApiStatusEnum } from 'src/enums/HttpStatus.enum';
 import { LoginResponse } from 'src/dtos/user/login-response.dto';
 import { ApiError } from 'src/helpers/api-error-class';
 import { MailerService } from '@nestjs-modules/mailer';
 import { AuthRegister } from 'src/dtos/user/auth-register.dto';
+import { ApiResponse } from 'src/dtos/common-response.dto';
 
 @Injectable()
 export class AuthService {
 
   constructor(private readonly userService: UserService, private readonly jwtService: JwtService, private readonly mailService: MailerService) { }
 
-  async userRegistration(userObject: LocalRegister): Promise<UserClean> {
-    const { email, password, confirm_password, ...rest_user } = userObject;
+  async userRegistration(userObject: LocalRegister): Promise<ApiResponse> {
+    try {
 
-    if (password !== confirm_password) {
-      throw new ApiError(ApiStatusEnum.PASSWORDS_DONT_MATCH, BadRequestException);
-    }
+      const { email, password, confirm_password, ...rest_user } = userObject;
 
-    const is_existent: User | undefined = await this.userService.getUserByMail(email);
-
-    if (isNotEmpty(is_existent)) {
-      throw new ApiError(ApiStatusEnum.MAIL_IN_USE, ConflictException);
-    }
-
-    const hashed_password = await bcrypt.hash(password, 10);
-
-    if (!hashed_password) {
-      throw new ApiError(ApiStatusEnum.HASHING_FAILED, BadRequestException);
-    }
-
-    const user: UserClean = await this.userService.createUser({
-      ...rest_user,
-      email,
-      password: hashed_password,
-    });
-
-    await this.mailService.sendMail({
-      from: 'ActiveProject <activeproject04@gmail.com>', 
-      to: email, 
-      subject: 'Welcome to our app',
-      template: 'registration',
-      context: {
-        name:rest_user.name, 
-        contactEmail: 'activeproject04@gmail.com', 
+      if (password !== confirm_password) {
+        throw new ApiError(ApiStatusEnum.PASSWORDS_DONT_MATCH, BadRequestException);
       }
-      
-    })
 
-    return user;
+      const is_existent: User | undefined = await this.userService.getUserByMail(email);
+
+      if (isNotEmpty(is_existent)) {
+        throw new ApiError(ApiStatusEnum.MAIL_IN_USE, ConflictException);
+      }
+
+      const hashed_password = await bcrypt.hash(password, 10);
+
+      if (!hashed_password) {
+        throw new ApiError(ApiStatusEnum.HASHING_FAILED, BadRequestException);
+      }
+
+      await this.userService.createUser({
+        ...rest_user,
+        email,
+        password: hashed_password,
+      });
+
+      await this.mailService.sendMail({
+        from: 'ActiveProject <activeproject04@gmail.com>',
+        to: email,
+        subject: 'Welcome to our app',
+        template: 'registration',
+        context: {
+          name: rest_user.name,
+          contactEmail: 'activeproject04@gmail.com',
+        }
+
+      })
+
+      return { message: ApiStatusEnum.REGISTRATION_SUCCESS };
+
+    } catch (error) {
+      throw new ApiError(error?.message, InternalServerErrorException, error)
+    }
+
   }
+
 
   async authZeroRegistration(userObject: AuthRegister): Promise<UserClean> {
     return new UserClean;
   }
 
+  
   async userLogin(userCredentials: UserLogin): Promise<LoginResponse> {
     const { email, password } = userCredentials;
 

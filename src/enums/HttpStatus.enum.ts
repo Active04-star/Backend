@@ -16,7 +16,8 @@ export enum ApiStatusEnum {
     USER_NOT_FOUND = "Usuario no encontrado",
     USER_UPDATE_FAILED = "Error al actualizar el usuario",
     USER_LIST_EMPTY = "La lista de usuarios está vacia",
-    USER_UNBAN_OR_BAN= "No se pudo actualizar el estado baneado de este usuario",
+    USER_UNBAN_OR_BAN = "No se pudo actualizar el estado baneado de este usuario",
+    USER_RANKUP_FAILED = "No se pudo actualizar el rango de este usuario",
 
     RANKING_UP_FAIL = "Error al mejorar el rango del usuario",
     RANKING_UP_SUCCESS = "El rol de este usuario ha cambiado",
@@ -40,5 +41,13 @@ export enum ApiStatusEnum {
     REVIEWS_NOT_IN_CENTER = "No hay reseñas para este complejo!",
 
     RESERVATION_NOT_FOUND = "No se encontró ninguna reseña",
+
+    RATING_OUT_OF_BOUNDS = "Rating fuera de limites",
+    CENTER_LIST_EMTPY = "No se encontraron centros deportivos",
+    CENTER_CREATION_FAILED = "Creacion de  centro deportivo fallida",
+    CENTER_NOT_FOUND = "No se pudo encontra este centro deportivo",
+
+    IMAGE_CREATION_FAILED = "No se pudo crear una nueva imagen",
+    IMAGE_INSERTION_FAIL = "No se pudo insertar",
 
 }

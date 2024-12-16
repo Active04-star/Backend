@@ -17,7 +17,7 @@ export class ReviewController {
   constructor(private readonly reviewService: ReviewService) { }
 
   @Get()
-  @ApiOperation({ summary: '(Solo para admins, o muestra de estadisticas), Obtiene ' })
+  @ApiOperation({ summary: '(Solo para admins, o muestra de estadisticas), Obtiene el total de reviews en la base de datos' })
   async getApiReviews(): Promise<number> {
     return this.reviewService.getApiReviews();
   }
