@@ -1,4 +1,12 @@
-import { IsNotEmpty, Min, Max, IsInt, IsUUID, IsEnum } from 'class-validator';
+import {
+  IsNotEmpty,
+  Min,
+  Max,
+  IsInt,
+  IsUUID,
+  IsOptional,
+  IsDecimal,
+} from 'class-validator';
 
 export class FieldDto {
   @IsInt()
@@ -8,8 +16,12 @@ export class FieldDto {
   number: number;
 
   @IsNotEmpty()
+  @IsDecimal()
+  price: string;
+
   @IsUUID()
-  sportCategoryId: string;
+  @IsOptional()
+  sportCategoryId?: string;
 
   @IsNotEmpty()
   @IsUUID()
