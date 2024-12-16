@@ -7,7 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { BadRequestException, ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserClean } from 'src/dtos/user/user-clean.dto';
-import { StatusEnum } from 'src/enums/HttpStatus.enum';
+import { ApiStatusEnum } from 'src/enums/HttpStatus.enum';
 import { LoginResponse } from 'src/dtos/user/login-response.dto';
 import { ApiError } from 'src/helpers/api-error-class';
 import { MailerService } from '@nestjs-modules/mailer';
@@ -22,19 +22,19 @@ export class AuthService {
     const { email, password, confirm_password, ...rest_user } = userObject;
 
     if (password !== confirm_password) {
-      throw new ApiError(StatusEnum.PASSWORDS_DONT_MATCH, BadRequestException);
+      throw new ApiError(ApiStatusEnum.PASSWORDS_DONT_MATCH, BadRequestException);
     }
 
     const is_existent: User | undefined = await this.userService.getUserByMail(email);
 
     if (isNotEmpty(is_existent)) {
-      throw new ApiError(StatusEnum.MAIL_IN_USE, ConflictException);
+      throw new ApiError(ApiStatusEnum.MAIL_IN_USE, ConflictException);
     }
 
     const hashed_password = await bcrypt.hash(password, 10);
 
     if (!hashed_password) {
-      throw new ApiError(StatusEnum.HASHING_FAILED, BadRequestException);
+      throw new ApiError(ApiStatusEnum.HASHING_FAILED, BadRequestException);
     }
 
     const user: UserClean = await this.userService.createUser({
@@ -59,7 +59,7 @@ export class AuthService {
   }
 
   async authZeroRegistration(userObject: AuthRegister): Promise<UserClean> {
-    return new UserClean
+    return new UserClean;
   }
 
   async userLogin(userCredentials: UserLogin): Promise<LoginResponse> {
@@ -68,7 +68,7 @@ export class AuthService {
     const user: User | undefined = await this.userService.getUserByMail(email);
 
     if (isNotEmpty(user) && user.was_banned) {
-      throw new ApiError(StatusEnum.USER_DELETED, UnauthorizedException);
+      throw new ApiError(ApiStatusEnum.USER_DELETED, UnauthorizedException);
     }
 
     if (isNotEmpty(user)) {
@@ -82,7 +82,7 @@ export class AuthService {
         });
 
         return {
-          message: StatusEnum.LOGIN_SUCCESS,
+          message: ApiStatusEnum.LOGIN_SUCCESS,
           token,
           user: {
             id: user.id,
@@ -98,6 +98,6 @@ export class AuthService {
 
     }
 
-    throw new ApiError(StatusEnum.INVALID_CREDENTIALS, UnauthorizedException);
+    throw new ApiError(ApiStatusEnum.INVALID_CREDENTIALS, UnauthorizedException);
   }
 }

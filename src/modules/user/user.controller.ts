@@ -2,7 +2,7 @@ import { BadRequestException, Body, Controller, Get, Param, ParseUUIDPipe, Put, 
 import { UserService } from "./user.service";
 import { ApiBody, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { UserClean } from "src/dtos/user/user-clean.dto";
-import { StatusEnum } from "src/enums/HttpStatus.enum";
+import { ApiStatusEnum } from "src/enums/HttpStatus.enum";
 import { isNotEmpty, isNotEmptyObject } from "class-validator";
 import { UpdateUser } from "src/dtos/user/update-user.dto";
 import { ApiError } from "src/helpers/api-error-class";
@@ -31,7 +31,7 @@ export class UserController {
         description:
             'recibe el id de un usuario por parametro y actualiza el estado was_banned del usuario',
     })
-    async banOrUnbanUser(@Param('id', ParseUUIDPipe) id: string): Promise<{ message: StatusEnum }> {
+    async banOrUnbanUser(@Param('id', ParseUUIDPipe) id: string): Promise<{ message: ApiStatusEnum }> {
         return this.userService.banOrUnbanUser(id);
     }
 
@@ -51,11 +51,11 @@ export class UserController {
     async updateUser(@Param('id', ParseUUIDPipe) id: string, @Body() modified_user: UpdateUser): Promise<UserClean> {
 
         if (!isNotEmptyObject(modified_user)) {
-            throw new ApiError(StatusEnum.USER_UPDATE_FAILED, BadRequestException, "body values are empty");
+            throw new ApiError(ApiStatusEnum.USER_UPDATE_FAILED, BadRequestException, "body values are empty");
         }
 
         if (isNotEmpty(modified_user.password)) {
-            throw new ApiError(StatusEnum.USER_UPDATE_FAILED, BadRequestException, "Password can't be updated from this endpoint");
+            throw new ApiError(ApiStatusEnum.USER_UPDATE_FAILED, BadRequestException, "Password can't be updated from this endpoint");
         }
 
         return await this.userService.updateUser(id, modified_user);

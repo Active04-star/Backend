@@ -1,5 +1,5 @@
 import { HttpException } from "@nestjs/common";
-import { StatusEnum } from "src/enums/HttpStatus.enum";
+import { ApiStatusEnum } from "src/enums/HttpStatus.enum";
 
 export class ApiError {
 
@@ -13,7 +13,7 @@ export class ApiError {
      * @param exception excepcion de tipo `HttpException`
      * @param info Error desconocido atrapado en catch() o mensaje customizado
      */
-    constructor(message: StatusEnum | null, exception: new (...args: any[]) => HttpException = HttpException, info?: any) {
+    constructor(message: ApiStatusEnum | null, exception: new (...args: any[]) => HttpException = HttpException, info?: any) {
         this.exception = exception;
         this.message = message;
         this.info = info;

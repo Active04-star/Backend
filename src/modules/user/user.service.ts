@@ -4,7 +4,7 @@ import { UserRepository } from "./user.repository";
 import { User } from "src/entities/user.entity";
 import { UserClean } from "../../dtos/user/user-clean.dto";
 import { LocalRegister } from "src/dtos/user/local-register.dto";
-import { StatusEnum } from "src/enums/HttpStatus.enum";
+import { ApiStatusEnum } from "src/enums/HttpStatus.enum";
 import { isEmpty } from "class-validator";
 import { UpdateUser } from "src/dtos/user/update-user.dto";
 import { ApiError } from "src/helpers/api-error-class";
@@ -18,7 +18,7 @@ export class UserService {
         const found_user: User | undefined = await this.userRepository.getUserById(id);
 
         if (isEmpty(found_user)) {
-            throw new ApiError(StatusEnum.USER_NOT_FOUND, NotFoundException);
+            throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, NotFoundException);
         }
 
         const updated_user: User = await this.userRepository.updateUser(found_user, modified_user);
@@ -27,25 +27,25 @@ export class UserService {
         return filtered_user;
     }
 
-    async banOrUnbanUser(id: string): Promise<{ message: StatusEnum }> {
+    async banOrUnbanUser(id: string): Promise<{ message: ApiStatusEnum }> {
         const found_user: User | undefined = await this.userRepository.getUserById(id);
 
         if (isEmpty(found_user)) {
-            throw new ApiError(StatusEnum.USER_NOT_FOUND, NotFoundException);
+            throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, NotFoundException);
         }
 
         try {
             const [updated_user, status]: [User, string] = await this.userRepository.banOrUnbanUser(found_user);
 
             if (updated_user && status === "deleted") {
-                return { message: StatusEnum.USER_DELETED };
+                return { message: ApiStatusEnum.USER_DELETED };
 
             } else if (updated_user && status === "restored") {
-                return { message: StatusEnum.USER_RESTORED };
+                return { message: ApiStatusEnum.USER_RESTORED };
 
             }
 
-            throw new ApiError(StatusEnum.USER_UNBAN_OR_BAN, BadRequestException, "Something went wrong trying to modify this");
+            throw new ApiError(ApiStatusEnum.USER_UNBAN_OR_BAN, BadRequestException, "Something went wrong trying to modify this");
 
         } catch (error) {
             throw new ApiError(error?.message, BadRequestException, error);
@@ -57,7 +57,7 @@ export class UserService {
         const found_users: Omit<User, 'password'>[] = await this.userRepository.getUsers(page, limit);
 
         if (found_users.length === 0) {
-            throw new ApiError(StatusEnum.USER_LIST_EMPTY, NotFoundException);
+            throw new ApiError(ApiStatusEnum.USER_LIST_EMPTY, NotFoundException);
         }
         return found_users;
     }

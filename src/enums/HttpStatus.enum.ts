@@ -1,4 +1,4 @@
-export enum StatusEnum {
+export enum ApiStatusEnum {
 
     LOGIN_SUCCESS = "Logeado correctamente",
     LOGIN_FAIL = "Error al iniciar sesión",
@@ -33,4 +33,12 @@ export enum StatusEnum {
     MAIL_IN_USE = "Este correo ya esta registrado!",
 
     HASHING_FAILED = "Encriptado de contraseña fallido!",
+
+    REVIEW_CREATION_FAILED = "No se pudo crear una nueva reseña",
+    REVIEW_DELETION_FAILED = "No se pudo eliminar esta reseña",
+    REVIEW_DELETION_SUCCESS = "Reseña eliminada correctamente",
+    REVIEWS_NOT_IN_CENTER = "No hay reseñas para este complejo!",
+
+    RESERVATION_NOT_FOUND = "No se encontró ninguna reseña",
+
 }
