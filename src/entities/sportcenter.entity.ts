@@ -32,6 +32,9 @@ export class SportCenter {
   @Column({ type: 'decimal', precision: 2, scale: 1, nullable: true })
   averageRating: number;
 
+  @Column({ default: false })
+  isDeleted: boolean;
+
   @Column({
     type: 'enum',
     enum: SportCenterStatus,
@@ -42,7 +45,11 @@ export class SportCenter {
   @OneToMany(() => Review, (review) => review.sportcenter, { nullable: true })
   reviews: Review[];
 
-  @OneToMany(() => Image, (photos) => photos.sportcenter, { nullable: true, cascade: true, onDelete: "CASCADE" })
+  @OneToMany(() => Image, (photos) => photos.sportcenter, {
+    nullable: true,
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   photos: Image[];
 
   @OneToMany(() => Payment, (payment) => payment.field)
