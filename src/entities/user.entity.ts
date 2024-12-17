@@ -71,7 +71,7 @@ export class User {
   managed_centers: SportCenter[];
 
   @OneToMany(() => Reservation, (reservation) => reservation.user, {
-    nullable: true,
+    nullable: true,cascade:true
   })
   reservations: Reservation[];
 

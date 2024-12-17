@@ -1,14 +1,5 @@
-import { Type } from '@nestjs/class-transformer';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import {
-  ArrayMaxSize,
-  IsArray,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  IsUUID,
-  Length,
-} from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { ArrayMaxSize, IsNotEmpty, IsOptional, IsString, IsUUID, Length } from 'class-validator';
 
 export class CreateSportCenterDto {
   @ApiProperty({
@@ -30,20 +21,23 @@ export class CreateSportCenterDto {
 
   @ApiProperty({
     description: 'ID del usuario que va a crear el centro',
-    example: 'id-del-usuario',
+    example: 'uuid',
   })
   @IsUUID()
   @IsNotEmpty()
   manager: string;
 
-  @ApiPropertyOptional({
-    description: 'Array de fotos del centro deportivo',
-    type: [String],
-    example: ['photo1.jpg', 'photo2.jpg'],
+  @ApiProperty({
+    description: 'Imagenes (Debe ser un Array de Array buffer) (Nota: Swagger lo marca como obligatorio pero no lo es)',
+    type: 'array',
+    items: {
+      type: 'string',
+      format: 'binary',
+      maximum: 5,
+    },
   })
-  @IsArray()
   @ArrayMaxSize(5)
-  @IsString({ each: true })
   @IsOptional()
-  photos?: string[];
+  images: any[];
+
 }

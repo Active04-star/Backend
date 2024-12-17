@@ -3,8 +3,7 @@ import { Reflector } from "@nestjs/core";
 import { Observable } from "rxjs";
 import { UserRole } from "src/enums/roles.enum";
 
-
-Injectable()
+@Injectable()
 export class RolesGuard implements CanActivate {
     constructor(private readonly reflector:Reflector){}
     canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
