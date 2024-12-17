@@ -12,7 +12,7 @@ import { LoginResponse } from 'src/dtos/user/login-response.dto';
 import { ApiError } from 'src/helpers/api-error-class';
 import { MailerService } from '@nestjs-modules/mailer';
 import { AuthRegister } from 'src/dtos/user/auth-register.dto';
-import { ApiResponse } from 'src/dtos/common-response.dto';
+import { ApiResponse } from 'src/dtos/api-response';
 
 @Injectable()
 export class AuthService {

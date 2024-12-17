@@ -11,7 +11,7 @@ import { ReservationStatus } from 'src/enums/reservationStatus.enum';
 import { Reservation } from 'src/entities/reservation.entity';
 import { ApiError } from 'src/helpers/api-error-class';
 import { ApiStatusEnum } from 'src/enums/HttpStatus.enum';
-import { ApiResponse } from 'src/dtos/common-response.dto';
+import { ApiResponse } from 'src/dtos/api-response';
 
 @Injectable()
 export class ReviewService {

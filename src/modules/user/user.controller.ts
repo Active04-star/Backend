@@ -1,12 +1,13 @@
 import { BadRequestException, Body, Controller, Get, Param, ParseUUIDPipe, Put, Query } from "@nestjs/common";
 import { UserService } from "./user.service";
-import { ApiBody, ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { UserClean } from "src/dtos/user/user-clean.dto";
 import { ApiStatusEnum } from "src/enums/HttpStatus.enum";
 import { isNotEmpty, isNotEmptyObject } from "class-validator";
 import { UpdateUser } from "src/dtos/user/update-user.dto";
 import { ApiError } from "src/helpers/api-error-class";
 import { UserList } from "src/dtos/user/users-list.dto";
+import { User } from "src/entities/user.entity";
 
 @ApiTags("User")
 @Controller("user")
@@ -15,10 +16,9 @@ export class UserController {
 
 
     @Get('list')
-    @ApiOperation({
-        summary: 'Obtiene una lista de usuarios',
-        description: 'debe ser ejecutado por un usuario con rol admin',
-    })
+    @ApiQuery({ name: 'page', required: true, type: Number, example: 1, description: 'Numero de la pagina' })
+    @ApiQuery({ name: 'limit', required: true, type: Number, example: 10, description: 'Objetos por pagina' })
+    @ApiOperation({ summary: 'Obtiene una lista de usuarios', description: 'debe ser ejecutado por un usuario con rol admin' })
     async getUsers(@Query('page') page: number = 1, @Query('limit') limit: number = 10): Promise<UserList> {
         return await this.userService.getUsers(page, limit);
     }
@@ -54,6 +54,15 @@ export class UserController {
         }
 
         return await this.userService.updateUser(id, modified_user);
+    }
+
+    @Get("solo-para-testing/:id")
+    @ApiParam({
+        name: "id",
+        description: 'ID de usuario',
+    })
+    async getUserById(@Param("id", ParseUUIDPipe) id: string): Promise<User> {
+        return await this.getUserById(id);
     }
 
 }

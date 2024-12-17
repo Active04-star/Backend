@@ -28,7 +28,7 @@ export class CreateSportCenterDto {
   manager: string;
 
   @ApiProperty({
-    description: 'Imagenes a cargar (Debe ser un Array buffer)',
+    description: 'Imagenes (Debe ser un Array de Array buffer) (Nota: Swagger lo marca como obligatorio pero no lo es)',
     type: 'array',
     items: {
       type: 'string',

@@ -8,7 +8,7 @@ import { ApiStatusEnum } from "src/enums/HttpStatus.enum";
 import { isEmpty } from "class-validator";
 import { UpdateUser } from "src/dtos/user/update-user.dto";
 import { ApiError } from "src/helpers/api-error-class";
-import { ApiResponse } from "src/dtos/common-response.dto";
+import { ApiResponse } from "src/dtos/api-response";
 import { UserRole } from "src/enums/roles.enum";
 import { UserList } from "src/dtos/user/users-list.dto";
 

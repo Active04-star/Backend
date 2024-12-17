@@ -4,7 +4,7 @@ import { reviewCreate } from 'src/dtos/review/review-create.dto';
 import { reviewUpdate } from 'src/dtos/review/review-update.dto';
 import { Review } from 'src/entities/review.entity';
 import { ReviewService } from './review.service';
-import { ApiResponse } from 'src/dtos/common-response.dto';
+import { ApiResponse } from 'src/dtos/api-response';
 
 // endpoint para ordenar reseñas por puntuacion
 // endpoint para contar la cantidad de reseñas

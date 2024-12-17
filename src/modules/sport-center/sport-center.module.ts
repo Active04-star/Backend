@@ -5,18 +5,14 @@ import { SportCenterController } from './sport-center.controller';
 import { SportCenterService } from './sport-center.service';
 import { SportCenterRepository } from './sport-center.repository';
 import { UserModule } from '../user/user.module';
-import { User } from 'src/entities/user.entity';
-import { Image } from 'src/entities/image.entity';
 import { Sport_Cateogry_Module } from '../sport-category/sport-category.module';
+import { ImagesModule } from '../images/images.module';
+import { UploadModule } from 'src/uploads/upload.module';
 
 @Module({
-  imports: [
-    forwardRef(() => Sport_Cateogry_Module),
-    UserModule,
-    TypeOrmModule.forFeature([SportCenter, Image, User]),
-  ],
+  imports: [ImagesModule, UploadModule, UserModule, forwardRef(() => Sport_Cateogry_Module), TypeOrmModule.forFeature([SportCenter])],
   controllers: [SportCenterController],
   providers: [SportCenterService, SportCenterRepository],
   exports: [SportCenterService],
 })
-export class Sport_Center_Module {}
+export class Sport_Center_Module { }

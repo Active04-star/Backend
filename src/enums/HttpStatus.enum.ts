@@ -5,6 +5,7 @@ export enum ApiStatusEnum {
     REGISTRATION_FAIL = "Error al registrar el usuario",
     REGISTRATION_SUCCESS = "Registrado correctamente",
     INVALID_CREDENTIALS = "Credenciales invalidas!",
+    TEST_ERROR = "Error de prueba, debe ser eliminado en modo produccion!",
 
     PASSWORD_UPDATE_SUCCESS = "Contraseña actualizada correctamente",
     PASSWORD_UPDATE_FAILED = "Error al actualizar la contraseña",
@@ -46,6 +47,10 @@ export enum ApiStatusEnum {
     CENTER_LIST_EMTPY = "No se encontraron centros deportivos",
     CENTER_CREATION_FAILED = "Creacion de  centro deportivo fallida",
     CENTER_NOT_FOUND = "No se pudo encontra este centro deportivo",
+    CENTER_DELETION_SUCCESS = "Centro deportivo eliminado correctamente",
+    CENTER_DELETION_FAILED = "No se pudo eliminar este centro deportivo",
+    CENTER_ALREADY_HAS_STATE = "Este centro ya está en modo",
+    CENTER_WRONG_OWNER = "La cuenta asociada con este centro deportivo no coincide",
 
     IMAGE_CREATION_FAILED = "No se pudo crear una nueva imagen",
     IMAGE_INSERTION_FAIL = "No se pudo insertar",

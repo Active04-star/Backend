@@ -6,7 +6,7 @@ import { LocalRegister } from 'src/dtos/user/local-register.dto';
 import { UserLogin } from 'src/dtos/user/user-login.dto';
 import { LoginResponse } from 'src/dtos/user/login-response.dto';
 import { AuthRegister } from 'src/dtos/user/auth-register.dto';
-import { ApiResponse } from 'src/dtos/common-response.dto';
+import { ApiResponse } from 'src/dtos/api-response';
 
 @ApiTags('Autentication')
 @Controller('auth')
