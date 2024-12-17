@@ -24,7 +24,7 @@ import { reviewCreate } from 'src/dtos/review/review-create.dto';
         const foundReview = await this.reviewRepository.createQueryBuilder('review')
             .leftJoinAndSelect('review.user', 'user')
             .leftJoinAndSelect('review.sportcenter', 'sportcenter')
-            .leftJoinAndSelect('review.reservation', 'reservation') // Si es necesario
+            .leftJoinAndSelect('review.reservation', 'reservation') 
             .where('review.id = :id', { id })
             .getOne();
         

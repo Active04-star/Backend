@@ -49,7 +49,6 @@ export class ReviewService {
         return founReviewsById
     } 
 
-    //deberia mandar el id de un sportcenter, no de una reseña
     async getReviewBySportcenter(id: string):Promise<Review[]>{ 
         const reviews = await this.reviewRepository.getReviewsBySportcenter(id)
 
@@ -59,6 +58,7 @@ export class ReviewService {
 
        return reviews;
     }
+
 
     async createReview(data: reviewCreate){
         const {rating, comment, fieldId, userId} = data
@@ -78,17 +78,14 @@ export class ReviewService {
         if (!foundReservation){
             throw new NotFoundException('haz una reserva para opinar')
         }
-     //FALTA CREAR UN ENDPOINT DONDE ME TRAIGO TODAS LAS REVIEWS DE LA CANCHA Y CALCULO EL PROMEDIO
-     //VER LOGICA DE LA OBTENCIO DE LAS RESEÑAS POOR CENTRO DEPORTIVO. CREO QUE ESTA MAL. DEBO TENER UN CAMPO MAS EN EL DTO QUE SEA SportCenter.id. y hacer algo similar que con canchas   
-    //terminar. me traigo el registro del usuario especifico en esa cancha 
-        const review = await this.reservationRepository.findOne({   // validacion 3. que el usuario no tenga una review en esta cancha, evito duplicado
+        const existingReview  = await this.reservationRepository.findOne({   // validacion 3. que el usuario no tenga una review en esta cancha, evito duplicado
             where: {
                 user: {id: userId},
                 field: {id: fieldId}
             }
         })
 
-        if(review){
+        if(existingReview ){
             throw new NotFoundException('Ya tienes una reseña en esta cancha')
         }
 
