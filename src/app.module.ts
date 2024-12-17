@@ -13,6 +13,7 @@ import { Sport_Center_Module } from './modules/sport-center/sport-center.module'
 import { Sport_Cateogry_Module } from './modules/sport-category/sport-category.module';
 import { Field_Module } from './modules/field/field.module';
 import { ReviewModule } from './modules/review/review.module';
+import { ImagesModule } from './modules/images/images.module';
 //
 
 @Module({
@@ -59,6 +60,7 @@ import { ReviewModule } from './modules/review/review.module';
       }),
     }),
     
+    ImagesModule,
     UploadModule,
     Sport_Center_Module,
     AuthModule,

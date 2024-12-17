@@ -30,7 +30,7 @@ export class Field_Service {
 }
 
   async createField(fieldData:FieldDto) {
-    const sportCenter:SportCenter=await this.sportCenterService.findOne(fieldData.sportCenterId)
+    const sportCenter:SportCenter=await this.sportCenterService.getById(fieldData.sportCenterId)
 
     const sportCategory = fieldData.sportCategoryId
     ? await this.sportCategoryService.findById(fieldData.sportCategoryId)

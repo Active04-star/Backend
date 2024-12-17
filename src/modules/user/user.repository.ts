@@ -3,12 +3,16 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { LocalRegister } from "src/dtos/user/local-register.dto";
 import { UpdateUser } from "src/dtos/user/update-user.dto";
+import { UserList } from "src/dtos/user/users-list.dto";
 import { User } from "src/entities/user.entity";
+import { UserRole } from "src/enums/roles.enum";
 import { Repository } from "typeorm";
 
 @Injectable()
 export class UserRepository {
+
     constructor(@InjectRepository(User) private userRepository: Repository<User>) { }
+
 
     async updateUser(actual_user: User, modified_user: UpdateUser): Promise<User> {
         this.userRepository.merge(actual_user, modified_user);
@@ -17,10 +21,23 @@ export class UserRepository {
         return actual_user;
     }
 
-    async getUsers(page: number, limit: number): Promise<Omit<User, 'password'>[]> {
-        const [users, total] = await this.userRepository.findAndCount({ skip: (page - 1) * limit, take: limit });
+    
+    async rankUpTo(user: User, role: UserRole): Promise<User> {
+        user.role = role;
+        await this.userRepository.save(user);
+        return await this.getUserById(user.id);
+    }
 
-        return users.map(({ password, ...userWithoutPassword }) => userWithoutPassword);
+
+    async getUsers(page: number, limit: number): Promise<UserList> {
+        const [users, total] = await this.userRepository.findAndCount({ skip: (page - 1) * limit, take: limit });
+        return {
+            items: total,
+            page: Number(page),
+            limit: Number(limit),
+            total_pages: Math.ceil(total / limit),
+            users: users.map(({ password, ...userWithoutPassword }) => userWithoutPassword),
+          };
     }
 
     async getUserById(id: string): Promise<User | undefined> {
