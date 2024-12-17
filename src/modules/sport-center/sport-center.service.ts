@@ -30,12 +30,12 @@ export class SportCenterService {
   ) { }
 
 
-  async getSportCenters(page: number, limit: number, rating?: number, search?: string): Promise<SportCenterList> {
+  async getSportCenters(page: number, limit: number, show_hidden: boolean, rating?: number, keyword?: string): Promise<SportCenterList> {
     if (rating < 1 || rating > 5) {
       throw new ApiError(ApiStatusEnum.RATING_OUT_OF_BOUNDS, BadRequestException);
     }
 
-    const found_centers: SportCenterList = await this.sportcenterRepository.getSportCenters(page, limit, rating, search);
+    const found_centers: SportCenterList = await this.sportcenterRepository.getSportCenters(page, limit, show_hidden, rating, keyword);
 
     if (found_centers.sport_centers === undefined || found_centers.sport_centers.length === 0) {
       throw new ApiError(ApiStatusEnum.CENTER_LIST_EMTPY, NotFoundException);
@@ -56,7 +56,7 @@ export class SportCenterService {
       await this.imagesService.insertImageToCenter(found_center, url);
 
       return { message: ApiStatusEnum.IMAGE_TOCENTER_UPLOAD_SUCCESS };
-      
+
     } catch (error) {
       throw new ApiError(error?.message, InternalServerErrorException, error);
 
