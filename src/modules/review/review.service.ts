@@ -80,16 +80,16 @@ export class ReviewService {
             //VER LOGICA DE LA OBTENCIO DE LAS RESEÑAS POOR CENTRO DEPORTIVO. CREO QUE ESTA MAL. DEBO TENER UN CAMPO MAS EN EL DTO QUE SEA SportCenter.id. y hacer algo similar que con canchas   
             //terminar. me traigo el registro del usuario especifico en esa cancha 
             const review = await this.reservationRepository.findOne({   // validacion 3. que el usuario no tenga una review en esta cancha, evito duplicado
-              where: {
-                user: {id: userId},
-                field: {id: fieldId}
-              }
+                where: {
+                    user: { id: userId },
+                    field: { id: fieldId }
+                }
             });
 
-            if(review){
-            //TODO FIX  throw new NotFoundException('Ya tienes una reseña en esta cancha')
+            if (review) {
+                throw new ApiError(ApiStatusEnum.FIELD_ALREADY_HAS_A_REVIEW, BadRequestException);
             }
-          
+
             const createReview: Review | undefined = await this.reviewRepository.createReview({ //creo reseña
                 rating,
                 comment,

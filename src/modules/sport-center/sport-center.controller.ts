@@ -21,7 +21,7 @@ export class SportCenterController {
   @ApiQuery({ name: "search", required: false, type: String, description: "Palabra de busqueda" })
   @ApiOperation({ summary: 'Obtiene lista de sportcenter ordenados por rating de mayor a menor' })
   async getSportCenters(@Query('page') page: number = 1, @Query('limit') limit: number = 10, @Query("rating") rating?: number, @Query("search") search?: string): Promise<SportCenterList> {
-    return await this.sportcenterService.getSportCenters(page, limit, rating, search);
+    return await this.sportcenterService.getSportCenters(page, limit, false, rating, search);
   }
 
 
@@ -158,11 +158,7 @@ export class SportCenterController {
     description:
       'Esta ruta permite eliminar un centro deportivo (SportCenter) de la base de datos. Si el usuario que lo gestiona (manager) tiene el rol de MANAGER, su rol puede ser afectado dependiendo del estado del SportCenter eliminado y de los otros SportCenters que gestione.El rol del manager solo se modifica si, tras la eliminación, no tiene otros centros en estado PUBLISHED o DISABLE.',
   })
-  @ApiParam({
-    name: 'id',
-    description: 'ID del Centro deportivo a eliminar',
-    example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
-  })
+  @ApiParam({ name: 'id', description: 'ID del Centro deportivo a eliminar', example: 'e3d5c8f0-1234-5678-9101-abcdef123456' })
   async banOrUnBanCenter(@Param('id', ParseUUIDPipe) id: string): Promise<ApiResponse> {
     return await this.sportcenterService.banOrUnBanCenter(id);
   }
