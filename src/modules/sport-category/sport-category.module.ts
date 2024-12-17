@@ -13,6 +13,6 @@ import { Sport_Center_Module } from '../sport-center/sport-center.module';
   ],
   controllers: [Sport_Category_Controller],
   providers: [Sport_Category_Service, Sport_Category_Repository],
-  exports: [],
+  exports: [Sport_Category_Service],
 })
 export class Sport_Cateogry_Module {}

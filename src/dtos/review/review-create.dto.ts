@@ -9,7 +9,7 @@ export class reviewCreate {
 
     @IsNotEmpty()
     @IsString()
-    @Length(20, 100)
+    @Length(1, 100)
     comment: string;
 
     @IsNotEmpty()

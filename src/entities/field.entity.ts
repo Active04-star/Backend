@@ -34,8 +34,6 @@ export class Field {
     },
   })
   price: Decimal;
-
-
  
   @OneToMany(() => Reservation, (reservation) => reservation.field, {
     nullable: true,
@@ -54,11 +52,10 @@ export class Field {
   schedules: Field_Schedule[];
 
   @OneToMany(() => Image, (photos) => photos.field , { nullable: true })
+  photos: Image[];
 
   @OneToMany(() => Review, (review) => review.sportcenter, { nullable: true })
   reviews: Review[];
-  photos: Image[];
-
 
   @ManyToOne(() => Sport_Category, (sportCategory) => sportCategory.field, {
     onDelete: 'CASCADE',nullable:true

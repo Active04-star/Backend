@@ -25,7 +25,7 @@ export class Sport_Category_Service {
     data: CreateSportCategoryDto,
   ) {
     const sportCenter: SportCenter =
-      await this.sportCenterService.findOne(sportCenterId);
+      await this.sportCenterService.getById(sportCenterId);
     const repeatedName = await this.sportCategoryRepository.findByName(
       data.name,
     );

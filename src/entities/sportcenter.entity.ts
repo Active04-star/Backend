@@ -42,7 +42,7 @@ export class SportCenter {
   @OneToMany(() => Review, (review) => review.sportcenter, { nullable: true })
   reviews: Review[];
 
-  @OneToMany(() => Image, (photos) => photos.sportcenter, { nullable: true })
+  @OneToMany(() => Image, (photos) => photos.sportcenter, { nullable: true, cascade: true, onDelete: "CASCADE" })
   photos: Image[];
 
   @OneToMany(() => Payment, (payment) => payment.field)
