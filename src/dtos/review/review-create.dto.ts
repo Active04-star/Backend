@@ -21,4 +21,9 @@ export class reviewCreate {
     @IsString()
     @IsUUID()
     userId: string
+
+    @IsNotEmpty()
+    @IsString()
+    @IsUUID()
+    sportCenterId: string
 }
