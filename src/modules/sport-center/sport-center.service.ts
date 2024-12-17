@@ -1,4 +1,4 @@
-import { BadRequestException, forwardRef, ImATeapotException, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { SportCenterRepository } from './sport-center.repository';
 import { CreateSportCenterDto } from 'src/dtos/sportcenter/createSportCenter.dto';
 import { User } from 'src/entities/user.entity';
@@ -45,6 +45,26 @@ export class SportCenterService {
   }
 
 
+  async uploadImages(id: string, file: Express.Multer.File): Promise<ApiResponse> {
+    let url: string;
+
+    try {
+
+      const found_center: SportCenter = await this.getById(id);
+
+      url = await this.uploadService.uploadToCloudinary(file);
+      await this.imagesService.insertImageToCenter(found_center, url);
+
+      return { message: ApiStatusEnum.IMAGE_TOCENTER_UPLOAD_SUCCESS };
+      
+    } catch (error) {
+      throw new ApiError(error?.message, InternalServerErrorException, error);
+
+    }
+
+  }
+
+
   async createSportCenter(createSportCenter: CreateSportCenterDto, files?: Array<Express.Multer.File>): Promise<SportCenter> {
     const { manager, ...sportCenterData } = createSportCenter;
     let images_urls: string[];
@@ -52,6 +72,15 @@ export class SportCenterService {
     let id = "";
 
     try {
+
+      const future_manager: User = await this.userService.getUserById(manager);
+      const created_sportcenter: SportCenter | undefined = await this.sportcenterRepository.createSportCenter(future_manager, sportCenterData, images_inserted);
+
+      if (created_sportcenter === undefined) {
+        throw new ApiError(ApiStatusEnum.CENTER_CREATION_FAILED, BadRequestException);
+      }
+
+      id = created_sportcenter.id;
 
       if (isNotEmpty(files)) {
 
@@ -69,15 +98,6 @@ export class SportCenterService {
           })
         );
       }
-
-      const future_manager: User = await this.userService.getUserById(manager);
-      const created_sportcenter: SportCenter | undefined = await this.sportcenterRepository.createSportCenter(future_manager, sportCenterData, images_inserted);
-
-      if (created_sportcenter === undefined) {
-        throw new ApiError(ApiStatusEnum.CENTER_CREATION_FAILED, BadRequestException);
-      }
-
-      id = created_sportcenter.id;
 
       const was_ranked: boolean = await this.userService.rankUpTo(future_manager, UserRole.MAIN_MANAGER);
 

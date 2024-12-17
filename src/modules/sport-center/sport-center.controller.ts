@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Put, Query, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Put, Query, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { SportCenterService } from './sport-center.service';
 import { CreateSportCenterDto } from 'src/dtos/sportcenter/createSportCenter.dto';
@@ -36,8 +36,8 @@ export class SportCenterController {
     description: 'Crea un nuevo registro de SportCenter en el sistema.',
   })
   @ApiBody({ description: 'Datos necesarios para crear un nuevo SportCenter', type: CreateSportCenterDto })
-  async createSportCenter(@Body() data: CreateSportCenterDto): Promise<SportCenter> {
-    return await this.sportcenterService.createSportCenter(data);
+  async createSportCenter(@Body() data: CreateSportCenterDto, @UploadedFiles() files?: Array<Express.Multer.File>): Promise<SportCenter> {
+    return await this.sportcenterService.createSportCenter(data, files);
   }
 
 

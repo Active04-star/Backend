@@ -54,5 +54,7 @@ export enum ApiStatusEnum {
 
     IMAGE_CREATION_FAILED = "No se pudo crear una nueva imagen",
     IMAGE_INSERTION_FAIL = "No se pudo insertar",
+    IMAGE_TOCENTER_UPLOAD_SUCCESS = "Nueva imagen creada para el centro deportivo",
+    IMAGE_TOCENTER_UPLOAD_FAILED = "No se pudo insertar la imagen al centro deportivo",
 
 }
