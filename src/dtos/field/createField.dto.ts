@@ -20,7 +20,7 @@ export class FieldDto {
   price: string;
 
   @IsUUID()
-  @IsOptional()
+  @IsNotEmpty()
   sportCategoryId?: string;
 
   @IsNotEmpty()
