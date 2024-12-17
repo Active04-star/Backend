@@ -101,7 +101,8 @@ export class AuthService {
             profile_image: user.profile_image,
             role: user.role,
             was_banned: user.was_banned,
-            subscription_status: user.subscription_status
+            subscription_status: user.subscription_status,
+            subscription:null                                         //se va a poner la relacio  cuando cree el servicio de subscripcion
           },
         };
       }
