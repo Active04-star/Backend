@@ -76,9 +76,6 @@ export class ReviewService {
                 throw new ApiError(ApiStatusEnum.RESERVATION_NOT_FOUND, NotFoundException);
             }
 
-            //FALTA CREAR UN ENDPOINT DONDE ME TRAIGO TODAS LAS REVIEWS DE LA CANCHA Y CALCULO EL PROMEDIO
-            //VER LOGICA DE LA OBTENCIO DE LAS RESEÑAS POOR CENTRO DEPORTIVO. CREO QUE ESTA MAL. DEBO TENER UN CAMPO MAS EN EL DTO QUE SEA SportCenter.id. y hacer algo similar que con canchas   
-            //terminar. me traigo el registro del usuario especifico en esa cancha 
             const review = await this.reservationRepository.findOne({   // validacion 3. que el usuario no tenga una review en esta cancha, evito duplicado
                 where: {
                     user: { id: userId },
