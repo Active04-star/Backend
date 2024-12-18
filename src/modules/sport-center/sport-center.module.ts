@@ -7,7 +7,7 @@ import { SportCenterRepository } from './sport-center.repository';
 import { UserModule } from '../user/user.module';
 import { Sport_Cateogry_Module } from '../sport-category/sport-category.module';
 import { ImagesModule } from '../images/images.module';
-import { UploadModule } from 'src/uploads/upload.module';
+import { UploadModule } from 'src/modules/uploads/upload.module';
 
 @Module({
   imports: [forwardRef(() => ImagesModule), UploadModule, UserModule, forwardRef(() => Sport_Cateogry_Module), TypeOrmModule.forFeature([SportCenter])],

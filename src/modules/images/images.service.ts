@@ -1,12 +1,12 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from "@nestjs/common";
+import { BadRequestException, HttpException, Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { ImagesRepository } from "./images.repository";
 import { Image } from "src/entities/image.entity";
 import { SportCenter } from "src/entities/sportcenter.entity";
 import { ApiError } from "src/helpers/api-error-class";
 import { ApiStatusEnum } from "src/enums/HttpStatus.enum";
 import { Field } from "src/entities/field.entity";
-import { UploadService } from "src/uploads/upload.service";
-import { arrayNotEmpty } from "class-validator";
+import { UploadService } from "src/modules/uploads/upload.service";
+import { arrayNotEmpty, isNotEmpty } from "class-validator";
 import { ApiResponse } from "src/dtos/api-response";
 import { SportCenterService } from "../sport-center/sport-center.service";
 import { Field_Service } from "../field/field.service";
@@ -16,6 +16,8 @@ import { User } from "src/entities/user.entity";
 @Injectable()
 export class ImagesService {
 
+    public static CENTER_IMAGES_LIMIT: number = 3;
+
     constructor(private readonly imagesRepository: ImagesRepository,
         private readonly uploadService: UploadService,
         private readonly sportCenterService: SportCenterService,
@@ -23,43 +25,47 @@ export class ImagesService {
         private readonly userService: UserService,
     ) { }
 
-
     async uploadImages(id: string, files: Array<Express.Multer.File>): Promise<ApiResponse> {
 
         try {
             const found_center: SportCenter = await this.sportCenterService.getById(id);
 
-            if (arrayNotEmpty(files)) {
+            if (!isNotEmpty(found_center.photos) || found_center.photos.length + files.length <= ImagesService.CENTER_IMAGES_LIMIT ) {
 
-                const images_urls: string[] = await Promise.all(
-                    files.map(async (file) => {
-                        const url: string = await this.uploadService.uploadToCloudinary(file);
+                if (arrayNotEmpty(files)) {
 
-                        return url;
-                    })
-                );
+                    const images_urls: string[] = await Promise.all(
+                        files.map(async (file) => {
+                            const url: string = await this.uploadService.uploadToCloudinary(file);
 
-                await Promise.all(
-                    images_urls.map(async (url) => {
-                        return await this.insertImageToCenter(found_center, url);
-                    })
-                );
+                            return url;
+                        })
+                    );
 
-            } else {
-                throw new ApiError(ApiStatusEnum.NO_IMAGES_IN_REQUEST, BadRequestException);
+                    await Promise.all(
+                        images_urls.map(async (url) => {
+                            return await this.insertImageToCenter(found_center, url);
+                        })
+                    );
 
+                } else {
+                    throw new ApiError(ApiStatusEnum.NO_IMAGES_IN_REQUEST, BadRequestException);
+
+                }
+
+                return { message: ApiStatusEnum.IMAGE_TOCENTER_UPLOAD_SUCCESS };
             }
 
-            return { message: ApiStatusEnum.IMAGE_TOCENTER_UPLOAD_SUCCESS };
+            throw new ApiError(ApiStatusEnum.MAX_IMAGES_REACHED, BadRequestException);
 
         } catch (error) {
-            throw new ApiError(error?.message, InternalServerErrorException, error);
+            throw new HttpException(error?.message, error?.status || 500);
 
         }
 
     }
 
-    
+
     async insertImageToCenter(sport_center: SportCenter, url: string): Promise<Image> {
         const inserted: Image | undefined = await this.imagesRepository.insertImageToCenter(sport_center, url);
 
@@ -77,16 +83,31 @@ export class ImagesService {
             const url: string = await this.uploadService.uploadToCloudinary(file);
 
             const found_field: Field = await this.fieldService.findById(id);
-            const inserted: Image | undefined = await this.imagesRepository.insertImageToField(found_field, url);
 
-            if (inserted === undefined) {
-                throw new ApiError(ApiStatusEnum.IMAGE_CREATION_FAILED, InternalServerErrorException,
-                    ApiStatusEnum.IMAGE_INSERTION_FAIL + ` [${url}] en la cancha (${found_field.number})`);
+            if (found_field.photos.length <= 1) {
+                const outdated_image: Image | undefined = await this.getByUrl(found_field.photos[0].image_url);
+
+                if (outdated_image === undefined) {
+                    throw new ApiError(ApiStatusEnum.IMAGE_NOT_FOUND, NotFoundException);
+                }
+
+                // const inserted: Image | undefined = await this.imagesRepository.insertImageToField(found_field, url);
+                const updated_image: Image = await this.imagesRepository.updateFieldImage(outdated_image, url);
+
+                if (updated_image === undefined) {
+                    throw new ApiError(ApiStatusEnum.IMAGE_CREATION_FAILED, InternalServerErrorException,
+                        ApiStatusEnum.IMAGE_INSERTION_FAIL + ` [${url}] en la cancha (${found_field.number})`);
+                }
+
+                await this.uploadService.removeFromCloudinary(outdated_image.image_url);
+
+                return { message: ApiStatusEnum.IMAGE_TOCENTER_UPLOAD_SUCCESS };
             }
 
-            return { message: ApiStatusEnum.IMAGE_TOCENTER_UPLOAD_SUCCESS };
+            throw new ApiError(ApiStatusEnum.MAX_IMAGES_REACHED, BadRequestException);
+
         } catch (error) {
-            throw new ApiError(error?.message, InternalServerErrorException, error);
+            throw new HttpException(error?.message, error?.status || 500);
 
         }
     }
@@ -106,12 +127,44 @@ export class ImagesService {
 
             }
 
-            return { message: ApiStatusEnum.IMAGE_TOCENTER_UPLOAD_SUCCESS, url: url };
+            return { message: ApiStatusEnum.IMAGE_PROFILE_UPLOAD_SUCCESS, url: url };
 
         } catch (error) {
-            throw new ApiError(error?.message, InternalServerErrorException, error);
+            throw new HttpException(error?.message, error?.status || 500);
 
         }
+    }
+
+
+    async deleteImage(url: string): Promise<ApiResponse> {
+        try {
+
+            const found_image: Image | undefined = await this.getByUrl(url);
+
+            if (found_image !== undefined) {
+                const deleted_image: Image = await this.imagesRepository.deleteImage(found_image);
+
+                if (!deleted_image) {
+                    throw new ApiError(ApiStatusEnum.IMAGE_DELETION_FAILED, InternalServerErrorException);
+                }
+
+            }
+
+            await this.uploadService.removeFromCloudinary(url);
+
+            return { message: ApiStatusEnum.IMAGE_DELETION_SUCCESS };
+
+        } catch (error) {
+            throw new HttpException(error?.message, error?.status || 500);
+
+        }
+    }
+
+
+    async getByUrl(url: string): Promise<Image | undefined> {
+        const found_image: Image | undefined = await this.imagesRepository.getByUrl(url);
+
+        return found_image;
     }
 
 }

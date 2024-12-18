@@ -40,9 +40,6 @@ export class SportCenterService {
   }
 
 
-
-
-
   async createSportCenter(createSportCenter: CreateSportCenterDto): Promise<SportCenter> {
     const { manager, ...sportCenterData } = createSportCenter;
     // let images_urls: string[];

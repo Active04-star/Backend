@@ -4,7 +4,7 @@ import { ImagesRepository } from "./images.repository";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Image } from "src/entities/image.entity";
 import { ImagesController } from "./images.controller";
-import { UploadModule } from "src/uploads/upload.module";
+import { UploadModule } from "src/modules/uploads/upload.module";
 import { Sport_Center_Module } from "../sport-center/sport-center.module";
 import { Field_Module } from "../field/field.module";
 import { UserModule } from "../user/user.module";

@@ -34,7 +34,9 @@ export class UploadService {
 
       const sliced = url.slice(second_dot + 1, slash);
 
-      const result = await cloudinary.uploader.destroy(sliced);
+      const result = await cloudinary.uploader.destroy(sliced, { invalidate: true });
+
+      console.log(sliced);
 
       if (result.result === 'ok') {
         return true;
@@ -43,7 +45,6 @@ export class UploadService {
         console.log('No se pudo eliminar la imagen:', result.result);
         // throw new ApiError(ApiStatusEnum.IMAGE_DELETION_FAILED, InternalServerErrorException, result.result);
       }
-
 
     } catch (error) {
       throw new ApiError(error?.message, InternalServerErrorException, error);

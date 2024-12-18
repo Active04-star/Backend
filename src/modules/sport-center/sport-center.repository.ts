@@ -44,7 +44,7 @@ export class SportCenterRepository {
     const queryBuilder = this.sportCenterRepository
       .createQueryBuilder('sportcenter')
       .orderBy('sportcenter.averageRating', 'DESC', 'NULLS LAST'); // Ordena por averageRating directamente
-      //ESTA FUNCION SE DEBE REUTILIZAR PARA LOS ADMINS CAMBIANDO EL PARAMETRO EN SHOW_HIDDEN
+    //ESTA FUNCION SE DEBE REUTILIZAR PARA LOS ADMINS CAMBIANDO EL PARAMETRO EN SHOW_HIDDEN
 
     if (!show_hidden) {
       queryBuilder.andWhere('sportcenter.status = :status', { status: SportCenterStatus.PUBLISHED, })
@@ -88,7 +88,7 @@ export class SportCenterRepository {
 
 
   async findOne(id: string): Promise<SportCenter | undefined> {
-    const found_sportcenter = await this.sportCenterRepository.findOne({ where: { id: id } });
+    const found_sportcenter: SportCenter = await this.sportCenterRepository.findOne({ where: { id: id }, relations: { photos: true } });
 
     return found_sportcenter === null ? undefined : found_sportcenter;
   }
