@@ -1,12 +1,10 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import cloudinary from 'src/config/cloudinary.config';
-import { ApiError } from 'src/helpers/api-error-class';
 
 @Injectable()
 export class UploadService {
 
   async uploadToCloudinary(file: Express.Multer.File): Promise<string> {
-    console.log(file);
 
     return new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream({ folder: 'ActiveProject' },
@@ -47,7 +45,7 @@ export class UploadService {
       }
 
     } catch (error) {
-      throw new ApiError(error?.message, InternalServerErrorException, error);
+      throw new HttpException(error?.message, error?.status || 500);
 
     }
 

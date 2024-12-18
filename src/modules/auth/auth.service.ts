@@ -19,6 +19,7 @@ export class AuthService {
 
   constructor(private readonly userService: UserService, private readonly jwtService: JwtService, private readonly mailService: MailerService) { }
 
+  
   async userRegistration(userObject: LocalRegister): Promise<ApiResponse> {
     try {
 
