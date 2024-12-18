@@ -5,7 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import TypeOrmConfig from './config/database.config';
 import { JwtModule } from '@nestjs/jwt';
-import { UploadModule } from './uploads/upload.module';
+import { UploadModule } from './modules/uploads/upload.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { join } from 'path';
 import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';

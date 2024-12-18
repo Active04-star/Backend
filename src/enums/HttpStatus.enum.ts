@@ -54,8 +54,17 @@ export enum ApiStatusEnum {
 
     IMAGE_CREATION_FAILED = "No se pudo crear una nueva imagen",
     IMAGE_INSERTION_FAIL = "No se pudo insertar",
-    IMAGE_TOCENTER_UPLOAD_SUCCESS = "Nueva imagen creada para el centro deportivo",
+    IMAGE_TOCENTER_UPLOAD_SUCCESS = "Imagenes insertadas en el centro deportivo correctamente",
     IMAGE_TOCENTER_UPLOAD_FAILED = "No se pudo insertar la imagen al centro deportivo",
+    IMAGE_TO_FIELD_UPLOAD_SUCCESS = "Imagen insertada en la cancha correctamente",
+    NO_IMAGES_IN_REQUEST = "No se encontraron imagenes en esta peticion!",
+    IMAGE_PROFILE_UPLOAD_FAILED = "No se pudo subir la imagen de perfil!",
+    IMAGE_PROFILE_UPLOAD_SUCCESS = "Imagen de perfil subida correctamente",
+    IMAGE_DELETION_FAILED = "No se pudo eliminar esta imagen!",
+    IMAGE_NOT_FOUND = "No se pudo encontrar esta imagen!",
+    IMAGE_DELETION_SUCCESS = "Imagen eliminada correctamente",
+    MAX_IMAGES_REACHED= "Maximo de imagenes alcanzado, elimina una imagen antes de subir otra!",
+
 
     FIELD_ALREADY_HAS_A_REVIEW = "Esta cancha ya tiene una reseña!"
 

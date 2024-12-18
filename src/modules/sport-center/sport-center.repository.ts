@@ -43,9 +43,8 @@ export class SportCenterRepository {
 
     const queryBuilder = this.sportCenterRepository
       .createQueryBuilder('sportcenter')
-      //ESTA FUNCION SE DEBE REUTILIZAR PARA LOS ADMINS CAMBIANDO EL PARAMETRO EN SHOW_HIDDEN
-      // .where('sportcenter.status = :status', { status: SportCenterStatus.PUBLISHED, })
       .orderBy('sportcenter.averageRating', 'DESC', 'NULLS LAST'); // Ordena por averageRating directamente
+    //ESTA FUNCION SE DEBE REUTILIZAR PARA LOS ADMINS CAMBIANDO EL PARAMETRO EN SHOW_HIDDEN
 
     if (!show_hidden) {
       queryBuilder.andWhere('sportcenter.status = :status', { status: SportCenterStatus.PUBLISHED, })
@@ -76,7 +75,6 @@ export class SportCenterRepository {
       total_pages: Math.ceil(centers.length / limit),
       sport_centers: centers
     };
-    // return new SportCenterList();
   }
 
 
@@ -90,16 +88,7 @@ export class SportCenterRepository {
 
 
   async findOne(id: string): Promise<SportCenter | undefined> {
-    // const found_sportcenter = await this.sportCenterRepository
-    //   .createQueryBuilder('sportcenter')
-    //   .leftJoinAndSelect('sportcenter.manager', 'manager')
-    //   .leftJoinAndSelect('sportcenter.reviews', 'reviews')
-    //   .leftJoinAndSelect('sportcenter.field', 'field')
-    //   .leftJoinAndSelect('sportcenter.sport_category', 'sport_category')
-    //   .leftJoinAndSelect('sportcenter.photos', 'photos')
-    //   .where('sportcenter.id = :id', { id })
-    //   .getOne();
-    const found_sportcenter = await this.sportCenterRepository.findOne({ where: { id: id } });
+    const found_sportcenter: SportCenter = await this.sportCenterRepository.findOne({ where: { id: id }, relations: { photos: true } });
 
     return found_sportcenter === null ? undefined : found_sportcenter;
   }

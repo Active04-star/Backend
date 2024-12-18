@@ -7,12 +7,9 @@ import { Sport_Category_Repository } from './sport-category.repository';
 import { Sport_Center_Module } from '../sport-center/sport-center.module';
 
 @Module({
-  imports: [
-    forwardRef(() => Sport_Center_Module),
-    TypeOrmModule.forFeature([Sport_Category]),
-  ],
+  imports: [forwardRef(() => Sport_Center_Module), TypeOrmModule.forFeature([Sport_Category])],
   controllers: [Sport_Category_Controller],
   providers: [Sport_Category_Service, Sport_Category_Repository],
   exports: [Sport_Category_Service],
 })
-export class Sport_Cateogry_Module {}
+export class Sport_Cateogry_Module { }

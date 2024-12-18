@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ArrayMaxSize, IsNotEmpty, IsOptional, IsString, IsUUID, Length } from 'class-validator';
+import { IsNotEmpty, IsString, IsUUID, Length } from 'class-validator';
 
 export class CreateSportCenterDto {
   @ApiProperty({
@@ -26,18 +26,4 @@ export class CreateSportCenterDto {
   @IsUUID()
   @IsNotEmpty()
   manager: string;
-
-  @ApiProperty({
-    description: 'Imagenes Max. 5 (Debe ser un Array de Array buffer) (Nota: Swagger lo marca como obligatorio pero no lo es)',
-    type: 'array',
-    items: {
-      type: 'string',
-      format: 'binary',
-      maximum: 5,
-    },
-  })
-  @ArrayMaxSize(5)
-  @IsOptional()
-  images: any[];
-
 }
