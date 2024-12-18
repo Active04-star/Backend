@@ -49,12 +49,12 @@ import { SportCenter } from './sportcenter.entity';
     user: User; 
     
     @ManyToOne(() => SportCenter, (sportCenter) => sportCenter.paymentsHistory, {
-        nullable: false,
+        nullable: true,
       })
       sportCenter: SportCenter;
     
       // Relación con la cancha asociada al pago
-      @ManyToOne(() => Field, (field) => field.paymentsHistory, { nullable: false })
+      @ManyToOne(() => Field, (field) => field.paymentsHistory, { nullable: true })
       field: Field;
     
       // Relación con la reserva asociada al pago

@@ -1,7 +1,8 @@
 export enum SubscriptionStatus {
-    PENDING = 'pendig',
-    AUTHORIZED = 'authorized',
-    PAUSED = 'paused',
-    CANCELLED = 'cancelled',
-    NOTHING = 'nothing'
+  NOTHING = 'nothing',
+  PENDING = 'PENDING', // En proceso de activación
+  ACTIVE = 'ACTIVE', // Activa
+  EXPIRED = 'EXPIRED', // Venció la suscripción
+  CANCELLED = 'CANCELLED', // Cancelada manualmente
+  SUSPENDED = 'SUSPENDED', // Por pagos fallidos
 }

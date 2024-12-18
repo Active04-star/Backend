@@ -49,16 +49,16 @@ export class Payment {
   })
   paymentMethod: PaymentMethod;
 
-  @OneToMany(()=>Payment_History,(history)=>history.payment)
-  history:Payment_History
+  @OneToMany(() => Payment_History, (history) => history.payment, { cascade: true })
+  history: Payment_History[];
 
   // Relación con la cancha asociada al pago
-  @ManyToOne(() => Field, (field) => field.payments, { nullable: false })
+  @ManyToOne(() => Field, (field) => field.payments, { nullable: true })
   field: Field;
 
   // Relación con el centro deportivo asociado al pago
   @ManyToOne(() => SportCenter, (sportCenter) => sportCenter.payments, {
-    nullable: false,
+    nullable: true,
   })
   sportCenter: SportCenter;
 

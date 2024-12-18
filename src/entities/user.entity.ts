@@ -3,6 +3,7 @@ import {
   Entity,
   ManyToMany,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { UserRole } from 'src/enums/roles.enum';
@@ -13,6 +14,7 @@ import { Reservation } from './reservation.entity';
 import { Payment } from './payment.entity';
 import { Sport_Center_Managers } from './sport_center_managers.entity';
 import { Payment_History } from './payment_hisotry.entity';
+import { Subscription } from './subscription.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -53,6 +55,10 @@ export class User {
 
   @Column({ nullable: false, default: false })
   was_banned: boolean;
+
+
+  @OneToOne(() => Subscription, (subscription) => subscription.user,{nullable:true})
+  subscription: Subscription;
 
   @OneToMany(() => Payment, (payment) => payment.field, { nullable: true })
   payments: Payment[];

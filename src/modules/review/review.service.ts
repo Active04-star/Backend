@@ -77,16 +77,16 @@ export class ReviewService {
             }
 
             const review = await this.reservationRepository.findOne({   // validacion 3. que el usuario no tenga una review en esta cancha, evito duplicado
-              where: {
-                user: {id: userId},
-                field: {id: fieldId}
-              }
+                where: {
+                    user: { id: userId },
+                    field: { id: fieldId }
+                }
             });
 
-            if(review){
-            //TODO FIX  throw new NotFoundException('Ya tienes una reseña en esta cancha')
+            if (review) {
+                throw new ApiError(ApiStatusEnum.FIELD_ALREADY_HAS_A_REVIEW, BadRequestException);
             }
-          
+
             const createReview: Review | undefined = await this.reviewRepository.createReview({ //creo reseña
                 rating,
                 comment,

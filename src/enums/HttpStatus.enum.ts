@@ -57,4 +57,6 @@ export enum ApiStatusEnum {
     IMAGE_TOCENTER_UPLOAD_SUCCESS = "Nueva imagen creada para el centro deportivo",
     IMAGE_TOCENTER_UPLOAD_FAILED = "No se pudo insertar la imagen al centro deportivo",
 
+    FIELD_ALREADY_HAS_A_REVIEW = "Esta cancha ya tiene una reseña!"
+
 }
