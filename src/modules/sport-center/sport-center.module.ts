@@ -10,7 +10,7 @@ import { ImagesModule } from '../images/images.module';
 import { UploadModule } from 'src/uploads/upload.module';
 
 @Module({
-  imports: [ImagesModule, UploadModule, UserModule, forwardRef(() => Sport_Cateogry_Module), TypeOrmModule.forFeature([SportCenter])],
+  imports: [forwardRef(() => ImagesModule), UploadModule, UserModule, forwardRef(() => Sport_Cateogry_Module), TypeOrmModule.forFeature([SportCenter])],
   controllers: [SportCenterController],
   providers: [SportCenterService, SportCenterRepository],
   exports: [SportCenterService],

@@ -38,7 +38,7 @@ export class UserController {
     @Put(':id')
     @ApiOperation({
         summary: 'actualiza la informacion de un usuario, por id y body',
-        description: 'uuid de user y objeto a actualizar (por ahora solo con nombre)',
+        description: 'uuid de user y objeto a actualizar (por ahora solo con nombre)(Nota: Aqui no deberia actualizarse la imagen de perfil)',
     })
     @ApiBody({
         type: UpdateUser,

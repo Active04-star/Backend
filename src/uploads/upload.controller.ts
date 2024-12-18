@@ -11,7 +11,7 @@ export class UploadController {
 
   @Post()
   @UseInterceptors(FileInterceptor('image')) // 'image' debe coincidir con el nombre del campo en el frontend
-  @ApiOperation({ summary: 'poder subir imagenes ' })
+  @ApiOperation({ summary: 'subida de imagenes' })
   @ApiConsumes('multipart/form-data') // Indica que la ruta consume archivos de tipo 'multipart/form-data'
   @ApiBody({
     schema: {

@@ -5,15 +5,12 @@ import { User } from 'src/entities/user.entity';
 import { SportCenter } from 'src/entities/sportcenter.entity';
 import { UpdateSportCenterDto } from 'src/dtos/sportcenter/updateSportCenter.dto';
 import { UserRole } from 'src/enums/roles.enum';
-import { Image } from 'src/entities/image.entity';
 import { Sport_Category } from 'src/entities/sport_category.entity';
 import { Sport_Category_Service } from '../sport-category/sport-category.service';
-import { ImagesService } from '../images/images.service';
 import { UserService } from '../user/user.service';
 import { ApiError } from 'src/helpers/api-error-class';
 import { ApiStatusEnum } from 'src/enums/HttpStatus.enum';
-import { UploadService } from 'src/uploads/upload.service';
-import { isNotEmpty, isUUID } from 'class-validator';
+import { isUUID } from 'class-validator';
 import { ApiResponse } from 'src/dtos/api-response';
 import { SportCenterList } from 'src/dtos/sportcenter/sport-center-list.dto';
 import { SportCenterStatus } from 'src/enums/sportCenterStatus.enum';
@@ -23,9 +20,7 @@ export class SportCenterService {
 
   constructor(
     private readonly sportcenterRepository: SportCenterRepository,
-    private readonly imagesService: ImagesService,
     private readonly userService: UserService,
-    private readonly uploadService: UploadService,
     @Inject(forwardRef(() => Sport_Category_Service)) private sportCategoryService: Sport_Category_Service,
   ) { }
 
@@ -45,36 +40,19 @@ export class SportCenterService {
   }
 
 
-  async uploadImages(id: string, file: Express.Multer.File): Promise<ApiResponse> {
-    let url: string;
-
-    try {
-
-      const found_center: SportCenter = await this.getById(id);
-
-      url = await this.uploadService.uploadToCloudinary(file);
-      await this.imagesService.insertImageToCenter(found_center, url);
-
-      return { message: ApiStatusEnum.IMAGE_TOCENTER_UPLOAD_SUCCESS };
-
-    } catch (error) {
-      throw new ApiError(error?.message, InternalServerErrorException, error);
-
-    }
-
-  }
 
 
-  async createSportCenter(createSportCenter: CreateSportCenterDto, files?: Array<Express.Multer.File>): Promise<SportCenter> {
+
+  async createSportCenter(createSportCenter: CreateSportCenterDto): Promise<SportCenter> {
     const { manager, ...sportCenterData } = createSportCenter;
-    let images_urls: string[];
-    let images_inserted: Image[];
+    // let images_urls: string[];
+    // let images_inserted: Image[];
     let id = "";
 
     try {
 
       const future_manager: User = await this.userService.getUserById(manager);
-      const created_sportcenter: SportCenter | undefined = await this.sportcenterRepository.createSportCenter(future_manager, sportCenterData, images_inserted);
+      const created_sportcenter: SportCenter | undefined = await this.sportcenterRepository.createSportCenter(future_manager, sportCenterData);
 
       if (created_sportcenter === undefined) {
         throw new ApiError(ApiStatusEnum.CENTER_CREATION_FAILED, BadRequestException);
@@ -82,22 +60,22 @@ export class SportCenterService {
 
       id = created_sportcenter.id;
 
-      if (isNotEmpty(files)) {
+      // if (isNotEmpty(files)) {
 
-        images_urls = await Promise.all(
-          files.map(async (file) => {
-            const url: string = await this.uploadService.uploadToCloudinary(file);
+      //   images_urls = await Promise.all(
+      //     files.map(async (file) => {
+      //       const url: string = await this.uploadService.uploadToCloudinary(file);
 
-            return url;
-          })
-        );
+      //       return url;
+      //     })
+      //   );
 
-        images_inserted = await Promise.all(
-          images_urls.map(async (url) => {
-            return await this.imagesService.insertImageToCenter(created_sportcenter, url);
-          })
-        );
-      }
+      //   images_inserted = await Promise.all(
+      //     images_urls.map(async (url) => {
+      //       return await this.imagesService.insertImageToCenter(created_sportcenter, url);
+      //     })
+      //   );
+      // }
 
       const was_ranked: boolean = await this.userService.rankUpTo(future_manager, UserRole.MAIN_MANAGER);
 
