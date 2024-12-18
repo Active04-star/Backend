@@ -14,6 +14,7 @@ import { Sport_Cateogry_Module } from './modules/sport-category/sport-category.m
 import { Field_Module } from './modules/field/field.module';
 import { ReviewModule } from './modules/review/review.module';
 import { ImagesModule } from './modules/images/images.module';
+import { AdminModule } from './modules/Admin/admin.module';
 //
 
 @Module({
@@ -68,7 +69,8 @@ import { ImagesModule } from './modules/images/images.module';
     Sport_Cateogry_Module,
     Field_Module,
     UploadModule,
-    ReviewModule, 
+    ReviewModule,
+    AdminModule,
   ],
   controllers: [],
   providers: [],
