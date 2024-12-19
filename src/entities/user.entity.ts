@@ -27,6 +27,9 @@ export class User {
   @Column({ unique: true, length: 50, nullable: false })
   email: string;
 
+  @Column({default:null})
+  stripeCustomerId:string
+
   @Column({
     default:
       'https://res.cloudinary.com/dvgvcleky/image/upload/f_auto,q_auto/v1/RestO/ffgx6ywlaix0mb3jghux',

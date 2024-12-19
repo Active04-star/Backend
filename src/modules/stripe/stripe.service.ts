@@ -13,11 +13,23 @@ export class StripeService {
     });
   }
 
+
+  async createCustomer(userId: string, email: string): Promise<Stripe.Customer> {
+    const customer = await this.stripe.customers.create({
+      email,
+      metadata: {
+        userId, // Asocia el ID del usuario en tu base de datos
+      },
+    });
+    return customer;
+  }
+
   async createCheckoutSession(
-    priceId: string,userId:string
+    priceId: string,customerId:string
   ): Promise<Stripe.Checkout.Session> {
     try {
       const session = await this.stripe.checkout.sessions.create({
+        customer:customerId,
         mode: 'subscription',
         line_items: [
           {
@@ -28,7 +40,6 @@ export class StripeService {
         success_url:
           `http://localhost:3000/success.html?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `http://localhost:3000/example.com/canceled.html`,
-        metadata:{userId}
       });
       return session;
     } catch (error) {
