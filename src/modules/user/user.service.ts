@@ -112,18 +112,18 @@ export class UserService {
 //      throw new ApiError(error?.message, BadRequestException, error);
 //    }
  // }
-
-  async getUsers(page: number, limit: number): Promise<UserList> {
-    const found_users: UserList = await this.userRepository.getUsers(
-      page,
-      limit,
-    );
-
-    if (found_users.users.length === 0) {
-      throw new ApiError(ApiStatusEnum.USER_LIST_EMPTY, NotFoundException);
-    }
-    return found_users;
-  }
+//en el modulo admin
+//  async getUsers(page: number, limit: number): Promise<UserList> {
+//    const found_users: UserList = await this.userRepository.getUsers(
+//      page,
+//      limit,
+//    );
+//
+//    if (found_users.users.length === 0) {
+//      throw new ApiError(ApiStatusEnum.USER_LIST_EMPTY, NotFoundException);
+//    }
+//    return found_users;
+//  }
 
   async getUserByMail(email: string): Promise<User | undefined> {
     const found: User | undefined =
