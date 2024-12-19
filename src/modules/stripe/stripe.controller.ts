@@ -5,6 +5,7 @@ import {
   HttpException,
   HttpStatus,
   Post,
+  Req,
   Res,
 } from '@nestjs/common';
 import { StripeService } from './stripe.service';
@@ -63,10 +64,10 @@ export class StripeController {
 
 
   @Post('webhook')
-  async handleStripeWebhook(@Body() body: any, @Headers('stripe-signature') signature: string, @Res() res: Response) {
-    const webhookSecret = 'whsec_qMrj7rQWJcuR1TGRFFDVzOIVrgLWmSeA'
-    const rawBody = JSON.stringify(body);
-    console.log('Raw body:', rawBody);  // Verifica cómo luce el cuerpo del webhook
+  async handleStripeWebhook(@Req() req: Request, @Headers('stripe-signature') signature: string) {
+    const webhookSecret = 'whsec_qMrj7rQWJcuR1TGRFFDVzOIVrgLWmSeA';
+    const rawBody = req.body; // Ya es raw debido al middleware
+    console.log('Raw body:', typeof(rawBody));  // Verifica cómo luce el cuerpo del webhook
     console.log('Received signature:', signature);  // Verifica la firma recibida
 
     try {
