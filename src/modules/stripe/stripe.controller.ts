@@ -64,7 +64,7 @@ export class StripeController {
 
   @Post('webhook')
   async handleStripeWebhook(@Body() body: any, @Headers('stripe-signature') signature: string, @Res() res: Response) {
-    const webhookSecret = 'whsec_hmRnAmTLfPkHN785pUxDak6fqcoaYJe1'
+    const webhookSecret = 'whsec_qMrj7rQWJcuR1TGRFFDVzOIVrgLWmSeA'
     const rawBody = JSON.stringify(body);
     console.log('Raw body:', rawBody);  // Verifica cómo luce el cuerpo del webhook
     console.log('Received signature:', signature);  // Verifica la firma recibida
