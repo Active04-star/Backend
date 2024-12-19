@@ -14,12 +14,15 @@ import { Sport_Cateogry_Module } from './modules/sport-category/sport-category.m
 import { Field_Module } from './modules/field/field.module';
 import { ReviewModule } from './modules/review/review.module';
 import { ImagesModule } from './modules/images/images.module';
+import { StripeModule } from './modules/stripe/stripe.module';
 //
 
 @Module({
   imports: [
+    StripeModule.forRootAsync(),
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: '.env',
       load: [TypeOrmConfig],
     }),
 
@@ -34,7 +37,7 @@ import { ImagesModule } from './modules/images/images.module';
       signOptions: { expiresIn: '1h' },
       secret: process.env.JWT_SECRET,
     }),
-    
+
     MailerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -52,14 +55,15 @@ import { ImagesModule } from './modules/images/images.module';
           from: '"nest-modules" <modules@nestjs.com>',
         },
         template: {
-          dir: join(__dirname, 'templates'),          adapter: new PugAdapter(),
+          dir: join(__dirname, 'templates'),
+          adapter: new PugAdapter(),
           options: {
             strict: true,
           },
         },
       }),
     }),
-    
+
     ImagesModule,
     UploadModule,
     Sport_Center_Module,
@@ -68,7 +72,7 @@ import { ImagesModule } from './modules/images/images.module';
     Sport_Cateogry_Module,
     Field_Module,
     UploadModule,
-    ReviewModule, 
+    ReviewModule,
   ],
   controllers: [],
   providers: [],
