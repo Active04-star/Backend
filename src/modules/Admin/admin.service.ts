@@ -10,6 +10,7 @@ import { ApiResponse } from "src/dtos/api-response";
 import { UserRole } from "src/enums/roles.enum";
 import { UserList } from "src/dtos/user/users-list.dto";
 import { AdminRepository } from "./admin.repository";
+import { SportCenterList } from "src/dtos/sportcenter/sport-center-list.dto";
 
 @Injectable()
 export class AdminService {
@@ -23,6 +24,16 @@ export class AdminService {
         }
         return found_users;
     }
+
+    async getCenterBan(page: number, limit: number): Promise<SportCenterList> {
+            const found_centers: SportCenterList = await this.adminRepository.getCenterBan(page, limit)
+            
+            if(found_centers.sport_centers.length === 0) {
+                throw new ApiError(ApiStatusEnum.CENTER_LIST_BAN, NotFoundException);
+            }
+            return found_centers
+    }
+
 
     async banOrUnbanUser(id: string): Promise<ApiResponse> {
         try {
