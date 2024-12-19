@@ -88,12 +88,12 @@ export class UserService {
     }
 
 
-    async getUserByMail(email: string): Promise<User> {
+    async getUserByMail(email: string): Promise<User | undefined> {
         const found: User | undefined = await this.userRepository.getUserByMail(email);
-
-        if (found === undefined) {
-            throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, NotFoundException);
-        }
+        //ESTE ERROR NO DEBE ESTAR AQUI
+        // if (found === undefined) {
+        //     throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, NotFoundException);
+        // }
         return found;
     }
 

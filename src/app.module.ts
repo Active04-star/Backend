@@ -5,7 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import TypeOrmConfig from './config/database.config';
 import { JwtModule } from '@nestjs/jwt';
-import { UploadModule } from './uploads/upload.module';
+import { UploadModule } from './modules/uploads/upload.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { join } from 'path';
 import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
@@ -15,7 +15,8 @@ import { Field_Module } from './modules/field/field.module';
 import { ReviewModule } from './modules/review/review.module';
 import { ImagesModule } from './modules/images/images.module';
 import { StripeModule } from './modules/stripe/stripe.module';
-//
+import { AdminModule } from './modules/Admin/admin.module';
+
 
 @Module({
   imports: [
@@ -73,6 +74,7 @@ import { StripeModule } from './modules/stripe/stripe.module';
     Field_Module,
     UploadModule,
     ReviewModule,
+    AdminModule,
   ],
   controllers: [],
   providers: [],
