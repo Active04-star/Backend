@@ -8,4 +8,9 @@ export class Payment_Service {
     private readonly subscriptionService: Subscription_Service, 
     private readonly paymentRepository:Payment_Repository
   ) {}
+
+
+  async createSubscriptionPayment(){
+
+  }
 }

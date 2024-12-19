@@ -12,15 +12,13 @@ import { StripeService } from './stripe.service';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 
-
-@ApiTags("Stripe")
+@ApiTags('Stripe')
 @Controller('stripe')
 export class StripeController {
-  constructor(private stripeService: StripeService,private configService:ConfigService) {}
-
-
-
-
+  constructor(
+    private stripeService: StripeService,
+    private configService: ConfigService,
+  ) {}
 
   @Post('create-checkout-session')
   @ApiOperation({ summary: 'Crear una sesión de checkout para suscripciones' })
@@ -49,66 +47,73 @@ export class StripeController {
     status: 400,
     description: 'Error al crear la sesión.',
   })
-  async createCheckoutSession(@Body() body: { priceId: string }) {
+  async createCheckoutSession(
+    @Body() body: { priceId: string; userId: string },
+  ) {
     try {
-      const session = await this.stripeService.createCheckoutSession(body.priceId);
+      const session = await this.stripeService.createCheckoutSession(
+        body.priceId,
+        body.userId,
+      );
       return session;
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
-
-  
-
-
-
   @Post('webhook')
-  async handleStripeWebhook(@Req() req: Request, @Headers('stripe-signature') signature: string) {
+  async handleStripeWebhook(
+    @Req() req: Request,
+    @Headers('stripe-signature') signature: string,
+  ) {
     const webhookSecret = 'whsec_qMrj7rQWJcuR1TGRFFDVzOIVrgLWmSeA';
     const rawBody = req.body; // Ya es raw debido al middleware
-    console.log('Raw body:', typeof(rawBody));  // Verifica cómo luce el cuerpo del webhook
-    console.log('Received signature:', signature);  // Verifica la firma recibida
+    console.log('Raw body:', typeof rawBody); // Verifica cómo luce el cuerpo del webhook
+    console.log('Received signature:', signature); // Verifica la firma recibida
 
     try {
       // Verifica la firma del webhook
 
-      
-      const event = this.stripeService.verifyWebhook(rawBody, signature, webhookSecret);
+      const event = this.stripeService.verifyWebhook(
+        rawBody,
+        signature,
+        webhookSecret,
+      );
 
       // Procesa el evento según el tipo
       if (event.type === 'checkout.session.completed') {
-        const session = event.data.object;  
-        const status = session.status;
-        console.log(`Subscription status is ${status}.`);
-        await this.stripeService.handleCheckoutSessionCompleted(session);
+        const session = event.data.object;
+        // Recupera el userId de los metadatos
+        const userId = session.metadata?.userId;
+
+        if (!userId) {
+          throw new Error('No se encontró el ID del usuario en los metadatos.');
+        }
+        await this.stripeService.handleCheckoutSessionCompleted(session,userId);
       }
 
-      return 'Evento procesado'
+      return 'Evento procesado';
     } catch (err) {
       console.error('Error procesando el webhook', err);
-      return 'Error al procesar el webhook'
+      return 'Error al procesar el webhook';
     }
   }
 
+  //   @Delete(':subscriptionId')
+  //   async cancelSubscription(@Param('subscriptionId') subscriptionId: string) {
+  //     if (!subscriptionId) {
+  //       throw new HttpException(
+  //         'subscriptionId es requerido',
+  //         HttpStatus.BAD_REQUEST,
+  //       );
+  //     }
 
-  
-
-//   @Delete(':subscriptionId')
-//   async cancelSubscription(@Param('subscriptionId') subscriptionId: string) {
-//     if (!subscriptionId) {
-//       throw new HttpException(
-//         'subscriptionId es requerido',
-//         HttpStatus.BAD_REQUEST,
-//       );
-//     }
-
-//     try {
-//       const canceledSubscription =
-//         await this.stripeService.cancelSubscription(subscriptionId);
-//       return { canceledSubscription };
-//     } catch (error) {
-//       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
-//     }
-//   }
+  //     try {
+  //       const canceledSubscription =
+  //         await this.stripeService.cancelSubscription(subscriptionId);
+  //       return { canceledSubscription };
+  //     } catch (error) {
+  //       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+  //     }
+  //   }
 }

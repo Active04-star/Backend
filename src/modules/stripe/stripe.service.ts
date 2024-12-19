@@ -14,7 +14,7 @@ export class StripeService {
   }
 
   async createCheckoutSession(
-    priceId: string,
+    priceId: string,userId:string
   ): Promise<Stripe.Checkout.Session> {
     try {
       const session = await this.stripe.checkout.sessions.create({
@@ -28,6 +28,7 @@ export class StripeService {
         success_url:
           `http://localhost:3000/success.html?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `http://localhost:3000/example.com/canceled.html`,
+        metadata:{userId}
       });
       return session;
     } catch (error) {
@@ -46,21 +47,13 @@ export class StripeService {
   }
 
   // Manejar el evento de sesión completada
-  async handleCheckoutSessionCompleted(session: any) {
+  async handleCheckoutSessionCompleted(session: any,userId:string) {
     // Aquí puedes actualizar tu base de datos para indicar que el pago fue exitoso
     console.log('Pago completado:', session);
   }
 
 
-  //   async cancelSubscription(subscriptionId: string) {
-  //     try {
-  //       const canceledSubscription =
-  //         await this.stripe.subscriptions.cancel(subscriptionId);
-  //       return canceledSubscription;
-  //     } catch (error) {
-  //       throw new Error(`Error al cancelar la suscripción: ${error.message}`);
-  //     }
-  //   }
+
 
 }
 
