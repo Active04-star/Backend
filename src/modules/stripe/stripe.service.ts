@@ -26,8 +26,8 @@ export class StripeService {
           },
         ],
         success_url:
-          `${this.configService.get<string>('FRONTEND_URL')}/success.html?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${this.configService.get<string>('FRONTEND_URL')}/example.com/canceled.html`,
+          `http://localhost:3000/success.html?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `http://localhost:3000/example.com/canceled.html`,
       });
       return session;
     } catch (error) {
