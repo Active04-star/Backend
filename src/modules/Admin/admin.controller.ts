@@ -10,6 +10,7 @@ import { User } from "src/entities/user.entity";
 import { AdminService } from "./admin.service";
 import { SportCenterList } from "src/dtos/sportcenter/sport-center-list.dto";
 import { SportCenterService } from "../sport-center/sport-center.service";
+import { SportCenterStatus } from "src/enums/sportCenterStatus.enum";
 
 @ApiTags("Admin")
 @Controller("admin")
@@ -25,7 +26,7 @@ export class AdminController {
         return await this.adminService.getUsers(page, limit);
     }
 
-    @Get('list/centerBan')
+    @Get('list/centersBan')
     @ApiQuery({ name: 'page', required: true, type: Number, example: 1, description: 'Numero de la pagina' })
     @ApiQuery({ name: 'limit', required: true, type: Number, example: 10, description: 'Objetos por pagina' })
     @ApiQuery({ name: "rating", required: false, type: Number, example: 5, description: "Rating de centros deportivos" })
@@ -43,7 +44,7 @@ export class AdminController {
             'recibe el id de un usuario por parametro y actualiza el estado was_banned del usuario',
     })
     async banOrUnbanUser(@Param('id', ParseUUIDPipe) id: string): Promise<{ message: ApiStatusEnum }> {
-        return this.adminService.banOrUnbanUser(id);
+        return  await this.adminService.banOrUnbanUser(id);
     }
 
     @Put('ban-unban/sportcenter/:id')
@@ -67,8 +68,31 @@ export class AdminController {
             } 
         }
     })
-    async banOrBanCenter(@Param('id', ParseUUIDPipe) id: string): Promise<{message: ApiStatusEnum}> {
-        return this.adminService.banOrUnbanUser(id);
+    async banOrUnbanCenter(@Param('id', ParseUUIDPipe) id: string, @Body() body: {status: SportCenterStatus}): Promise<{message: ApiStatusEnum}> {
+        return await this.adminService.banOrUnbanCenter(id, body.status)
     }
-         
+
+    @Put('force.ban/:id')
+    @ApiOperation({
+        summary: 'fuerza el ban de un sportcenter',
+        description: 'recibe el id del sportcenter y actualiza su estado sportCenterStatus',
+    })
+    @ApiBody({
+        description: 'Nuevo estado del sportcenter',
+        schema: {
+            type: 'object',
+            properties: {
+               status: {
+                type: 'enum',
+                examples: {
+                   disable: { value: 'disable'},
+                   banned: { value: 'banned'},
+                }
+                }
+            } 
+        }
+    })
+    async forceBan(@Param('id', ParseUUIDPipe) id: string, body: {status: SportCenterStatus}): Promise<{message: ApiStatusEnum}> {
+        return await this.adminService.forceBan(id, body.status)
+    }
 }
