@@ -10,8 +10,23 @@ import { Repository } from "typeorm";
 
 @Injectable()
 export class UserRepository {
+    
+  
 
     constructor(@InjectRepository(User) private userRepository: Repository<User>) { }
+
+
+    async getUserByStripeCustomerId(customerId:string){
+        const found_user: User | null = await this.userRepository.findOne({ where: { stripeCustomerId: customerId } });
+        return found_user === null ? undefined : found_user;
+    }
+
+
+   async updateStripeCustomerId(user: User, customerId: any) {
+    user.stripeCustomerId=customerId
+    await this.userRepository.save(user)
+return user
+    }
 
 
     async updateUser(actual_user: User, modified_user: UpdateUser): Promise<User> {
