@@ -14,25 +14,25 @@ import { User } from "src/entities/user.entity";
 export class UserController {
     constructor(private readonly userService: UserService) { }
 
+// en el modulo admin
+//    @Get('list')
+//    @ApiQuery({ name: 'page', required: true, type: Number, example: 1, description: 'Numero de la pagina' })
+//    @ApiQuery({ name: 'limit', required: true, type: Number, example: 10, description: 'Objetos por pagina' })
+//    @ApiOperation({ summary: 'Obtiene una lista de usuarios', description: 'debe ser ejecutado por un usuario con rol admin' })
+//    async getUsers(@Query('page') page: number = 1, @Query('limit') limit: number = 10): Promise<UserList> {
+//        return await this.userService.getUsers(page, limit);
+//    }
 
-    @Get('list')
-    @ApiQuery({ name: 'page', required: true, type: Number, example: 1, description: 'Numero de la pagina' })
-    @ApiQuery({ name: 'limit', required: true, type: Number, example: 10, description: 'Objetos por pagina' })
-    @ApiOperation({ summary: 'Obtiene una lista de usuarios', description: 'debe ser ejecutado por un usuario con rol admin' })
-    async getUsers(@Query('page') page: number = 1, @Query('limit') limit: number = 10): Promise<UserList> {
-        return await this.userService.getUsers(page, limit);
-    }
-
-
-    @Put('ban-unban/:id')
-    @ApiOperation({
-        summary: 'Banea o desbanea con un softdelete',
-        description:
-            'recibe el id de un usuario por parametro y actualiza el estado was_banned del usuario',
-    })
-    async banOrUnbanUser(@Param('id', ParseUUIDPipe) id: string): Promise<{ message: ApiStatusEnum }> {
-        return this.userService.banOrUnbanUser(id);
-    }
+//en el modulo de admin
+    //@Put('ban-unban/:id')
+ //   @ApiOperation({
+  //      summary: 'Banea o desbanea con un softdelete',
+  //      description:
+  //          'recibe el id de un usuario por parametro y actualiza el estado was_banned del usuario',
+  //  })
+  //  async banOrUnbanUser(@Param('id', ParseUUIDPipe) id: string): Promise<{ message: ApiStatusEnum }> {
+  //      return this.userService.banOrUnbanUser(id);
+  //  }
 
 
     @Put(':id')

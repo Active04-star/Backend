@@ -84,34 +84,34 @@ export class UserService {
     }
     return found_user;
   }
+// en el modulo de admin
+ // async banOrUnbanUser(id: string): Promise<ApiResponse> {
+ //   try {
+ //     const found_user: User | undefined =
+ //       await this.userRepository.getUserById(id);
+//
+ //     if (isEmpty(found_user)) {
+//        throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, NotFoundException);
+ //     }
+//
+ //     const [updated_user, status]: [User, string] =
+ //       await this.userRepository.banOrUnbanUser(found_user);
 
-  async banOrUnbanUser(id: string): Promise<ApiResponse> {
-    try {
-      const found_user: User | undefined =
-        await this.userRepository.getUserById(id);
+//      if (updated_user && status === 'deleted') {
+//       return { message: ApiStatusEnum.USER_DELETED };
+//      } else if (updated_user && status === 'restored') {
+//        return { message: ApiStatusEnum.USER_RESTORED };
+//      }
 
-      if (isEmpty(found_user)) {
-        throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, NotFoundException);
-      }
-
-      const [updated_user, status]: [User, string] =
-        await this.userRepository.banOrUnbanUser(found_user);
-
-      if (updated_user && status === 'deleted') {
-        return { message: ApiStatusEnum.USER_DELETED };
-      } else if (updated_user && status === 'restored') {
-        return { message: ApiStatusEnum.USER_RESTORED };
-      }
-
-      throw new ApiError(
-        ApiStatusEnum.USER_UNBAN_OR_BAN,
-        BadRequestException,
-        'Something went wrong trying to modify this',
-      );
-    } catch (error) {
-      throw new ApiError(error?.message, BadRequestException, error);
-    }
-  }
+//      throw new ApiError(
+//        ApiStatusEnum.USER_UNBAN_OR_BAN,
+//        BadRequestException,
+//        'Something went wrong trying to modify this',
+//      );
+//    } catch (error) {
+//      throw new ApiError(error?.message, BadRequestException, error);
+//    }
+ // }
 
   async getUsers(page: number, limit: number): Promise<UserList> {
     const found_users: UserList = await this.userRepository.getUsers(

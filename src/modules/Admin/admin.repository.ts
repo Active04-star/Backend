@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { SportCenterList } from "src/dtos/sportcenter/sport-center-list.dto";
 import { LocalRegister } from "src/dtos/user/local-register.dto";
 import { UpdateUser } from "src/dtos/user/update-user.dto";
 import { UserList } from "src/dtos/user/users-list.dto";
@@ -22,6 +23,7 @@ export class AdminRepository {
                 users: users.map(({ password, ...userWithoutPassword }) => userWithoutPassword),
               };
         }
+
 
             async getUserById(id: string): Promise<User | undefined> {
                 const found_user: User | null = await this.adminRepository.findOne({ where: { id: id } });
