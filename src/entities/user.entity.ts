@@ -15,6 +15,7 @@ import { Payment } from './payment.entity';
 import { Sport_Center_Managers } from './sport_center_managers.entity';
 import { Payment_History } from './payment_hisotry.entity';
 import { Subscription } from './subscription.entity';
+import { Subscription_Payment } from './subscriptionPayment.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -59,6 +60,8 @@ export class User {
   @Column({ nullable: false, default: false })
   was_banned: boolean;
 
+  @OneToMany(() => Subscription_Payment, (payment) => payment.user,{nullable:true})
+  subscriptionPayments: Subscription_Payment[];
 
   @OneToOne(() => Subscription, (subscription) => subscription.user,{nullable:true})
   subscription: Subscription;

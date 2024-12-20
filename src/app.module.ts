@@ -16,6 +16,8 @@ import { ReviewModule } from './modules/review/review.module';
 import { ImagesModule } from './modules/images/images.module';
 import { StripeModule } from './modules/stripe/stripe.module';
 import { AdminModule } from './modules/Admin/admin.module';
+import { Payment_Module } from './modules/payment/payment.module';
+import { Subscription_Module } from './modules/subscription/subscription.module';
 
 
 @Module({
@@ -75,6 +77,8 @@ import { AdminModule } from './modules/Admin/admin.module';
     UploadModule,
     ReviewModule,
     AdminModule,
+    Payment_Module,
+    Subscription_Module
   ],
   controllers: [],
   providers: [],
