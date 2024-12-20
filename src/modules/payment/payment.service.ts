@@ -13,6 +13,10 @@ export class Payment_Service {
   ) {}
 
   async findById(id: string) {}
+
+
+
+  
   async createSubscriptionPayment(data: any, user: User) {
     const created_payment =
       await this.paymentRepository.createSUbscriptionPayment(data, user);

@@ -3,13 +3,14 @@ import Stripe from 'stripe';
 import { ConfigService } from '@nestjs/config';
 import { User } from 'src/entities/user.entity';
 import { Payment_Service } from '../payment/payment.service';
+import { Subscription_Service } from '../subscription/subscription.service';
 
 
 @Injectable()
 export class StripeService {
   private stripe: Stripe;
 
-  constructor(@Inject('STRIPE_API_KEY') private readonly apiKey: string,private configService:ConfigService,private paymentService:Payment_Service) {
+  constructor(@Inject('STRIPE_API_KEY') private readonly apiKey: string,private configService:ConfigService,private paymentService:Payment_Service,private subscriptionService:Subscription_Service) {
     this.stripe = new Stripe(this.apiKey, {
       apiVersion: '2024-11-20.acacia', 
     });
@@ -63,6 +64,7 @@ export class StripeService {
   async handleCheckoutSessionCompleted(session: any,user:User) {
     const payment=await this.paymentService.createSubscriptionPayment(session,user)
     console.log('Pago completado:', payment);
+    const subscription=await this.subscriptionService.createSubscription(payment,user)
   }
 
 
