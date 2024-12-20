@@ -13,14 +13,22 @@ import { ApiError } from 'src/helpers/api-error-class';
 import { MailerService } from '@nestjs-modules/mailer';
 import { AuthRegister } from 'src/dtos/user/auth-register.dto';
 import { ApiResponse } from 'src/dtos/api-response';
+import { Auth0Service } from '../auth0/auth0.service';
 
 @Injectable()
 export class AuthService {
 
-  constructor(private readonly userService: UserService, private readonly jwtService: JwtService, private readonly mailService: MailerService) { }
+  constructor(
+    private readonly userService: UserService,
+    private readonly jwtService: JwtService,
+    private readonly mailService: MailerService,
+    private readonly auth0Service: Auth0Service
+  ) { }
 
-  
+
   async userRegistration(userObject: LocalRegister): Promise<ApiResponse> {
+    let id: string = "";
+
     try {
 
       const { email, password, confirm_password, ...rest_user } = userObject;
@@ -41,11 +49,15 @@ export class AuthService {
         throw new ApiError(ApiStatusEnum.HASHING_FAILED, BadRequestException);
       }
 
-      await this.userService.createUser({
+      const created: UserClean = await this.userService.createUser({
         ...rest_user,
         email,
         password: hashed_password,
       });
+
+      id = created.id;
+
+      await this.auth0Service.syncUser({ name: rest_user.name, email, password, id: created.id });
 
       await this.mailService.sendMail({
         from: 'ActiveProject <activeproject04@gmail.com>',
@@ -57,22 +69,80 @@ export class AuthService {
           contactEmail: 'activeproject04@gmail.com',
         }
 
-      })
+      });
+
 
       return { message: ApiStatusEnum.REGISTRATION_SUCCESS };
 
     } catch (error) {
-      throw new ApiError(error?.message, InternalServerErrorException, error)
+      if (isNotEmpty(id)) {
+        await this.userService.deleteUser(id);
+      }
+
+      throw new ApiError(error?.message, InternalServerErrorException, error);
     }
 
   }
 
 
-  async authZeroRegistration(userObject: AuthRegister): Promise<UserClean> {
-    return new UserClean;
+  async loginOrRegister(userObject: AuthRegister): Promise<LoginResponse> {
+    const { email, sub, ...rest } = userObject;
+    try {
+
+      const found_user: User | undefined = await this.userService.getUserByMail(email);
+
+      console.log(found_user || "Usuario no encontrado. Creando un nuevo registro de usuario");
+      let created: UserClean;
+
+      if (found_user === undefined) {
+        created = await this.userService.createUser(userObject);
+      }
+
+      await this.mailService.sendMail({
+        from: 'ActiveProject <activeproject04@gmail.com>',
+        to: email,
+        subject: 'Welcome to our app',
+        template: 'registration',
+        context: {
+          name: rest.name,
+          contactEmail: 'activeproject04@gmail.com',
+        }
+
+      });
+
+      if (created !== undefined) {
+
+        const token = this.jwtService.sign({
+          id: created.id,
+          email: created.email,
+          role: created.role,
+        });
+
+        return {
+          message: ApiStatusEnum.LOGIN_SUCCESS,
+          token,
+          user: {
+            id: created.id,
+            name: created.name,
+            email: created.email,
+            profile_image: created.profile_image,
+            role: created.role,
+            was_banned: created.was_banned,
+            subscription_status: created.subscription_status,
+            subscription: null
+          },
+        };
+
+      }
+
+    } catch (error) {
+      throw new ApiError(error?.message, InternalServerErrorException, error);
+      
+    }
+
   }
 
-  
+
   async userLogin(userCredentials: UserLogin): Promise<LoginResponse> {
     const { email, password } = userCredentials;
 
@@ -103,7 +173,7 @@ export class AuthService {
             role: user.role,
             was_banned: user.was_banned,
             subscription_status: user.subscription_status,
-            subscription:null                                         //se va a poner la relacio  cuando cree el servicio de subscripcion
+            subscription: null                                         //se va a poner la relacio  cuando cree el servicio de subscripcion
           },
         };
       }

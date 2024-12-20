@@ -15,6 +15,7 @@ import { Field_Module } from './modules/field/field.module';
 import { ReviewModule } from './modules/review/review.module';
 import { ImagesModule } from './modules/images/images.module';
 import { AdminModule } from './modules/Admin/admin.module';
+import { Auth0Module } from './modules/auth0/auth0.module';
 //
 
 @Module({
@@ -61,6 +62,7 @@ import { AdminModule } from './modules/Admin/admin.module';
       }),
     }),
     
+    Auth0Module,
     ImagesModule,
     UploadModule,
     Sport_Center_Module,

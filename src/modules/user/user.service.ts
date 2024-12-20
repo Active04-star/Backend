@@ -11,11 +11,18 @@ import { ApiError } from "src/helpers/api-error-class";
 import { ApiResponse } from "src/dtos/api-response";
 import { UserRole } from "src/enums/roles.enum";
 import { UserList } from "src/dtos/user/users-list.dto";
+import { AuthRegister } from "src/dtos/user/auth-register.dto";
 
 @Injectable()
 export class UserService {
 
     constructor(private readonly userRepository: UserRepository) { }
+
+    async deleteUser(id: string): Promise<boolean> {
+        const found_user: User = await this.userRepository.getUserById(id);
+        return await this.userRepository.deleteUser(found_user);
+    }
+
 
     async updateUser(id: string, modified_user: UpdateUser): Promise<UserClean> {
         const found_user: User | undefined = await this.userRepository.getUserById(id);
@@ -30,7 +37,7 @@ export class UserService {
         return filtered_user;
     }
 
-    
+
     async rankUpTo(user: User, rank: UserRole): Promise<boolean> {
         const ranked_up: User | undefined = await this.userRepository.rankUpTo(user, rank);
 
@@ -90,7 +97,7 @@ export class UserService {
 
     async getUserByMail(email: string): Promise<User | undefined> {
         const found: User | undefined = await this.userRepository.getUserByMail(email);
-        //ESTE ERROR NO DEBE ESTAR AQUI
+        //ESTA FUNCION NUNCA DEBE LANZAR ERROR
         // if (found === undefined) {
         //     throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, NotFoundException);
         // }
@@ -98,10 +105,10 @@ export class UserService {
     }
 
 
-    async createUser(userObject: Omit<LocalRegister, "confirm_password">): Promise<UserClean> {
+    async createUser(userObject: Omit<LocalRegister, "confirm_password"> | AuthRegister): Promise<UserClean> {
         try {
             const created_user: User = await this.userRepository.createUser(userObject);
-            const { password, ...filtered } = created_user;
+            const { password, authtoken, ...filtered } = created_user;
 
             return filtered;
         } catch (error) {
