@@ -23,32 +23,6 @@ export class StripeController {
   ) {}
 
   @Post('create-checkout-session')
-  @ApiOperation({ summary: 'Crear una sesión de checkout para suscripciones' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        priceId: {
-          type: 'string',
-          description: 'El ID del precio de la suscripción',
-          example: 'price_1JxykR2eZvKYlo2C1LdbZbs7',
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 201,
-    description: 'Sesión creada exitosamente.',
-    schema: {
-      example: {
-        sessionUrl: 'https://checkout.stripe.com/pay/cs_test_a1b2c3d4',
-      },
-    },
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Error al crear la sesión.',
-  })
   async createCheckoutSession(
     @Body('priceId') priceId: string,
     @Body('userId') userId: string,
@@ -63,7 +37,11 @@ export class StripeController {
 
       if (!customerId) {
         const customer = await this.stripeService.createCustomer(user.id, user.email);
+        console.log('customer creado',customer);
+        
         customerId = customer.id;
+
+        console.log("customer id",customerId)
 
         // Actualiza el usuario con el nuevo customerId
         const updatedUser=await this.userService.updateStripeCustomerId(user, customerId);
