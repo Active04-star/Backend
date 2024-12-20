@@ -5,7 +5,13 @@ import { User } from 'src/entities/user.entity';
 import { isNotEmpty } from 'class-validator';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UserClean } from 'src/dtos/user/user-clean.dto';
 import { ApiStatusEnum } from 'src/enums/HttpStatus.enum';
 import { LoginResponse } from 'src/dtos/user/login-response.dto';
@@ -16,20 +22,25 @@ import { ApiResponse } from 'src/dtos/api-response';
 
 @Injectable()
 export class AuthService {
+  constructor(
+    private readonly userService: UserService,
+    private readonly jwtService: JwtService,
+    private readonly mailService: MailerService,
+  ) {}
 
-  constructor(private readonly userService: UserService, private readonly jwtService: JwtService, private readonly mailService: MailerService) { }
-
-  
   async userRegistration(userObject: LocalRegister): Promise<ApiResponse> {
     try {
-
       const { email, password, confirm_password, ...rest_user } = userObject;
 
       if (password !== confirm_password) {
-        throw new ApiError(ApiStatusEnum.PASSWORDS_DONT_MATCH, BadRequestException);
+        throw new ApiError(
+          ApiStatusEnum.PASSWORDS_DONT_MATCH,
+          BadRequestException,
+        );
       }
 
-      const is_existent: User | undefined = await this.userService.getUserByMail(email);
+      const is_existent: User | undefined =
+        await this.userService.getUserByMail(email);
 
       if (isNotEmpty(is_existent)) {
         throw new ApiError(ApiStatusEnum.MAIL_IN_USE, ConflictException);
@@ -55,24 +66,19 @@ export class AuthService {
         context: {
           name: rest_user.name,
           contactEmail: 'activeproject04@gmail.com',
-        }
-
-      })
+        },
+      });
 
       return { message: ApiStatusEnum.REGISTRATION_SUCCESS };
-
     } catch (error) {
-      throw new ApiError(error?.message, InternalServerErrorException, error)
+      throw new ApiError(error?.message, InternalServerErrorException, error);
     }
-
   }
-
 
   async authZeroRegistration(userObject: AuthRegister): Promise<UserClean> {
-    return new UserClean;
+    return new UserClean();
   }
 
-  
   async userLogin(userCredentials: UserLogin): Promise<LoginResponse> {
     const { email, password } = userCredentials;
 
@@ -103,16 +109,17 @@ export class AuthService {
             role: user.role,
             was_banned: user.was_banned,
             subscription_status: user.subscription_status,
-            subscription:user.subscription     ,
-            stripeCustomerId:user.stripeCustomerId         ,
-            subscriptionPayments:user.subscriptionPayments
-                                       //se va a poner la relacio  cuando cree el servicio de subscripcion
+            subscription: user.subscription,
+            stripeCustomerId: user.stripeCustomerId,
+            subscriptionPayments: user.subscriptionPayments,
           },
         };
       }
-
     }
 
-    throw new ApiError(ApiStatusEnum.INVALID_CREDENTIALS, UnauthorizedException);
+    throw new ApiError(
+      ApiStatusEnum.INVALID_CREDENTIALS,
+      UnauthorizedException,
+    );
   }
 }

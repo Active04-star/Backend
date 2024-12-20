@@ -67,6 +67,9 @@ export enum ApiStatusEnum {
     MAX_IMAGES_REACHED= "Maximo de imagenes alcanzado, elimina una imagen antes de subir otra!",
 
 
-    FIELD_ALREADY_HAS_A_REVIEW = "Esta cancha ya tiene una reseña!"
+    FIELD_ALREADY_HAS_A_REVIEW = "Esta cancha ya tiene una reseña!",
+
+
+    SUBSCRIPTION_PAYMENT_FAILED="No se pudo crear el pago de la subscripcion"
 
 }
