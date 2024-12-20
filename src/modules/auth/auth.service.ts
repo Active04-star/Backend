@@ -96,6 +96,33 @@ export class AuthService {
 
       if (found_user === undefined) {
         created = await this.userService.createUser(userObject);
+
+      } else {
+
+        if (sub === found_user.authtoken) {
+          const token = this.jwtService.sign({
+            id: found_user.id,
+            email: found_user.email,
+            role: found_user.role,
+          });
+
+          return {
+            message: ApiStatusEnum.LOGIN_SUCCESS,
+            token,
+            user: {
+              id: found_user.id,
+              name: found_user.name,
+              email: found_user.email,
+              profile_image: found_user.profile_image,
+              role: found_user.role,
+              was_banned: found_user.was_banned,
+              subscription_status: found_user.subscription_status,
+              subscription: null
+            },
+          };
+        } else {
+          throw new ApiError(ApiStatusEnum.TEST_ERROR, BadRequestException);
+        }
       }
 
       await this.mailService.sendMail({
@@ -137,7 +164,7 @@ export class AuthService {
 
     } catch (error) {
       throw new ApiError(error?.message, InternalServerErrorException, error);
-      
+
     }
 
   }
