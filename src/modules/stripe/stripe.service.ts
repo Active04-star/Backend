@@ -1,13 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common';
 import Stripe from 'stripe';
 import { ConfigService } from '@nestjs/config';
+import { User } from 'src/entities/user.entity';
+import { Payment_Service } from '../payment/payment.service';
 
 
 @Injectable()
 export class StripeService {
   private stripe: Stripe;
 
-  constructor(@Inject('STRIPE_API_KEY') private readonly apiKey: string,private configService:ConfigService) {
+  constructor(@Inject('STRIPE_API_KEY') private readonly apiKey: string,private configService:ConfigService,private paymentService:Payment_Service) {
     this.stripe = new Stripe(this.apiKey, {
       apiVersion: '2024-11-20.acacia', 
     });
@@ -58,8 +60,8 @@ export class StripeService {
   }
 
   // Manejar el evento de sesión completada
-  async handleCheckoutSessionCompleted(session: any,userId:string) {
-    // Aquí puedes actualizar tu base de datos para indicar que el pago fue exitoso
+  async handleCheckoutSessionCompleted(session: any,user:User) {
+    await this.paymentService.createSubscriptionPayment(session,user)
     console.log('Pago completado:', session);
   }
 

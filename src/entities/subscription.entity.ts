@@ -4,9 +4,11 @@ import {
     Column,
     OneToOne,
     JoinColumn,
+    OneToMany,
   } from 'typeorm';
   import { SubscriptionStatus } from 'src/enums/subscriptionStatus.enum';
   import { User } from './user.entity';
+import { Subscription_Payment } from './subscriptionPayment.entity';
   
   @Entity()
   export class Subscription {
@@ -36,5 +38,8 @@ import {
     @OneToOne(() => User, (user) => user.subscription, { onDelete: 'CASCADE' })
     @JoinColumn()
     user: User;
+
+    @OneToMany(() => Subscription_Payment, (payment) => payment.subscription)
+    payments: Subscription_Payment[];
   }
   

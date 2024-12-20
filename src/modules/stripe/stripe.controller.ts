@@ -94,7 +94,7 @@ export class StripeController {
           }
   
           // Aquí puedes continuar con la lógica de procesamiento del pago
-          await this.stripeService.handleCheckoutSessionCompleted(session, user.id);
+          await this.stripeService.handleCheckoutSessionCompleted(session, user);
         } else {
           throw new Error('customerId no es un string, es de tipo: ' + typeof customerId);
         }
