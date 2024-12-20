@@ -40,7 +40,7 @@ export class StripeService {
           },
         ],
         success_url:
-          `http://localhost:3000/success.html?session_id={CHECKOUT_SESSION_ID}`,
+          `http://localhost:3000/manager`,
         cancel_url: `http://localhost:3000/example.com/canceled.html`,
       });
       return session;
