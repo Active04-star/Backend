@@ -15,6 +15,7 @@ import { Field } from './field.entity';
 import { SportCenter } from './sportcenter.entity';
 import { User } from './user.entity';
 import { Payment_History } from './payment_hisotry.entity';
+import { Payment_Type } from 'src/enums/paymentType.enum';
 
 @Entity()
 export class Payment {
@@ -33,7 +34,11 @@ export class Payment {
   })
   amount: Decimal;
 
-  
+  @Column({ type: 'enum', enum: Payment_Type, default: Payment_Type.SUBSCRIPTION })
+  type: Payment_Type.SUBSCRIPTION;
+
+  @Column({ nullable: true })
+  description?: string;
 
   @Column({
     type: 'enum',
