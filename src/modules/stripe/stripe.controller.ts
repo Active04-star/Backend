@@ -58,12 +58,6 @@ export class StripeController {
        // Busca el usuario en tu base de datos
        const user = await this.userService.getUserById(userId);
 
-       if (!user) {
-         throw new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND);
-       }
-
-
-
          // Si el usuario no tiene un customerId, crea uno en Stripe
       let customerId = user.stripeCustomerId;
 
