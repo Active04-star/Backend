@@ -18,11 +18,33 @@ export class UserService {
 
     constructor(private readonly userRepository: UserRepository) { }
 
+
     async deleteUser(id: string): Promise<boolean> {
         const found_user: User = await this.userRepository.getUserById(id);
         return await this.userRepository.deleteUser(found_user);
     }
 
+    async getUserByStripeCustomerId(customerId: string) {
+        const found_user: User | undefined =
+            await this.userRepository.getUserByStripeCustomerId(customerId);
+
+        if (isEmpty(found_user)) {
+            throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, NotFoundException);
+        }
+        return found_user;
+    }
+
+
+
+    async updateStripeCustomerId(user: User, customerId: any) {
+        const updatedUser: User = await this.userRepository.updateStripeCustomerId(
+            user,
+            customerId,
+        );
+        const { password, ...filtered_user } = updatedUser;
+
+        return filtered_user;
+    }
 
     async updateUser(id: string, modified_user: UpdateUser): Promise<UserClean> {
         const found_user: User | undefined = await this.userRepository.getUserById(id);
@@ -31,12 +53,8 @@ export class UserService {
             throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, NotFoundException);
         }
 
-        const updated_user: User = await this.userRepository.updateUser(found_user, modified_user);
-        const { password, ...filtered_user } = updated_user;
-
-        return filtered_user;
+        return new UserClean();
     }
-
 
     async rankUpTo(user: User, rank: UserRole): Promise<boolean> {
         const ranked_up: User | undefined = await this.userRepository.rankUpTo(user, rank);
@@ -47,9 +65,9 @@ export class UserService {
         return true;
     }
 
-
     async getUserById(id: string): Promise<User> {
-        const found_user: User | undefined = await this.userRepository.getUserById(id);
+        const found_user: User | undefined =
+            await this.userRepository.getUserById(id);
 
         if (isEmpty(found_user)) {
             throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, NotFoundException);
@@ -57,53 +75,11 @@ export class UserService {
         return found_user;
     }
 
-
-    async banOrUnbanUser(id: string): Promise<ApiResponse> {
-        try {
-
-            const found_user: User | undefined = await this.userRepository.getUserById(id);
-
-            if (isEmpty(found_user)) {
-                throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, NotFoundException);
-            }
-
-            const [updated_user, status]: [User, string] = await this.userRepository.banOrUnbanUser(found_user);
-
-            if (updated_user && status === "deleted") {
-                return { message: ApiStatusEnum.USER_DELETED };
-
-            } else if (updated_user && status === "restored") {
-                return { message: ApiStatusEnum.USER_RESTORED };
-
-            }
-
-            throw new ApiError(ApiStatusEnum.USER_UNBAN_OR_BAN, BadRequestException, "Something went wrong trying to modify this");
-
-        } catch (error) {
-            throw new ApiError(error?.message, BadRequestException, error);
-        }
-    }
-
-
-    async getUsers(page: number, limit: number): Promise<UserList> {
-        const found_users: UserList = await this.userRepository.getUsers(page, limit);
-
-        if (found_users.users.length === 0) {
-            throw new ApiError(ApiStatusEnum.USER_LIST_EMPTY, NotFoundException);
-        }
-        return found_users;
-    }
-
-
     async getUserByMail(email: string): Promise<User | undefined> {
         const found: User | undefined = await this.userRepository.getUserByMail(email);
         //ESTA FUNCION NUNCA DEBE LANZAR ERROR
-        // if (found === undefined) {
-        //     throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, NotFoundException);
-        // }
         return found;
     }
-
 
     async createUser(userObject: Omit<LocalRegister, "confirm_password"> | AuthRegister): Promise<UserClean> {
         try {
@@ -117,3 +93,4 @@ export class UserService {
         }
     }
 }
+

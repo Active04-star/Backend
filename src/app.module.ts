@@ -14,14 +14,18 @@ import { Sport_Cateogry_Module } from './modules/sport-category/sport-category.m
 import { Field_Module } from './modules/field/field.module';
 import { ReviewModule } from './modules/review/review.module';
 import { ImagesModule } from './modules/images/images.module';
+import { StripeModule } from './modules/stripe/stripe.module';
 import { AdminModule } from './modules/Admin/admin.module';
 import { Auth0Module } from './modules/auth0/auth0.module';
-//
+import { Payment_Module } from './modules/payment/payment.module';
+import { Subscription_Module } from './modules/subscription/subscription.module';
 
 @Module({
   imports: [
+    StripeModule.forRootAsync(),
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: '.env',
       load: [TypeOrmConfig],
     }),
 
@@ -36,7 +40,7 @@ import { Auth0Module } from './modules/auth0/auth0.module';
       signOptions: { expiresIn: '1h' },
       secret: process.env.JWT_SECRET,
     }),
-    
+
     MailerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -54,7 +58,8 @@ import { Auth0Module } from './modules/auth0/auth0.module';
           from: '"nest-modules" <modules@nestjs.com>',
         },
         template: {
-          dir: join(__dirname, 'templates'),          adapter: new PugAdapter(),
+          dir: join(__dirname, 'templates'),
+          adapter: new PugAdapter(),
           options: {
             strict: true,
           },
@@ -73,6 +78,8 @@ import { Auth0Module } from './modules/auth0/auth0.module';
     UploadModule,
     ReviewModule,
     AdminModule,
+    Payment_Module,
+    Subscription_Module
   ],
   controllers: [],
   providers: [],

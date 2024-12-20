@@ -33,7 +33,6 @@ export class Payment {
   })
   amount: Decimal;
 
-  
 
   @Column({
     type: 'enum',

@@ -5,7 +5,13 @@ import { User } from 'src/entities/user.entity';
 import { isNotEmpty } from 'class-validator';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UserClean } from 'src/dtos/user/user-clean.dto';
 import { ApiStatusEnum } from 'src/enums/HttpStatus.enum';
 import { LoginResponse } from 'src/dtos/user/login-response.dto';
@@ -30,14 +36,15 @@ export class AuthService {
     let id: string = "";
 
     try {
-
       const { email, password, confirm_password, ...rest_user } = userObject;
 
       if (password !== confirm_password) {
         throw new ApiError(ApiStatusEnum.PASSWORDS_DONT_MATCH, BadRequestException);
+
       }
 
-      const is_existent: User | undefined = await this.userService.getUserByMail(email);
+      const is_existent: User | undefined =
+        await this.userService.getUserByMail(email);
 
       if (isNotEmpty(is_existent)) {
         throw new ApiError(ApiStatusEnum.MAIL_IN_USE, ConflictException);
@@ -71,7 +78,6 @@ export class AuthService {
 
       });
 
-
       return { message: ApiStatusEnum.REGISTRATION_SUCCESS };
 
     } catch (error) {
@@ -81,7 +87,6 @@ export class AuthService {
 
       throw new ApiError(error?.message, InternalServerErrorException, error);
     }
-
   }
 
 
@@ -117,7 +122,8 @@ export class AuthService {
               role: found_user.role,
               was_banned: found_user.was_banned,
               subscription_status: found_user.subscription_status,
-              subscription: null
+              subscription: null,
+              stripeCustomerId: found_user.stripeCustomerId,
             },
           };
         } else {
@@ -156,7 +162,8 @@ export class AuthService {
             role: created.role,
             was_banned: created.was_banned,
             subscription_status: created.subscription_status,
-            subscription: null
+            subscription: null,
+            stripeCustomerId: created.stripeCustomerId,
           },
         };
 
@@ -200,11 +207,11 @@ export class AuthService {
             role: user.role,
             was_banned: user.was_banned,
             subscription_status: user.subscription_status,
-            subscription: null                                         //se va a poner la relacio  cuando cree el servicio de subscripcion
+            subscription: null,
+            stripeCustomerId: user.stripeCustomerId
           },
         };
       }
-
     }
 
     throw new ApiError(ApiStatusEnum.INVALID_CREDENTIALS, UnauthorizedException);

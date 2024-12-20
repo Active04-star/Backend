@@ -12,12 +12,27 @@ import { Repository } from "typeorm";
 
 @Injectable()
 export class UserRepository {
+    
+  
 
     constructor(@InjectRepository(User) private userRepository: Repository<User>) { }
 
     async deleteUser(userInstance: User): Promise<boolean> {
         const found_user: User | undefined = await this.userRepository.remove(userInstance);
         return found_user === undefined ? false : true;
+    }
+
+
+    async getUserByStripeCustomerId(customerId:string){
+        const found_user: User | null = await this.userRepository.findOne({ where: { stripeCustomerId: customerId } });
+        return found_user === null ? undefined : found_user;
+    }
+
+
+   async updateStripeCustomerId(user: User, customerId: any) {
+    user.stripeCustomerId=customerId
+    await this.userRepository.save(user)
+return user
     }
 
 
@@ -35,28 +50,28 @@ export class UserRepository {
         return await this.getUserById(user.id);
     }
 
-
-    async getUsers(page: number, limit: number): Promise<UserList> {
-        const [users, total] = await this.userRepository.findAndCount({ skip: (page - 1) * limit, take: limit });
-        return {
-            items: total,
-            page: Number(page),
-            limit: Number(limit),
-            total_pages: Math.ceil(total / limit),
-            users: users.map(({ password, ...userWithoutPassword }) => userWithoutPassword),
-        };
-    }
+// en el modulo admin
+//    async getUsers(page: number, limit: number): Promise<UserList> {
+//        const [users, total] = await this.userRepository.findAndCount({ skip: (page - 1) * limit, take: limit });
+//        return {
+//            items: total,
+//            page: Number(page),
+//            limit: Number(limit),
+//            total_pages: Math.ceil(total / limit),
+//            users: users.map(({ password, ...userWithoutPassword }) => userWithoutPassword),
+//          };
+//    }
 
     async getUserById(id: string): Promise<User | undefined> {
         const found_user: User | null = await this.userRepository.findOne({ where: { id: id } });
         return found_user === null ? undefined : found_user;
     }
-
-    async banOrUnbanUser(userToModify: User): Promise<[User, "deleted" | "restored"]> {
-        userToModify.was_banned = !userToModify.was_banned;
-        const user: User = await this.userRepository.save(userToModify);
-        return [user, user.was_banned ? "deleted" : "restored"];
-    }
+ // en el modulo de admin
+  //  async banOrUnbanUser(userToModify: User): Promise<[User, "deleted" | "restored"]> {
+   //     userToModify.was_banned = !userToModify.was_banned;
+   //     const user: User = await this.userRepository.save(userToModify);
+   //     return [user, user.was_banned ? "deleted" : "restored"];
+   // }
 
     async createUser(userObject: Omit<LocalRegister, "confirm_password"> | AuthRegister): Promise<User> {
         let created_user: User;

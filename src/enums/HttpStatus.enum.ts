@@ -50,6 +50,7 @@ export enum ApiStatusEnum {
     CENTER_DELETION_SUCCESS = "Centro deportivo eliminado correctamente",
     CENTER_DELETION_FAILED = "No se pudo eliminar este centro deportivo",
     CENTER_ALREADY_HAS_STATE = "Este centro ya está en modo",
+    CENTER_UPDATE_STATUS = "Estado del centro modificado",
     CENTER_WRONG_OWNER = "La cuenta asociada con este centro deportivo no coincide",
 
     IMAGE_CREATION_FAILED = "No se pudo crear una nueva imagen",
@@ -66,6 +67,9 @@ export enum ApiStatusEnum {
     MAX_IMAGES_REACHED= "Maximo de imagenes alcanzado, elimina una imagen antes de subir otra!",
 
 
-    FIELD_ALREADY_HAS_A_REVIEW = "Esta cancha ya tiene una reseña!"
+    FIELD_ALREADY_HAS_A_REVIEW = "Esta cancha ya tiene una reseña!",
+
+
+    SUBSCRIPTION_PAYMENT_FAILED="No se pudo crear el pago de la subscripcion"
 
 }
