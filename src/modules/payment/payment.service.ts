@@ -1,24 +1,29 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Subscription_Service } from '../subscription/subscription.service';
 import { Payment_Repository } from './payment.repository';
-import { UserService } from '../user/user.service';
 import { User } from 'src/entities/user.entity';
-import { Payment } from 'src/entities/payment.entity';
+import { ApiError } from 'src/helpers/api-error-class';
+import { ApiStatusEnum } from 'src/enums/HttpStatus.enum';
 
 @Injectable()
 export class Payment_Service {
   constructor(
-    private readonly subscriptionService: Subscription_Service, 
-    private readonly paymentRepository:Payment_Repository,
-    private readonly userService: UserService,
+    private readonly subscriptionService: Subscription_Service,
+    private readonly paymentRepository: Payment_Repository,
   ) {}
 
+  async findById(id: string) {}
+  async createSubscriptionPayment(data: any, user: User) {
+    const created_payment =
+      await this.paymentRepository.createSUbscriptionPayment(data, user);
 
+    if (created_payment === undefined) {
+      throw new ApiError(
+        ApiStatusEnum.SUBSCRIPTION_PAYMENT_FAILED,
+        BadRequestException,
+      );
+    }
 
-  async findById(id:string){
-
-  }
-  async createSubscriptionPayment(data:any,user:User){
-const created_payment=await this.paymentRepository.createSUbscriptionPayment(data,user)
+    return created_payment
   }
 }

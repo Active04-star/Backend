@@ -61,8 +61,8 @@ export class StripeService {
 
   // Manejar el evento de sesión completada
   async handleCheckoutSessionCompleted(session: any,user:User) {
-    await this.paymentService.createSubscriptionPayment(session,user)
-    console.log('Pago completado:', session);
+    const payment=await this.paymentService.createSubscriptionPayment(session,user)
+    console.log('Pago completado:', payment);
   }
 
 
