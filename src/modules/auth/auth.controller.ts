@@ -1,7 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { UserClean } from 'src/dtos/user/user-clean.dto';
 import { LocalRegister } from 'src/dtos/user/local-register.dto';
 import { UserLogin } from 'src/dtos/user/user-login.dto';
 import { LoginResponse } from 'src/dtos/user/login-response.dto';
@@ -15,27 +14,23 @@ export class AuthController {
 
 
   @Post('register')
-  @ApiBody({
-    type: LocalRegister,
-  })
+  @ApiBody({ type: LocalRegister })
   @ApiOperation({ summary: 'Registro de usuario' })
   async userRegistration(@Body() userObject: LocalRegister): Promise<ApiResponse> {
     return await this.authService.userRegistration(userObject);
   }
 
 
-  @Post("auth-register")
-  @ApiOperation({ summary: 'Registro de terceros Auth0' })
-  async authZeroRegistration(@Body() userObject: AuthRegister): Promise<UserClean> {
-    const created_user: UserClean = await this.authService.authZeroRegistration(userObject);
-    return created_user;
+  @Post("authenticate")
+  @ApiOperation({ summary: 'Registro o login de terceros Auth0 (No se recomienda usar desde swagger)' })
+  @ApiBody({ type: AuthRegister })
+  async loginOrRegister(@Body() userObject: AuthRegister): Promise<LoginResponse> {
+    return await this.authService.loginOrRegister(userObject);
   }
 
 
   @Post('login')
-  @ApiBody({
-    type: UserLogin,
-  })
+  @ApiBody({ type: UserLogin })
   @ApiOperation({ summary: 'Login de usuario' })
   async userLogin(@Body() userCredentials: UserLogin): Promise<LoginResponse> {
     return await this.authService.userLogin(userCredentials);

@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { isNotEmpty } from "class-validator";
+import { AuthRegister } from "src/dtos/user/auth-register.dto";
 import { LocalRegister } from "src/dtos/user/local-register.dto";
 import { UpdateUser } from "src/dtos/user/update-user.dto";
 import { UserList } from "src/dtos/user/users-list.dto";
@@ -14,6 +16,11 @@ export class UserRepository {
   
 
     constructor(@InjectRepository(User) private userRepository: Repository<User>) { }
+
+    async deleteUser(userInstance: User): Promise<boolean> {
+        const found_user: User | undefined = await this.userRepository.remove(userInstance);
+        return found_user === undefined ? false : true;
+    }
 
 
     async getUserByStripeCustomerId(customerId:string){
@@ -36,7 +43,7 @@ return user
         return actual_user;
     }
 
-    
+
     async rankUpTo(user: User, role: UserRole): Promise<User> {
         user.role = role;
         await this.userRepository.save(user);
@@ -66,13 +73,35 @@ return user
    //     return [user, user.was_banned ? "deleted" : "restored"];
    // }
 
-    async createUser(userObject: Omit<LocalRegister, "confirm_password">): Promise<User> {
-        const created_user: User = this.userRepository.create(userObject);
+    async createUser(userObject: Omit<LocalRegister, "confirm_password"> | AuthRegister): Promise<User> {
+        let created_user: User;
+
+        if (this.isLocalRegister(userObject)) {
+            if (isNotEmpty(userObject.password)) {
+                created_user = this.userRepository.create(userObject);
+            }
+
+        } else if (this.isAuthRegister(userObject)) {
+            if (isNotEmpty(userObject.sub)) {
+                const { sub, ...rest } = userObject;
+                created_user = this.userRepository.create({ authtoken: sub, ...rest });
+            }
+            
+        }
+
         return await this.userRepository.save(created_user);
     }
 
     async getUserByMail(email: string): Promise<User | undefined> {
         const found: User | null = await this.userRepository.findOne({ where: { email: email } });
         return found ? found : undefined;
+    }
+
+    private isLocalRegister(userObject: any): userObject is Omit<LocalRegister, "confirm_password"> {
+        return "password" in userObject;
+    }
+
+    private isAuthRegister(userObject: any): userObject is AuthRegister {
+        return "sub" in userObject;
     }
 }
