@@ -103,7 +103,8 @@ export class AuthService {
             role: user.role,
             was_banned: user.was_banned,
             subscription_status: user.subscription_status,
-            subscription:null                                         //se va a poner la relacio  cuando cree el servicio de subscripcion
+            subscription:null     ,
+            stripeCustomerId:user.stripeCustomerId                                    //se va a poner la relacio  cuando cree el servicio de subscripcion
           },
         };
       }
