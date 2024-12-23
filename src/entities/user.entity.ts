@@ -69,10 +69,6 @@ export class User {
   @OneToMany(() => Payment, (payment) => payment.field, { nullable: true })
   payments: Payment[];
 
-  @OneToMany(() => Payment_History, (history) => history.payment, {
-    nullable: true,
-  })
-  paymentHistory: Payment_History;
 
   @OneToMany(() => Review, (review) => review.user, { nullable: true })
   reviews: Review[];
@@ -97,12 +93,3 @@ export class User {
   managers_list: Sport_Center_Managers[];
 }
 
-
-/**
-  // Relación con CustomerDetails
-  @OneToOne(() => CustomerDetails, (details) => details.user, { nullable: true })
-  customerDetails?: CustomerDetails;
-
-  // Relación con ManagerDetails
-  @OneToOne(() => ManagerDetails, (details) => details.user, { nullable: true })
-  managerDetails?: ManagerDetails; */

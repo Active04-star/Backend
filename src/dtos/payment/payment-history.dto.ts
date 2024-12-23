@@ -22,4 +22,3 @@ export class paymentHistory {
     paymentDate: Date
 }
 
-//podria agregar un sportcenterId o userId viendolo desde el lado de un admin

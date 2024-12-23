@@ -55,8 +55,7 @@ export class SportCenter {
   @OneToMany(() => Payment, (payment) => payment.field)
   payments: Payment[];
 
-  @OneToMany(() => Payment_History, (history) => history.payment)
-  paymentsHistory: Payment_History;
+
 
   @OneToMany(() => SportCenter_Schedule, (schedule) => schedule.sportcenter, {
     cascade: true,

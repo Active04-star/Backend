@@ -5,8 +5,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entities/user.entity';
 import { PaymentMethod } from 'src/enums/paymentMethod.enum';
 import { PaymentStatus } from 'src/enums/paymentStatus.enum';
-import { Payment_Type } from 'src/enums/paymentType.enum';
-import { Payment_History } from 'src/entities/payment_hisotry.entity';
 import { Subscription_Payment } from 'src/entities/subscriptionPayment.entity';
 
 @Injectable()
