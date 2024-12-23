@@ -96,3 +96,13 @@ export class User {
   )
   managers_list: Sport_Center_Managers[];
 }
+
+
+/**
+  // Relación con CustomerDetails
+  @OneToOne(() => CustomerDetails, (details) => details.user, { nullable: true })
+  customerDetails?: CustomerDetails;
+
+  // Relación con ManagerDetails
+  @OneToOne(() => ManagerDetails, (details) => details.user, { nullable: true })
+  managerDetails?: ManagerDetails; */
