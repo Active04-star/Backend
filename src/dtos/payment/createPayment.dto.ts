@@ -2,10 +2,10 @@ import Decimal from "decimal.js";
 import { PaymentMethod } from "src/enums/paymentMethod.enum";
 import { IsNotEmpty, IsString, IsDecimal, IsEnum, IsUUID } from "class-validator";
 
-export class paymentRequest {
+export class createPaymentDto {
     @IsNotEmpty()
     @IsDecimal()
-    price: Decimal;
+    amount: Decimal;
     
     @IsNotEmpty()
     @IsEnum(PaymentMethod)
@@ -19,6 +19,11 @@ export class paymentRequest {
     @IsNotEmpty()
     @IsString()
     @IsUUID()
-    reservationId: string
+    userId: string;
+
+    @IsNotEmpty()
+    @IsString()
+    @IsUUID()
+    fieldId: string;
 }
 

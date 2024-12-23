@@ -49,8 +49,6 @@ export class Field {
   @OneToMany(() => Payment, (payment) => payment.field)
   payments: Payment[];
 
-  @OneToMany(() => Payment_History, (history) => history.payment)
-  paymentsHistory: Payment_History;
 
   @OneToMany(() => Field_Schedule, (fieldSchedule) => fieldSchedule.field, {
     cascade: true,
