@@ -34,7 +34,6 @@ const typeOrmConfig = {
 
 export default registerAs('typeorm', () => typeOrmConfig);
 
-
 export const connectionSource = new DataSource(typeOrmConfig as DataSourceOptions);
 
 export const connectDatabase = async () => {

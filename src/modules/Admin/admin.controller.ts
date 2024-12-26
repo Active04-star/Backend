@@ -26,7 +26,8 @@ export class AdminController {
         return await this.adminService.getUsers(page, limit);
     }
 
-    @Get('list/centersBan')
+
+    @Get('list/centersban')
     @ApiQuery({ name: 'page', required: true, type: Number, example: 1, description: 'Numero de la pagina' })
     @ApiQuery({ name: 'limit', required: true, type: Number, example: 10, description: 'Objetos por pagina' })
     @ApiQuery({ name: "rating", required: false, type: Number, example: 5, description: "Rating de centros deportivos" })

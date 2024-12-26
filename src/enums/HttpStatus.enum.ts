@@ -41,7 +41,7 @@ export enum ApiStatusEnum {
     REVIEW_DELETION_SUCCESS = "Reseña eliminada correctamente",
     REVIEWS_NOT_IN_CENTER = "No hay reseñas para este complejo!",
 
-    RESERVATION_NOT_FOUND = "No se encontró ninguna reseña",
+    RESERVATION_NOT_FOUND = "No se encontró ninguna reserva",
 
     RATING_OUT_OF_BOUNDS = "Rating fuera de limites",
     CENTER_LIST_EMTPY = "No se encontraron centros deportivos",
