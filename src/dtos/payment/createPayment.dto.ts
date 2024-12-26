@@ -25,5 +25,10 @@ export class createPaymentDto {
     @IsString()
     @IsUUID()
     fieldId: string;
+
+    @IsNotEmpty()
+    @IsString()
+    @IsUUID()
+    reservationId: string;
 }
 
