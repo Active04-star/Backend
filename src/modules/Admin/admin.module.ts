@@ -12,7 +12,7 @@ import { Sport_Center_Module } from "../sport-center/sport-center.module";
 @Module({
     imports: [Sport_Center_Module,UserModule, TypeOrmModule.forFeature([User, SportCenter,Reservation])],
     controllers: [AdminController], 
-    providers: [AdminService, AdminRepository], //reservationRepository,
+    providers: [AdminService, AdminRepository], 
     exports: []
 })
 export class AdminModule {}

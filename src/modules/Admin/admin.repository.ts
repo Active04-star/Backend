@@ -31,7 +31,6 @@ export class AdminRepository {
               };
         }
 
-
         async getUserById(id: string): Promise<User | undefined> {
             const found_user: User | null = await this.userRepository.findOne({ where: { id: id } });
             return found_user === null ? undefined : found_user;
