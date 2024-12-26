@@ -16,13 +16,24 @@ import { ApiError } from 'src/helpers/api-error-class';
 import { ApiResponse } from 'src/dtos/api-response';
 import { UserRole } from 'src/enums/roles.enum';
 import { UserList } from 'src/dtos/user/users-list.dto';
+import { AuthRegister } from 'src/dtos/user/auth-register.dto';
+import { ReservationStatus } from 'src/enums/reservationStatus.enum';
+import { Repository } from 'typeorm';
+import { Reservation } from 'src/entities/reservation.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class UserService {
- 
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    @InjectRepository(Reservation)
+    private readonly reservatioRepository: Repository<Reservation>,
+  ) {}
 
-
+  async deleteUser(id: string): Promise<boolean> {
+    const found_user: User = await this.userRepository.getUserById(id);
+    return await this.userRepository.deleteUser(found_user);
+  }
 
   async getUserByStripeCustomerId(customerId: string) {
     const found_user: User | undefined =
@@ -34,8 +45,6 @@ export class UserService {
     return found_user;
   }
 
-
-  
   async updateStripeCustomerId(user: User, customerId: any) {
     const updatedUser: User = await this.userRepository.updateStripeCustomerId(
       user,
@@ -54,16 +63,29 @@ export class UserService {
       throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, NotFoundException);
     }
 
-    const updated_user: User = await this.userRepository.updateUser(
-      found_user,
-      modified_user,
-    );
-    const { password, ...filtered_user } = updated_user;
+    return new UserClean();
+  }
 
-    return filtered_user;
+  async hasActiveReservations(userId: string): Promise<boolean> {
+    const activeReservation = await this.reservatioRepository
+      .createQueryBuilder('reservation')
+      .where('reservation.userId = :userId', { userId })
+      .andWhere('reservation.status = :status', {
+        status: ReservationStatus.ACTIVE,
+      })
+      .getOne();
+
+    console.log('active', !!activeReservation);
+
+    // Si se encuentra una reserva activa, devolver true
+    return !!activeReservation;
   }
 
   async rankUpTo(user: User, rank: UserRole): Promise<boolean> {
+    if (this.hasActiveReservations(user.id)) {
+      throw new ApiError(ApiStatusEnum.RANKING_UP_FAIL, BadRequestException);
+    }
+
     const ranked_up: User | undefined = await this.userRepository.rankUpTo(
       user,
       rank,
@@ -84,64 +106,21 @@ export class UserService {
     }
     return found_user;
   }
-// en el modulo de admin
- // async banOrUnbanUser(id: string): Promise<ApiResponse> {
- //   try {
- //     const found_user: User | undefined =
- //       await this.userRepository.getUserById(id);
-//
- //     if (isEmpty(found_user)) {
-//        throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, NotFoundException);
- //     }
-//
- //     const [updated_user, status]: [User, string] =
- //       await this.userRepository.banOrUnbanUser(found_user);
-
-//      if (updated_user && status === 'deleted') {
-//       return { message: ApiStatusEnum.USER_DELETED };
-//      } else if (updated_user && status === 'restored') {
-//        return { message: ApiStatusEnum.USER_RESTORED };
-//      }
-
-//      throw new ApiError(
-//        ApiStatusEnum.USER_UNBAN_OR_BAN,
-//        BadRequestException,
-//        'Something went wrong trying to modify this',
-//      );
-//    } catch (error) {
-//      throw new ApiError(error?.message, BadRequestException, error);
-//    }
- // }
-//en el modulo admin
-//  async getUsers(page: number, limit: number): Promise<UserList> {
-//    const found_users: UserList = await this.userRepository.getUsers(
-//      page,
-//      limit,
-//    );
-//
-//    if (found_users.users.length === 0) {
-//      throw new ApiError(ApiStatusEnum.USER_LIST_EMPTY, NotFoundException);
-//    }
-//    return found_users;
-//  }
 
   async getUserByMail(email: string): Promise<User | undefined> {
     const found: User | undefined =
       await this.userRepository.getUserByMail(email);
-    //ESTE ERROR NO DEBE ESTAR AQUI
-    // if (found === undefined) {
-    //     throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, NotFoundException);
-    // }
+    //ESTA FUNCION NUNCA DEBE LANZAR ERROR
     return found;
   }
 
   async createUser(
-    userObject: Omit<LocalRegister, 'confirm_password'>,
+    userObject: Omit<LocalRegister, 'confirm_password'> | AuthRegister,
   ): Promise<UserClean> {
     try {
       const created_user: User =
         await this.userRepository.createUser(userObject);
-      const { password, ...filtered } = created_user;
+      const { password, authtoken, ...filtered } = created_user;
 
       return filtered;
     } catch (error) {

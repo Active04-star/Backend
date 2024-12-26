@@ -15,10 +15,10 @@ import { Field_Module } from './modules/field/field.module';
 import { ReviewModule } from './modules/review/review.module';
 import { ImagesModule } from './modules/images/images.module';
 import { StripeModule } from './modules/stripe/stripe.module';
-import { AdminModule } from './modules/admin/admin.module';
+import { AdminModule } from './modules/Admin/admin.module';
+import { Auth0Module } from './modules/auth0/auth0.module';
 import { Payment_Module } from './modules/payment/payment.module';
 import { Subscription_Module } from './modules/subscription/subscription.module';
-
 
 @Module({
   imports: [
@@ -66,7 +66,8 @@ import { Subscription_Module } from './modules/subscription/subscription.module'
         },
       }),
     }),
-
+    
+    Auth0Module,
     ImagesModule,
     UploadModule,
     Sport_Center_Module,
