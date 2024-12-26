@@ -70,6 +70,11 @@ export enum ApiStatusEnum {
     FIELD_ALREADY_HAS_A_REVIEW = "Esta cancha ya tiene una reseña!",
 
 
-    SUBSCRIPTION_PAYMENT_FAILED="No se pudo crear el pago de la subscripcion"
+    SUBSCRIPTION_PAYMENT_FAILED="No se pudo crear el pago de la subscripcion",
+
+
+    PAYMENT_NOT_FOUND='Pago no entonctrado',
+    PAYMENT_CREATION_FAILED="No se pudo crear el pago",
+    INVALID_RESERVATION_STATUS='Estado de la reserva invalido'
 
 }
