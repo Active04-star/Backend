@@ -4,12 +4,13 @@ import { reservationCancel } from 'src/dtos/reservation/reservation-cancel.dto';
 import { reservationCreate } from 'src/dtos/reservation/reservation-create.dto';
 import { reservationUpdate } from 'src/dtos/reservation/reservation-update.dto';
 import { Reservation } from 'src/entities/reservation.entity';
+import { ReservationService } from './reservation.service';
 
 @ApiTags("Reservation")
 @Controller('reservation')
 export class reservationController {
     constructor(private readonly reservationService: ReservationService) {}
-
+//
     @Get('user/:id')
     @ApiOperation({ summary: 'obtine una reserva por id de usuario'})
     async getReservationUser(@Param('id', ParseUUIDPipe) id: string): Promise<Reservation> {
