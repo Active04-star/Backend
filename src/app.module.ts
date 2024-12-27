@@ -19,6 +19,7 @@ import { AdminModule } from './modules/Admin/admin.module';
 import { Auth0Module } from './modules/auth0/auth0.module';
 import { Payment_Module } from './modules/payment/payment.module';
 import { Subscription_Module } from './modules/subscription/subscription.module';
+import { Reservation_Module } from './modules/reservation/reservation.module';
 
 @Module({
   imports: [
@@ -79,7 +80,8 @@ import { Subscription_Module } from './modules/subscription/subscription.module'
     ReviewModule,
     AdminModule,
     Payment_Module,
-    Subscription_Module
+    Subscription_Module,
+    Reservation_Module,
   ],
   controllers: [],
   providers: [],
