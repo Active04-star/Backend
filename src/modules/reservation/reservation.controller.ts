@@ -1,14 +1,11 @@
 import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Put } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { reservationCancel } from 'src/dtos/reservation/reservation-cancel.dto';
-import { reservationCreate } from 'src/dtos/reservation/reservation-create.dto';
-import { reservationUpdate } from 'src/dtos/reservation/reservation-update.dto';
 import { Reservation } from 'src/entities/reservation.entity';
 import { Reservation_Service } from './reservation.service';
 
 @ApiTags("Reservation")
 @Controller('reservation')
-export class reservationController {
+export class Reservation_Controller {
     constructor(private readonly reservationService: Reservation_Service) {}
 //
     // @Get('user/:id')

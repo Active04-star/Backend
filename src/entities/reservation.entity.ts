@@ -13,6 +13,7 @@ import { Field } from './field.entity';
 import { Payment } from './payment.entity';
 import { Review } from './review.entity';
 import { Payment_History } from './payment_hisotry.entity';
+import { Field_Schedule } from './field_schedule.entity';
 
 @Entity({
   name: 'reservations',
@@ -47,4 +48,9 @@ export class Reservation {
 
   @ManyToOne(() => Field, (field) => field.reservation, { nullable: false })
   field: Field;
+
+  @ManyToOne(() => Field_Schedule, (schedule) => schedule.reservations, {
+    nullable: false,
+  })
+  fieldSchedule: Field_Schedule;
 }

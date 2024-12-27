@@ -1,9 +1,10 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { SportCenter } from './sportcenter.entity';
 import { DayOfWeek } from 'src/enums/dayOfWeek.enum';
 import { Field } from './field.entity';
 import { SportCenter_Schedule } from './sportcenter_schedules.entity';
 import { FieldStatus } from 'src/enums/fieldStatus.enum';
+import { Reservation } from './reservation.entity';
 
 @Entity({ name: 'field_schedule' })
 export class Field_Schedule {
@@ -32,6 +33,11 @@ export class Field_Schedule {
     nullable: false,
   })
   field: Field;
+
+  @OneToMany(() => Reservation, (reservation) => reservation.fieldSchedule, {
+    cascade: true,
+  })
+  reservations: Reservation[];
 
   @ManyToOne(
     () => SportCenter_Schedule,
