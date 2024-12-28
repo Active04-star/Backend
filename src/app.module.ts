@@ -9,7 +9,7 @@ import { UploadModule } from './modules/uploads/upload.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { join } from 'path';
 import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
-import { Sport_Center_Module } from './modules/sport-center/sport-center.module';
+import { SportCenter_Module } from './modules/sport-center/sport-center.module';
 import { Sport_Cateogry_Module } from './modules/sport-category/sport-category.module';
 import { Field_Module } from './modules/field/field.module';
 import { ReviewModule } from './modules/review/review.module';
@@ -71,7 +71,7 @@ import { Reservation_Module } from './modules/reservation/reservation.module';
     Auth0Module,
     ImagesModule,
     UploadModule,
-    Sport_Center_Module,
+    SportCenter_Module,
     AuthModule,
     UserModule,
     Sport_Cateogry_Module,

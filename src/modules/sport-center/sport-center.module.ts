@@ -15,4 +15,4 @@ import { UploadModule } from 'src/modules/uploads/upload.module';
   providers: [SportCenterService, SportCenterRepository],
   exports: [SportCenterService],
 })
-export class Sport_Center_Module { }
+export class SportCenter_Module { }
