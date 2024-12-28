@@ -1,5 +1,4 @@
 import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Put, UseGuards } from '@nestjs/common';
-import { ManagerService } from './manager.service';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam } from '@nestjs/swagger';
 import { AuthGuard } from 'src/guards/auth-guard.guard';
 import { Roles } from 'src/decorators/roles.decorator';
@@ -8,6 +7,7 @@ import { Field } from 'src/entities/field.entity';
 import { UpdateSportCenterDto } from 'src/dtos/sportcenter/updateSportCenter.dto';
 import { SportCenterService } from 'src/modules/sport-center/sport-center.service';
 import { ApiResponse } from 'src/dtos/api-response';
+import { ManagerService } from './manager.service';
 
 @Controller('manager')
 export class ManagerController {
