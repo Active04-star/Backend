@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToOne } from 'typeorm';
-import { Field_Schedule } from './field_schedule.entity';
 import { Reservation } from './reservation.entity';
+import { Field } from './field.entity';
 
 export enum BlockStatus {
   AVAILABLE = 'AVAILABLE',
@@ -21,9 +21,10 @@ export class Field_Block {
   @Column({ type: 'enum', enum: BlockStatus, default: BlockStatus.AVAILABLE })
   status: BlockStatus; // Estado del bloque: disponible o reservado
 
-  @ManyToOne(() => Field_Schedule, (fieldSchedule) => fieldSchedule.blocks, { onDelete: 'CASCADE' })
-  fieldSchedule: Field_Schedule;
-
+  @ManyToOne(() => Field, (field) => field.blocks, {
+    onDelete: 'CASCADE',
+  })
+  field: Field;
 
   @OneToOne(() => Reservation, (reservation) => reservation.fieldBlock, { cascade: true, nullable: true })
   reservation: Reservation;
