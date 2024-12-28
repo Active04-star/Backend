@@ -51,7 +51,6 @@ export class SportCenterRepository {
     const queryBuilder = this.sportCenterRepository
       .createQueryBuilder('sportcenter')
       .orderBy('sportcenter.averageRating', 'DESC', 'NULLS LAST'); // Ordena por averageRating directamente
-    //ESTA FUNCION SE DEBE REUTILIZAR PARA LOS ADMINS CAMBIANDO EL PARAMETRO EN SHOW_HIDDEN
 
     if (!show_hidden) {
       queryBuilder.andWhere('sportcenter.status = :status', {
@@ -85,7 +84,12 @@ export class SportCenterRepository {
       page: Number(page),
       limit: Number(limit),
       total_pages: Math.ceil(centers.length / limit),
-      sport_centers: centers,
+
+      sport_centers: centers.map(center => ({
+        ...center,
+        photos: center.photos === undefined ? [] : center.photos.map(image => image.image_url)
+      }))
+
     };
   }
 

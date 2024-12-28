@@ -12,8 +12,8 @@ import { Repository } from "typeorm";
 
 @Injectable()
 export class UserRepository {
-    
-  
+
+
 
     constructor(@InjectRepository(User) private userRepository: Repository<User>) { }
 
@@ -23,16 +23,16 @@ export class UserRepository {
     }
 
 
-    async getUserByStripeCustomerId(customerId:string){
+    async getUserByStripeCustomerId(customerId: string) {
         const found_user: User | null = await this.userRepository.findOne({ where: { stripeCustomerId: customerId } });
         return found_user === null ? undefined : found_user;
     }
 
 
-   async updateStripeCustomerId(user: User, customerId: any) {
-    user.stripeCustomerId=customerId
-    await this.userRepository.save(user)
-return user
+    async updateStripeCustomerId(user: User, customerId: any) {
+        user.stripeCustomerId = customerId
+        await this.userRepository.save(user)
+        return user
     }
 
 
@@ -51,8 +51,8 @@ return user
     }
 
 
-    async getUserById(id: string): Promise<User | undefined> {
-        const found_user: User | null = await this.userRepository.findOne({ where: { id: id } });
+    async getUserById(id: string, relations = false): Promise<User | undefined> {
+        const found_user: User | null = await this.userRepository.findOne({ where: { id: id }, relations: { managed_centers: relations } });
         return found_user === null ? undefined : found_user;
     }
 
@@ -69,7 +69,7 @@ return user
                 const { sub, ...rest } = userObject;
                 created_user = this.userRepository.create({ authtoken: sub, ...rest });
             }
-            
+
         }
 
         return await this.userRepository.save(created_user);

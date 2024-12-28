@@ -3,7 +3,6 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -44,7 +43,6 @@ export class Reservation {
   @OneToOne(() => Review, (review) => review.reservation, { cascade: true })
   @JoinColumn()
   review: Review;
-
 
 
   @ManyToOne(() => User, (user) => user.reservations, { nullable: false })

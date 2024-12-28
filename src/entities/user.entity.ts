@@ -13,7 +13,6 @@ import { SportCenter } from './sportcenter.entity';
 import { Reservation } from './reservation.entity';
 import { Payment } from './payment.entity';
 import { Sport_Center_Managers } from './sport_center_managers.entity';
-import { Payment_History } from './payment_hisotry.entity';
 import { Subscription } from './subscription.entity';
 import { Subscription_Payment } from './subscriptionPayment.entity';
 

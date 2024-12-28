@@ -76,7 +76,7 @@ export class SportCenterController {
     );
   }
 
-  /**IMAGENES MOVIDAS A SU PROPIA RUTA */
+  
   @Post('create')
   //   @Roles(UserRole.CONSUMER)
   //   @UseGuards(AuthGuard)

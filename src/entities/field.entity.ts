@@ -13,7 +13,6 @@ import { Image } from './image.entity';
 import Decimal from 'decimal.js';
 import { Payment } from './payment.entity';
 import { Review } from './review.entity';
-import { Payment_History } from './payment_hisotry.entity';
 
 @Entity()
 export class Field {
@@ -48,7 +47,6 @@ export class Field {
 
   @OneToMany(() => Payment, (payment) => payment.field)
   payments: Payment[];
-
 
   @OneToMany(() => Field_Schedule, (fieldSchedule) => fieldSchedule.field, {
     cascade: true,
