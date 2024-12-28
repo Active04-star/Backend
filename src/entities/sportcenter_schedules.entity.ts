@@ -21,8 +21,8 @@ export class SportCenter_Schedule {
   })
   day: DayOfWeek;
 
-  @Column({ type: 'varchar', nullable: true })
-  note?: string;
+  @Column({ nullable: false,default:true })
+  isOpen: boolean;
 
   @Column({ type: 'time', nullable: false })
   opening_time: string;

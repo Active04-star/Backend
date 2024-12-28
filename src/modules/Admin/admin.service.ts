@@ -15,7 +15,7 @@ import { ApiResponse } from 'src/dtos/api-response';
 import { UserRole } from 'src/enums/roles.enum';
 import { UserList } from 'src/dtos/user/users-list.dto';
 import { SportCenterList } from 'src/dtos/sportcenter/sport-center-list.dto';
-import { SportCenterStatus } from 'src/enums/sportCenterStatus.enum';
+import { Sport_Center_Status } from 'src/enums/sport_Center_Status.enum';
 import { SportCenter } from 'src/entities/sportcenter.entity';
 import { AdminRepository } from './admin.repository';
 import { Reservation } from 'src/entities/reservation.entity';
@@ -42,7 +42,6 @@ export class AdminService {
     }
     return found_users;
   }
-
 
   async banOrUnbanUser(id: string): Promise<ApiResponse> {
     try {
@@ -74,7 +73,7 @@ export class AdminService {
 
   async banOrUnbanCenter(
     id: string,
-    estado: SportCenterStatus,
+    estado: Sport_Center_Status,
   ): Promise<ApiResponse> {
     const found_center: SportCenter | undefined =
       await this.adminRepository.getCenterById(id);
@@ -100,7 +99,7 @@ export class AdminService {
     }
   }
 
-  async forceBan(id: string, status: SportCenterStatus): Promise<ApiResponse> {
+  async forceBan(id: string, status: Sport_Center_Status): Promise<ApiResponse> {
     const found_center: SportCenter | undefined =
       await this.adminRepository.getCenterById(id);
 

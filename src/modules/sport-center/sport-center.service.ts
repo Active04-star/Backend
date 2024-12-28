@@ -20,7 +20,7 @@ import { ApiStatusEnum } from 'src/enums/HttpStatus.enum';
 import { isUUID } from 'class-validator';
 import { ApiResponse } from 'src/dtos/api-response';
 import { SportCenterList } from 'src/dtos/sportcenter/sport-center-list.dto';
-import { SportCenterStatus } from 'src/enums/sportCenterStatus.enum';
+import { Sport_Center_Status } from 'src/enums/sport_Center_Status.enum';
 
 @Injectable()
 export class SportCenterService {
@@ -223,7 +223,7 @@ export class SportCenterService {
   async updateStatus(
     userId: string,
     sportCenterId: string,
-    status: SportCenterStatus,
+    status: Sport_Center_Status,
   ): Promise<SportCenter> {
     const user: User = await this.userService.getUserById(userId);
 
