@@ -11,6 +11,7 @@ import { ApiResponse } from 'src/dtos/api-response';
 import { ApiStatusEnum } from 'src/enums/HttpStatus.enum';
 import { ApiError } from 'src/helpers/api-error-class';
 import { Sport_Category } from 'src/entities/sport_category.entity';
+import { Field_Block_Service } from '../field_blocks/field_schedule.service';
 
 @Injectable()
 export class Field_Service {
@@ -20,6 +21,7 @@ export class Field_Service {
     private sportCenterService: SportCenterService,
     private sportCategoryService: Sport_Category_Service,
     private reservationService: Reservation_Service,
+    private fieldblockService:Field_Block_Service
   ) { }
 
 
@@ -42,6 +44,13 @@ export class Field_Service {
 
       if (created_field === undefined) {
         throw new ApiError(ApiStatusEnum.FIELD_CREATION_FAILED, InternalServerErrorException);
+      }
+
+      for (const schedule of sportCenter.schedules) {
+        const blocks = await this.fieldblockService.createFieldBlocks(created_field, schedule);
+        if (!blocks || blocks.length === 0) {
+          throw new ApiError(ApiStatusEnum.FIELD_BLOCK_CREATION_FAILED, InternalServerErrorException);
+        }
       }
 
       return await this.findById(created_field.id);

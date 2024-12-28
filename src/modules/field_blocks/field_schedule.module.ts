@@ -1,16 +1,13 @@
 
-// import { Module } from "@nestjs/common";
-// import { TypeOrmModule } from "@nestjs/typeorm";
-// import { Field_Schedule_Service } from "./field_schedule.service";
-// import { Field_Schedule_Controller } from "./field_schedule.controller";
-// import { Field_Block } from "src/entities/field_blocks.entity";
-// import { Field_Module } from "../field/field.module";
-// import { Field_Schedule } from "src/entities/field_schedule.entity";
+import { Module } from "@nestjs/common";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { Field_Block } from "src/entities/field_blocks.entity";
+import { Field_Module } from "../field/field.module";
+import { Field_Block_Service } from "./field_schedule.service";
 
-// @Module({
-//     imports: [Field_Module,TypeOrmModule.forFeature([Field_Schedule,Field_Block])],
-//     controllers: [Field_Schedule_Controller],
-//     providers: [Field_Schedule_Service],
-//     exports: [],
-// })
-// export class Field_Schedule_Module { }
+@Module({
+    imports: [Field_Module,TypeOrmModule.forFeature([Field_Block])],
+    providers: [Field_Block_Service],
+    exports: [Field_Block_Service],
+})
+export class Field_Block_Module { }

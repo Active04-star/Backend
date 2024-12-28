@@ -6,6 +6,7 @@ import {
   IsInt,
   IsUUID,
   IsDecimal,
+  IsOptional,
 } from 'class-validator';
 
 export class FieldDto {
@@ -26,6 +27,12 @@ export class FieldDto {
     example: '100.00',
   })
   price: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(15)
+  @Max(1440)
+  duration_minutes:number
 
   @IsUUID()
   @IsNotEmpty()
