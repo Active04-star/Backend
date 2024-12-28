@@ -1,7 +1,6 @@
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Field } from './field.entity';
 import { SportCenter_Schedule } from './sportcenter_schedules.entity';
-import { FieldStatus } from 'src/enums/fieldStatus.enum';
 import { Field_Block } from './field_blocks.entity';
 
 @Entity({ name: 'field_schedule' })
@@ -19,12 +18,9 @@ export class Field_Schedule {
   @Column({ type: 'int', nullable: false, default: 60 }) // Duración en minutos
   duration_minutes: number;
 
-  @Column({
-    type: 'enum',
-    enum: FieldStatus,
-    default: FieldStatus.AVAILABLE,
-  })
-  status: FieldStatus;
+  
+  @Column({ nullable: false,default:true })
+  isOpen: boolean;
 
   @ManyToOne(() => Field, (field) => field.schedules, {
     onDelete: 'CASCADE',

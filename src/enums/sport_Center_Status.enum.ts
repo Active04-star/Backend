@@ -1,4 +1,4 @@
-export enum SportCenterStatus {
+export enum Sport_Center_Status {
   /**solamente el usuario que creo dicho sportcenter puede verlo, antes de publicarlo */
   DRAFT = 'draft',
   /**el centro ya esta activo */

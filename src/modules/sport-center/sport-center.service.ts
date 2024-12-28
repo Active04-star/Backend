@@ -19,7 +19,7 @@ import { ApiStatusEnum } from 'src/enums/HttpStatus.enum';
 import { isUUID } from 'class-validator';
 import { ApiResponse } from 'src/dtos/api-response';
 import { SportCenterList } from 'src/dtos/sportcenter/sport-center-list.dto';
-import { SportCenterStatus } from 'src/enums/sportCenterStatus.enum';
+import { Sport_Center_Status } from 'src/enums/sport_Center_Status.enum';
 
 @Injectable()
 export class SportCenterService {
@@ -168,7 +168,12 @@ export class SportCenterService {
   //   return await this.sportcenterRepository.updateStatus(found_sportcenter, SportCenterStatus.DISABLE);
   // }
 
-  async updateStatus(userId: string, sportCenterId: string, status: SportCenterStatus): Promise<SportCenter> {
+  async updateStatus(
+    userId: string,
+    sportCenterId: string,
+    status: Sport_Center_Status,
+  ): Promise<SportCenter> {
+  
     const user: User = await this.userService.getUserById(userId);
 
     const found_sportcenter = await this.getById(sportCenterId);

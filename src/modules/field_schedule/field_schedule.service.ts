@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CreateFieldScheduleDto } from 'src/dtos/field_scheudle/createFieldSchedule.dto';
 import { Field_Block } from 'src/entities/field_blocks.entity';
 import { Field_Schedule } from 'src/entities/field_schedule.entity';
 import { Repository } from 'typeorm';
@@ -13,7 +14,7 @@ export class Field_Schedule_Service {
     private fieldBlockRepository: Repository<Field_Block>,
   ) {}
 
-  async create(){
+  async create(data:CreateFieldScheduleDto){
     
   }
 }
