@@ -8,11 +8,11 @@ import {
 import { Sport_Category } from './sport_category.entity';
 import { SportCenter } from './sportcenter.entity';
 import { Reservation } from './reservation.entity';
-import { Field_Schedule } from './field_schedule.entity';
 import { Image } from './image.entity';
 import Decimal from 'decimal.js';
 import { Payment } from './payment.entity';
 import { Review } from './review.entity';
+import { Field_Block } from './field_blocks.entity';
 
 @Entity()
 export class Field {
@@ -40,6 +40,11 @@ export class Field {
   })
   price: Decimal;
 
+  // Duración de cada rango horario (por ejemplo, 1 hora por reserva)
+  @Column({ type: 'int', nullable: false, default: 60 }) // Duración en minutos
+  duration_minutes: number;
+  
+
   @OneToMany(() => Reservation, (reservation) => reservation.field, {
     nullable: true,
   })
@@ -48,10 +53,8 @@ export class Field {
   @OneToMany(() => Payment, (payment) => payment.field)
   payments: Payment[];
 
-  @OneToMany(() => Field_Schedule, (fieldSchedule) => fieldSchedule.field, {
-    cascade: true,
-  })
-  schedules: Field_Schedule[];
+  @OneToMany(() => Field_Block, (block) => block.field, { cascade: true })
+  blocks: Field_Block[];
 
   @OneToMany(() => Image, (photos) => photos.field, { nullable: true })
   photos: Image[];
