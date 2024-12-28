@@ -73,8 +73,8 @@ export enum ApiStatusEnum {
   FIELD_DELETION_FAILED = 'No se pudo eliminar esta cancha',
   FIELD_NOT_FOUND = 'No se pudo encontrar esta cancha',
   FIELD_CREATION_FAILED = 'No se pudo crear una nueva cancha',
+  FIELD_BLOCK_CREATION_FAILED='Se produjo un error creando los bloques de las canchas',
 
-  FIELD_SCHEUDLE_VALIDATION_FAILED = 'los horarios de la cnahca deben estar dentro de los horarios del centro deportivo y tener un rango valido',
 
   SUBSCRIPTION_PAYMENT_FAILED = 'No se pudo crear el pago de la subscripcion',
 

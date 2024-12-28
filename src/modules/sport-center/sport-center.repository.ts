@@ -113,8 +113,7 @@ export class SportCenterRepository {
   async findOne(id: string): Promise<SportCenter | undefined> {
     const found_sportcenter: SportCenter =
       await this.sportCenterRepository.findOne({
-        where: { id: id },
-        relations: { photos: true },
+        where: { id: id }
       });
 
     return found_sportcenter === null ? undefined : found_sportcenter;

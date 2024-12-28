@@ -22,6 +22,7 @@ import { Subscription_Module } from './modules/subscription/subscription.module'
 import { Reservation_Module } from './modules/reservation/reservation.module';
 import { SportCenter_Schedule_Module } from './modules/sportcenter_schedules/sportCenter_schedule.module';
 import { ManagerModule } from './modules/manager/manager.module';
+import { Field_Block_Module } from './modules/field_blocks/field_schedule.module';
 
 @Module({
   imports: [
@@ -85,7 +86,8 @@ import { ManagerModule } from './modules/manager/manager.module';
     Subscription_Module,
     Reservation_Module,
     SportCenter_Schedule_Module,
-    ManagerModule
+    ManagerModule,
+    Field_Block_Module
   ],
   controllers: [],
   providers: [],

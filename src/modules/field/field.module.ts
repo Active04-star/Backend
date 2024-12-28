@@ -7,9 +7,10 @@ import { Field_Repository } from "./field.repository";
 import { SportCenter_Module } from "../sport-center/sport-center.module";
 import { Sport_Cateogry_Module } from "../sport-category/sport-category.module";
 import { Reservation_Module } from "../reservation/reservation.module";
+import { Field_Block_Module } from "../field_blocks/field_schedule.module";
 
 @Module({
-    imports: [Sport_Cateogry_Module, Reservation_Module, forwardRef(() => SportCenter_Module), TypeOrmModule.forFeature([Field])],
+    imports: [Field_Block_Module,Sport_Cateogry_Module, Reservation_Module, forwardRef(() => SportCenter_Module), TypeOrmModule.forFeature([Field])],
     controllers: [Field_Controller],
     providers: [Field_Service, Field_Repository],
     exports: [Field_Service],
