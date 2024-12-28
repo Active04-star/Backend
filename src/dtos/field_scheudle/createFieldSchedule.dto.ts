@@ -1,4 +1,12 @@
-import {  IsNotEmpty, IsNumber, IsString, IsUUID, Matches, Max, Min } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  IsUUID,
+  Matches,
+  Max,
+  Min,
+} from 'class-validator';
 
 export class CreateFieldScheduleDto {
   @IsString()
@@ -21,7 +29,7 @@ export class CreateFieldScheduleDto {
   @IsNotEmpty()
   duration_minutes: number;
 
-
+  
 
   @IsUUID()
   @IsNotEmpty()
