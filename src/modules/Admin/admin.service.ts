@@ -90,7 +90,7 @@ export class AdminService {
   }
 
 
-  async forceBan(id: string, status: SportCenterStatus): Promise<ApiResponse> {
+  async forceBan(id: string, status: Sport_Center_Status): Promise<ApiResponse> {
     const found_center: SportCenter | undefined = await this.adminRepository.getCenterById(id);
 
     if (isEmpty(found_center)) {
