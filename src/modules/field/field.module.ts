@@ -4,12 +4,12 @@ import { Field } from "src/entities/field.entity";
 import { Field_Controller } from "./field.controller";
 import { Field_Service } from "./field.service";
 import { Field_Repository } from "./field.repository";
-import { Sport_Center_Module } from "../sport-center/sport-center.module";
 import { Sport_Cateogry_Module } from "../sport-category/sport-category.module";
-import { Reservation } from "src/entities/reservation.entity";
+import { Reservation_Module } from "../reservation/reservation.module";
+import { Sport_Center_Module } from "../sport-center/sport-center.module";
 
 @Module({
-    imports: [Sport_Cateogry_Module, forwardRef(() => Sport_Center_Module), TypeOrmModule.forFeature([Field, Reservation])],
+    imports: [Sport_Cateogry_Module, Reservation_Module, forwardRef(() => Sport_Center_Module), TypeOrmModule.forFeature([Field])],
     controllers: [Field_Controller],
     providers: [Field_Service, Field_Repository],
     exports: [Field_Service],

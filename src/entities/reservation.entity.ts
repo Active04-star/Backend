@@ -3,7 +3,6 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -12,7 +11,6 @@ import { ReservationStatus } from 'src/enums/reservationStatus.enum';
 import { Field } from './field.entity';
 import { Payment } from './payment.entity';
 import { Review } from './review.entity';
-import { Payment_History } from './payment_hisotry.entity';
 import { Field_Schedule } from './field_schedule.entity';
 
 @Entity({
@@ -40,7 +38,6 @@ export class Reservation {
   @OneToOne(() => Review, (review) => review.reservation, { cascade: true })
   @JoinColumn()
   review: Review;
-
 
 
   @ManyToOne(() => User, (user) => user.reservations, { nullable: false })

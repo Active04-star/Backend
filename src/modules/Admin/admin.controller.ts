@@ -1,12 +1,7 @@
-import { BadRequestException, Body, Controller, Get, Param, ParseUUIDPipe, Put, Query } from "@nestjs/common";
-import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
-import { UserClean } from "src/dtos/user/user-clean.dto";
+import { Body, Controller, Get, Param, ParseUUIDPipe, Put, Query } from "@nestjs/common";
+import { ApiBody, ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { ApiStatusEnum } from "src/enums/HttpStatus.enum";
-import { isNotEmpty, isNotEmptyObject } from "class-validator";
-import { UpdateUser } from "src/dtos/user/update-user.dto";
-import { ApiError } from "src/helpers/api-error-class";
 import { UserList } from "src/dtos/user/users-list.dto";
-import { User } from "src/entities/user.entity";
 import { AdminService } from "./admin.service";
 import { SportCenterList } from "src/dtos/sportcenter/sport-center-list.dto";
 import { SportCenterService } from "../sport-center/sport-center.service";

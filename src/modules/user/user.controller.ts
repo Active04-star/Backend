@@ -1,12 +1,11 @@
-import { BadRequestException, Body, Controller, Get, Param, ParseUUIDPipe, Put, Query } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Get, Param, ParseUUIDPipe, Put } from "@nestjs/common";
 import { UserService } from "./user.service";
-import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
+import { ApiBody, ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
 import { UserClean } from "src/dtos/user/user-clean.dto";
 import { ApiStatusEnum } from "src/enums/HttpStatus.enum";
 import { isNotEmpty, isNotEmptyObject } from "class-validator";
 import { UpdateUser } from "src/dtos/user/update-user.dto";
 import { ApiError } from "src/helpers/api-error-class";
-import { UserList } from "src/dtos/user/users-list.dto";
 import { User } from "src/entities/user.entity";
 
 @ApiTags("User")
@@ -36,7 +35,19 @@ export class UserController {
         return await this.userService.updateUser(id, modified_user);
     }
 
-    @Get("csolo-para-testing/:id")
+
+    @Get("center/:id")
+    @ApiOperation({ summary: 'Obtiene el ID del centro deportivo que administra un usuario' })
+    @ApiParam({
+        name: "id",
+        description: 'ID de usuario',
+    })
+    async getManagerSportCenter(@Param("id", ParseUUIDPipe) id: string): Promise<{ id: string }> {
+        return await this.userService.getManagerSportCenter(id);
+    }
+
+
+    @Get("solo-para-testing/:id")
     @ApiParam({
         name: "id",
         description: 'ID de usuario',

@@ -16,7 +16,6 @@ import { Sport_Category } from './sport_category.entity';
 import { SportCenter_Schedule } from './sportcenter_schedules.entity';
 import { Payment } from './payment.entity';
 import { Sport_Center_Managers } from './sport_center_managers.entity';
-import { Payment_History } from './payment_hisotry.entity';
 
 @Entity()
 export class SportCenter {
@@ -54,8 +53,6 @@ export class SportCenter {
 
   @OneToMany(() => Payment, (payment) => payment.field)
   payments: Payment[];
-
-
 
   @OneToMany(() => SportCenter_Schedule, (schedule) => schedule.sportcenter, {
     cascade: true,

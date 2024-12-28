@@ -1,20 +1,10 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { User } from 'src/entities/user.entity';
-import { UserClean } from '../../dtos/user/user-clean.dto';
-import { LocalRegister } from 'src/dtos/user/local-register.dto';
 import { ApiStatusEnum } from 'src/enums/HttpStatus.enum';
 import { isEmpty } from 'class-validator';
-import { UpdateUser } from 'src/dtos/user/update-user.dto';
 import { ApiError } from 'src/helpers/api-error-class';
 import { ApiResponse } from 'src/dtos/api-response';
-import { UserRole } from 'src/enums/roles.enum';
 import { UserList } from 'src/dtos/user/users-list.dto';
-import { SportCenterList } from 'src/dtos/sportcenter/sport-center-list.dto';
 import { SportCenterStatus } from 'src/enums/sportCenterStatus.enum';
 import { SportCenter } from 'src/entities/sportcenter.entity';
 import { AdminRepository } from './admin.repository';
@@ -29,7 +19,7 @@ export class AdminService {
     @InjectRepository(Reservation)
     private reservationRepository: Repository<Reservation>,
     private readonly adminRepository: AdminRepository,
-  ) {}
+  ) { }
 
   async getUsers(page: number, limit: number): Promise<UserList> {
     const found_users: UserList = await this.adminRepository.getUsers(
@@ -101,8 +91,7 @@ export class AdminService {
   }
 
   async forceBan(id: string, status: SportCenterStatus): Promise<ApiResponse> {
-    const found_center: SportCenter | undefined =
-      await this.adminRepository.getCenterById(id);
+    const found_center: SportCenter | undefined = await this.adminRepository.getCenterById(id);
 
     if (isEmpty(found_center)) {
       throw new ApiError(ApiStatusEnum.CENTER_NOT_FOUND, NotFoundException);
