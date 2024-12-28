@@ -7,10 +7,10 @@ import { AdminService } from "./admin.service";
 import { AdminRepository } from "./admin.repository";
 import { SportCenter } from "src/entities/sportcenter.entity";
 import { Reservation } from "src/entities/reservation.entity";
-import { Sport_Center_Module } from "../sport-center/sport-center.module";
+import { SportCenter_Module } from "../sport-center/sport-center.module";
 
 @Module({
-    imports: [Sport_Center_Module,UserModule, TypeOrmModule.forFeature([User, SportCenter,Reservation])],
+    imports: [SportCenter_Module,UserModule, TypeOrmModule.forFeature([User, SportCenter,Reservation])],
     controllers: [AdminController], 
     providers: [AdminService, AdminRepository], 
     exports: []

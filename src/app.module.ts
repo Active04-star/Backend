@@ -20,6 +20,8 @@ import { Auth0Module } from './modules/auth0/auth0.module';
 import { Payment_Module } from './modules/payment/payment.module';
 import { Subscription_Module } from './modules/subscription/subscription.module';
 import { Reservation_Module } from './modules/reservation/reservation.module';
+import { Field_Schedule_Module } from './modules/field_schedule/field_schedule.module';
+import { SportCenter_Schedule_Module } from './modules/sportcenter_schedules/sportCenter_schedule.module';
 
 @Module({
   imports: [
@@ -82,6 +84,8 @@ import { Reservation_Module } from './modules/reservation/reservation.module';
     Payment_Module,
     Subscription_Module,
     Reservation_Module,
+    Field_Schedule_Module,
+    SportCenter_Schedule_Module
   ],
   controllers: [],
   providers: [],
