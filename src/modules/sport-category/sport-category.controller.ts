@@ -7,6 +7,7 @@ import {
   ParseUUIDPipe,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -19,6 +20,9 @@ import {
 import { Sport_Category_Service } from './sport-category.service';
 import { CreateSportCategoryDto } from 'src/dtos/sportcategory/createSportCategory.dto';
 import { Sport_Category } from 'src/entities/sport_category.entity';
+import { Roles } from 'src/decorators/roles.decorator';
+import { AuthGuard } from 'src/guards/auth-guard.guard';
+import { UserRole } from 'src/enums/roles.enum';
 
 @ApiTags('Sport Categories')
 @Controller('sportCategories')
@@ -28,8 +32,8 @@ export class Sport_Category_Controller {
   ) {}
 
   @Post('create/:sportCenterId')
-  //   @Roles(UserRole.CONSUMER,UserRole.MANAGER)
-  //   @UseGuards(AuthGuard)
+  //@Roles(UserRole.MANAGER)
+  //@UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Registra un nuevo deporte',

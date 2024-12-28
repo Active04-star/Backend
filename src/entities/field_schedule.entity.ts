@@ -1,10 +1,8 @@
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { SportCenter } from './sportcenter.entity';
-import { DayOfWeek } from 'src/enums/dayOfWeek.enum';
 import { Field } from './field.entity';
 import { SportCenter_Schedule } from './sportcenter_schedules.entity';
 import { FieldStatus } from 'src/enums/fieldStatus.enum';
-import { Reservation } from './reservation.entity';
+import { Field_Block } from './field_blocks.entity';
 
 @Entity({ name: 'field_schedule' })
 export class Field_Schedule {
@@ -12,10 +10,10 @@ export class Field_Schedule {
   id: string;
 
   @Column({ type: 'time', nullable: false })
-  start_time: string;
+  opening_time: string;
 
   @Column({ type: 'time', nullable: false })
-  end_time: string;
+  closing_time: string;
 
   // Duración de cada rango horario (por ejemplo, 1 hora por reserva)
   @Column({ type: 'int', nullable: false, default: 60 }) // Duración en minutos
@@ -34,10 +32,9 @@ export class Field_Schedule {
   })
   field: Field;
 
-  @OneToMany(() => Reservation, (reservation) => reservation.fieldSchedule, {
-    cascade: true,
-  })
-  reservations: Reservation[];
+  @OneToMany(() => Field_Block, (fieldBlock) => fieldBlock.fieldSchedule, { cascade: true })
+  blocks: Field_Block[];
+
 
   @ManyToOne(
     () => SportCenter_Schedule,

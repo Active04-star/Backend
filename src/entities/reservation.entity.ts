@@ -11,7 +11,7 @@ import { ReservationStatus } from 'src/enums/reservationStatus.enum';
 import { Field } from './field.entity';
 import { Payment } from './payment.entity';
 import { Review } from './review.entity';
-import { Field_Schedule } from './field_schedule.entity';
+import { Field_Block } from './field_blocks.entity';
 
 @Entity({
   name: 'reservations',
@@ -19,6 +19,11 @@ import { Field_Schedule } from './field_schedule.entity';
 export class Reservation {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
+
 
   @Column({ type: 'timestamp' })
   date: Date;
@@ -46,8 +51,7 @@ export class Reservation {
   @ManyToOne(() => Field, (field) => field.reservation, { nullable: false })
   field: Field;
 
-  @ManyToOne(() => Field_Schedule, (schedule) => schedule.reservations, {
-    nullable: false,
-  })
-  fieldSchedule: Field_Schedule;
+  @OneToOne(() => Field_Block, (fieldBlock) => fieldBlock.reservation)
+  @JoinColumn() 
+  fieldBlock: Field_Block;
 }
