@@ -21,7 +21,7 @@ import { Payment_Module } from './modules/payment/payment.module';
 import { Subscription_Module } from './modules/subscription/subscription.module';
 import { Reservation_Module } from './modules/reservation/reservation.module';
 import { SportCenter_Schedule_Module } from './modules/sportcenter_schedules/sportCenter_schedule.module';
-import { ManagerModule } from './modules/manager/manager/manager.module';
+import { ManagerModule } from './modules/manager/manager.module';
 
 @Module({
   imports: [
