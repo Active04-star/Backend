@@ -24,7 +24,7 @@ export class SportCenterController {
     return await this.sportcenterService.getSportCenters(page, limit, false, rating, search);
   }
 
-  /**IMAGENES MOVIDAS A SU PROPIA RUTA */
+  
   @Post('create')
   //   @Roles(UserRole.CONSUMER)
   //   @UseGuards(AuthGuard)

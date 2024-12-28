@@ -19,6 +19,7 @@ export enum ApiStatusEnum {
     USER_LIST_EMPTY = "La lista de usuarios está vacia",
     USER_UNBAN_OR_BAN = "No se pudo actualizar el estado baneado de este usuario",
     USER_RANKUP_FAILED = "No se pudo actualizar el rango de este usuario",
+    NO_CENTER_FOR_THIS_USER = "No hay centros deportivos para este usuario",
 
     RANKING_UP_FAIL = "Error al mejorar el rango del usuario",
     RANKING_UP_SUCCESS = "El rol de este usuario ha cambiado",
@@ -64,17 +65,20 @@ export enum ApiStatusEnum {
     IMAGE_DELETION_FAILED = "No se pudo eliminar esta imagen!",
     IMAGE_NOT_FOUND = "No se pudo encontrar esta imagen!",
     IMAGE_DELETION_SUCCESS = "Imagen eliminada correctamente",
-    MAX_IMAGES_REACHED= "Maximo de imagenes alcanzado, elimina una imagen antes de subir otra!",
-
+    MAX_IMAGES_REACHED = "Maximo de imagenes alcanzado, elimina una imagen antes de subir otra!",
+    
+    RESERVATION_ALREADY_CANCELED = "Esta reserva ya fue cancelada",
 
     FIELD_ALREADY_HAS_A_REVIEW = "Esta cancha ya tiene una reseña!",
+    FIELD_DELETED_SUCCESSFULLY = "Cancha eliminada correctamente",
+    FIELD_DELETION_FAILED = "No se pudo eliminar esta cancha",
+    FIELD_NOT_FOUND = "No se pudo encontrar esta cancha",
+    FIELD_CREATION_FAILED = "No se pudo crear una nueva cancha",
 
+    SUBSCRIPTION_PAYMENT_FAILED = "No se pudo crear el pago de la subscripcion",
 
-    SUBSCRIPTION_PAYMENT_FAILED="No se pudo crear el pago de la subscripcion",
-
-
-    PAYMENT_NOT_FOUND='Pago no entonctrado',
-    PAYMENT_CREATION_FAILED="No se pudo crear el pago",
-    INVALID_RESERVATION_STATUS='Estado de la reserva invalido'
-
+    PAYMENT_NOT_FOUND = 'Pago no entonctrado',
+    PAYMENT_CREATION_FAILED = "No se pudo crear el pago",
+    INVALID_RESERVATION_STATUS = 'Estado de la reserva invalido',
+    
 }
