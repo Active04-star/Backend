@@ -5,9 +5,10 @@ import { Field_Schedule } from "src/entities/field_schedule.entity";
 import { Field_Schedule_Service } from "./field_schedule.service";
 import { Field_Schedule_Controller } from "./field_schedule.controller";
 import { Field_Block } from "src/entities/field_blocks.entity";
+import { Field_Module } from "../field/field.module";
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Field_Schedule,Field_Block])],
+    imports: [Field_Module,TypeOrmModule.forFeature([Field_Schedule,Field_Block])],
     controllers: [Field_Schedule_Controller],
     providers: [Field_Schedule_Service],
     exports: [],
