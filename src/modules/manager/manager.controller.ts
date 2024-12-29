@@ -8,29 +8,34 @@ import { ManagerService } from './manager.service';
 
 @Controller('manager')
 export class ManagerController {
+
   constructor(private readonly managerService: ManagerService, private sportCenterService: SportCenterService) { }
 
-  @Get('fields/:managerId')
+  @Get('fields/:centerId')
   // @Roles(UserRole.MANAGER)
   //@UseGuards(AuthGuard)
   //@ApiBearerAuth()
   @ApiOperation({
     summary: 'optiene una lista de las canchas',
     description:
-      'Proporciona toda la información de las canchas del centro deportivo a cargo del usuario',
+      'Proporciona toda la información de las canchas del centro deportivo',
   })
   @ApiParam({
-    name: 'managerId',
-    description: 'ID del usuario con rol manager',
-    example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
+    name: 'centerId',
+    description: 'ID del centro deportivo',
+    example: '936c7033-6020-41da-be01-d50b42250018',
   })
-  async getFields(@Param('id', ParseUUIDPipe) managerId: string): Promise<Field[]> {
-    return await this.managerService.getFields(managerId)
+  async getFields(@Param('centerId', ParseUUIDPipe) centerId: string): Promise<Field[]> {
+    return await this.managerService.getFields(centerId);
   }
 
+
   @Get('reservations/:managerId')
+  // @Roles(UserRole.MANAGER)
+  //@UseGuards(AuthGuard)
+  //@ApiBearerAuth()
   @ApiOperation({
-    summary: 'optiene una lista de las reservas de una cancha ',
+    summary: 'obtiene una lista de las reservas de una cancha ',
     description:
       'Proporciona toda la información de las canchas del centro deportivo a cargo del usuario',
   })
@@ -39,14 +44,14 @@ export class ManagerController {
     description: 'ID del usuario con rol manager',
     example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
   })
-  async getReservations(@Param('id', ParseUUIDPipe) managerId: string) {
-    return await this.managerService.getReservations(managerId)
+  async getReservations(@Param('managerId', ParseUUIDPipe) managerId: string) {
+    return await this.managerService.getReservations(managerId);
   }
 
 
   @Put('update-sportcenter/:id')
-  //   @Roles(UserRole.CONSUMER,UserRole.MANAGER)
-  //   @UseGuards(AuthGuard)
+  // @Roles(UserRole.CONSUMER, UserRole.MANAGER)
+  // @UseGuards(AuthGuard)
   // @ApiBearerAuth()
   @ApiOperation({
     summary: 'Actualiza un SportCenter por su ID',
@@ -83,6 +88,7 @@ export class ManagerController {
   async banOrUnBanCenter(@Param('id', ParseUUIDPipe) id: string): Promise<ApiResponse> {
     return await this.sportCenterService.banOrUnBanCenter(id);
   }
+
 
   /**@Put('disable/:sportCenterId/:userId')
   //   @Roles(UserRole.MANAGER)

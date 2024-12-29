@@ -15,7 +15,7 @@ export class SportCenterRepository {
   constructor(
     @InjectRepository(SportCenter)
     private sportCenterRepository: Repository<SportCenter>,
-  ) {}
+  ) { }
 
   async putCategoryToCenter(
     sportCategories: Sport_Category[],
@@ -110,11 +110,10 @@ export class SportCenterRepository {
     return saved_sportcenter === null ? undefined : saved_sportcenter;
   }
 
-  async findOne(id: string): Promise<SportCenter | undefined> {
-    const found_sportcenter: SportCenter =
-      await this.sportCenterRepository.findOne({
-        where: { id: id }
-      });
+  async findOne(id: string, relations: boolean): Promise<SportCenter | undefined> {
+    const found_sportcenter: SportCenter = await this.sportCenterRepository.findOne({
+      where: { id: id }, relations: relations ? ['sport_categories', 'photos', "fields"] : []
+    });
 
     return found_sportcenter === null ? undefined : found_sportcenter;
   }
