@@ -1,8 +1,5 @@
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Put, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam } from '@nestjs/swagger';
-import { AuthGuard } from 'src/guards/auth-guard.guard';
-import { Roles } from 'src/decorators/roles.decorator';
-import { UserRole } from 'src/enums/roles.enum';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Put } from '@nestjs/common';
+import { ApiBody, ApiOperation, ApiParam } from '@nestjs/swagger';
 import { Field } from 'src/entities/field.entity';
 import { UpdateSportCenterDto } from 'src/dtos/sportcenter/updateSportCenter.dto';
 import { SportCenterService } from 'src/modules/sport-center/sport-center.service';
@@ -11,7 +8,7 @@ import { ManagerService } from './manager.service';
 
 @Controller('manager')
 export class ManagerController {
-  constructor(private readonly managerService: ManagerService,private sportCenterService:SportCenterService) {}
+  constructor(private readonly managerService: ManagerService, private sportCenterService: SportCenterService) { }
 
   @Get('fields/:managerId')
   // @Roles(UserRole.MANAGER)
@@ -27,7 +24,7 @@ export class ManagerController {
     description: 'ID del usuario con rol manager',
     example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
   })
-  async getFields(@Param('id', ParseUUIDPipe) managerId: string):Promise<Field[]> {
+  async getFields(@Param('id', ParseUUIDPipe) managerId: string): Promise<Field[]> {
     return await this.managerService.getFields(managerId)
   }
 
@@ -42,8 +39,8 @@ export class ManagerController {
     description: 'ID del usuario con rol manager',
     example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
   })
-  async getReservations(@Param('id', ParseUUIDPipe) managerId: string){
-return await this.managerService.getReservations(managerId)
+  async getReservations(@Param('id', ParseUUIDPipe) managerId: string) {
+    return await this.managerService.getReservations(managerId)
   }
 
 
@@ -64,10 +61,7 @@ return await this.managerService.getReservations(managerId)
     description: 'Datos necesarios para actualizar un SportCenter',
     type: UpdateSportCenterDto,
   })
-  async updateSportCenter(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() data: UpdateSportCenterDto,
-  ) {
+  async updateSportCenter(@Param('id', ParseUUIDPipe) id: string, @Body() data: UpdateSportCenterDto) {
     return await this.sportCenterService.updateSportCenter(id, data);
   }
 
@@ -86,9 +80,7 @@ return await this.managerService.getReservations(managerId)
     description: 'ID del Centro deportivo a eliminar',
     example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
   })
-  async banOrUnBanCenter(
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<ApiResponse> {
+  async banOrUnBanCenter(@Param('id', ParseUUIDPipe) id: string): Promise<ApiResponse> {
     return await this.sportCenterService.banOrUnBanCenter(id);
   }
 
