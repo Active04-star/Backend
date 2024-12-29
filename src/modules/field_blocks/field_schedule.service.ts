@@ -2,7 +2,6 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Field_Block } from "src/entities/field_blocks.entity";
 import { SportCenter_Schedule } from "src/entities/sportcenter_schedules.entity";
-import { Field_Service } from "../field/field.service";
 import { Repository } from "typeorm";
 import { Field } from "src/entities/field.entity";
 

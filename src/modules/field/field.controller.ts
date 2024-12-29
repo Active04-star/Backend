@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Param, ParseUUIDPipe, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Put } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { Field_Service } from './field.service';
 import { FieldDto } from 'src/dtos/field/createField.dto';
@@ -18,6 +18,22 @@ export class Field_Controller {
   @ApiBody({ description: 'Datos necesarios para crear una nueva cancha', type: FieldDto })
   async createField(@Body() fieldData: FieldDto): Promise<Field> {
     return await this.fieldService.createField(fieldData);
+  }
+
+
+  @Get('fields/:centerId')
+  @ApiOperation({
+    summary: 'obtiene una lista de las canchas, para el usuario',
+    description:
+      'Proporciona toda la información de las canchas del centro deportivo',
+  })
+  @ApiParam({
+    name: 'centerId',
+    description: 'ID del centro deportivo',
+    example: '936c7033-6020-41da-be01-d50b42250018',
+  })
+  async getFields(@Param('centerId', ParseUUIDPipe) centerId: string): Promise<Field[]> {
+    return await this.fieldService.getFields(centerId);
   }
 
 

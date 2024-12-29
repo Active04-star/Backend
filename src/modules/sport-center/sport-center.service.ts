@@ -31,6 +31,7 @@ export class SportCenterService {
     private sportCategoryService: Sport_Category_Service,
   ) { }
 
+
   async getSportCenters(page: number, limit: number, show_hidden: boolean, rating?: number, keyword?: string): Promise<SportCenterList> {
     if (rating < 1 || rating > 5) {
       throw new ApiError(ApiStatusEnum.RATING_OUT_OF_BOUNDS, BadRequestException);
@@ -45,6 +46,7 @@ export class SportCenterService {
 
     return found_centers;
   }
+
 
   async createSportCenter(createSportCenter: CreateSportCenterDto): Promise<SportCenter> {
     const { manager, ...sportCenterData } = createSportCenter;
@@ -87,8 +89,14 @@ export class SportCenterService {
     }
   }
 
-  async getById(id: string): Promise<SportCenter> {
-    const found_sportcenter: SportCenter | undefined = await this.sportcenterRepository.findOne(id);
+
+  /**
+   * 
+   * @param id Id del centro deportivo
+   * @param relations Declara esto como true si deseas traer las relaciones de la entidad
+   */
+  async getById(id: string, relations = false): Promise<SportCenter> {
+    const found_sportcenter: SportCenter | undefined = await this.sportcenterRepository.findOne(id, relations);
 
     if (found_sportcenter === undefined) {
       throw new ApiError(ApiStatusEnum.CENTER_NOT_FOUND, NotFoundException);
@@ -97,12 +105,14 @@ export class SportCenterService {
     return found_sportcenter;
   }
 
+
   async updateSportCenter(id: string, updateData: UpdateSportCenterDto): Promise<SportCenter> {
     const sportCenter: SportCenter = await this.getById(id);
 
     const updated: SportCenter = await this.sportcenterRepository.updateSportCenter(sportCenter, updateData);
     return updated;
   }
+
 
   private async deleteSportCenter(id: string): Promise<ApiResponse> {
     try {
@@ -168,12 +178,9 @@ export class SportCenterService {
   //   return await this.sportcenterRepository.updateStatus(found_sportcenter, SportCenterStatus.DISABLE);
   // }
 
-  async updateStatus(
-    userId: string,
-    sportCenterId: string,
-    status: Sport_Center_Status,
-  ): Promise<SportCenter> {
-  
+
+  async updateStatus(userId: string, sportCenterId: string, status: Sport_Center_Status): Promise<SportCenter> {
+
     const user: User = await this.userService.getUserById(userId);
 
     const found_sportcenter = await this.getById(sportCenterId);
@@ -189,6 +196,7 @@ export class SportCenterService {
     return await this.sportcenterRepository.updateStatus(found_sportcenter, status);
   }
 
+
   async putCategoryToCenter(category: string[], sportCenterId: string) {
 
     const sport_center: SportCenter = await this.getById(sportCenterId);
@@ -200,6 +208,7 @@ export class SportCenterService {
     }
     return updated_sportcenter;
   }
+
 
   async banOrUnBanCenter(id: string): Promise<ApiResponse> {
     const found_center: SportCenter = await this.getById(id);

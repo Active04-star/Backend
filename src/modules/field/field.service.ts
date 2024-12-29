@@ -21,7 +21,7 @@ export class Field_Service {
     private sportCenterService: SportCenterService,
     private sportCategoryService: Sport_Category_Service,
     private reservationService: Reservation_Service,
-    private fieldblockService:Field_Block_Service
+    private fieldblockService: Field_Block_Service
   ) { }
 
 
@@ -71,6 +71,23 @@ export class Field_Service {
     }
 
     return found_field;
+  }
+
+
+  async getFields(centerId: string): Promise<Field[]> {
+    try {
+      const found_center: SportCenter = await this.sportCenterService.getById(centerId, true);
+      
+      if (found_center.fields === undefined || found_center.fields.length === 0) {
+        throw new ApiError(ApiStatusEnum.CENTER_HAS_NO_FIELDS, NotFoundException);
+
+      }
+
+      return found_center.fields;
+    } catch (error) {
+      throw new ApiError(error?.message, InternalServerErrorException, error);
+
+    }
   }
 
 

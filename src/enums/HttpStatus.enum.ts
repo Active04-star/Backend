@@ -52,6 +52,7 @@ export enum ApiStatusEnum {
   CENTER_ALREADY_HAS_STATE = 'Este centro ya está en modo',
   CENTER_UPDATE_STATUS = 'Estado del centro modificado',
   CENTER_WRONG_OWNER = 'La cuenta asociada con este centro deportivo no coincide',
+  CENTER_HAS_NO_FIELDS = 'Este centro deportivo no tiene canchas',
 
   IMAGE_CREATION_FAILED = 'No se pudo crear una nueva imagen',
   IMAGE_INSERTION_FAIL = 'No se pudo insertar',
