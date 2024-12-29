@@ -8,19 +8,16 @@ import { Field } from "src/entities/field.entity";
 
 @Injectable()
 export class Field_Block_Service {
-  
+
   constructor(
-    @InjectRepository(Field_Block)
-    private fieldBlockRepository: Repository<Field_Block>,
-    @InjectRepository(SportCenter_Schedule)
-    private sportCenterSchedule: Repository<SportCenter_Schedule>,
-    private readonly fieldService: Field_Service,
-  ) {}
+    @InjectRepository(Field_Block) private fieldBlockRepository: Repository<Field_Block>,
+    // @InjectRepository(SportCenter_Schedule) private sportCenterSchedule: Repository<SportCenter_Schedule>,
+    // private readonly fieldService: Field_Service,
+  ) { }
 
 
-
- async createFieldBlocks(field:Field,sportCenterSchedule: SportCenter_Schedule) {
-    const {duration_minutes}=field
+  async createFieldBlocks(field: Field, sportCenterSchedule: SportCenter_Schedule) {
+    const { duration_minutes } = field
     const { opening_time, closing_time } = sportCenterSchedule;
 
     const opening = this.timeStringToMinutes(opening_time);
@@ -43,15 +40,17 @@ export class Field_Block_Service {
       blocks.push(block);
     }
 
-    const saved_blocks:Field_Block[]=await this.fieldBlockRepository.save(blocks);
-    
+    const saved_blocks: Field_Block[] = await this.fieldBlockRepository.save(blocks);
+
     return saved_blocks === null ? undefined : saved_blocks;
   }
+
 
   private timeStringToMinutes(time: string): number {
     const [hours, minutes] = time.split(':').map(Number);
     return hours * 60 + minutes;
   }
+
 
   private minutesToTimeString(minutes: number): string {
     const hours = Math.floor(minutes / 60);
@@ -63,6 +62,6 @@ export class Field_Block_Service {
 
 
 
- 
+
 
 
