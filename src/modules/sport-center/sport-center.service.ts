@@ -20,6 +20,7 @@ import { isUUID } from 'class-validator';
 import { ApiResponse } from 'src/dtos/api-response';
 import { SportCenterList } from 'src/dtos/sportcenter/sport-center-list.dto';
 import { Sport_Center_Status } from 'src/enums/sport_Center_Status.enum';
+import { UserRole } from 'src/enums/roles.enum';
 
 @Injectable()
 export class SportCenterService {
@@ -56,11 +57,7 @@ export class SportCenterService {
 
     try {
       const future_manager: User = await this.userService.getUserById(manager);
-      // const was_ranked: boolean = await this.userService.rankUpTo(future_manager, UserRole.MAIN_MANAGER,);
-
-      // if (!was_ranked) {
-      //   throw new ApiError(ApiStatusEnum.USER_RANKUP_FAILED, InternalServerErrorException);
-      // }
+  
 
       const created_sportcenter: SportCenter | undefined = await this.sportcenterRepository.createSportCenter(
         future_manager,
@@ -70,6 +67,14 @@ export class SportCenterService {
       if (created_sportcenter === undefined) {
         throw new ApiError(ApiStatusEnum.CENTER_CREATION_FAILED, BadRequestException);
       }
+
+
+      const userIsManager= await this.userService.rankUpTo(future_manager, UserRole.MAIN_MANAGER,);
+
+      if (!userIsManager) {
+         throw new ApiError(ApiStatusEnum.USER_RANKUP_FAILED, InternalServerErrorException);
+      }
+
 
       id = created_sportcenter.id;
 
