@@ -20,6 +20,8 @@ export enum ApiStatusEnum {
   USER_RANKUP_FAILED = 'No se pudo actualizar el rango de este usuario',
   NO_CENTER_FOR_THIS_USER = 'No hay centros deportivos para este usuario',
 
+
+  USER_HAS_RESERVATIONS='Usuario tiene reservas activas',
   RANKING_UP_FAIL = 'Error al mejorar el rango del usuario',
   RANKING_UP_SUCCESS = 'El rol de este usuario ha cambiado',
 

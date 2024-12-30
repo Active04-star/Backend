@@ -17,11 +17,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class UserService {
+  
 
   constructor(
     private readonly userRepository: UserRepository,
-    @InjectRepository(Reservation)
-    private readonly reservatioRepository: Repository<Reservation>,
   ) { }
 
 
@@ -75,35 +74,24 @@ export class UserService {
 
 
   async hasActiveReservations(userId: string): Promise<boolean> {
-    const activeReservation = await this.reservatioRepository
-      .createQueryBuilder('reservation')
-      .where('reservation.userId = :userId', { userId })
-      .andWhere('reservation.status = :status', {
-        status: ReservationStatus.ACTIVE,
-      })
-      .getOne();
-
-    console.log('active', !!activeReservation);
-
-    // Si se encuentra una reserva activa, devolver true
-    return !!activeReservation;
+    return await this.userRepository.hasActiveReservations(userId)
   }
 
-  // async rankUpTo(user: User, rank: UserRole): Promise<boolean> {
-  //   if (this.hasActiveReservations(user.id)) {
-  //     throw new ApiError(ApiStatusEnum.RANKING_UP_FAIL, BadRequestException);
-  //   }
+  async rankUpTo(user: User, rank: UserRole): Promise<boolean> {
+    if (this.hasActiveReservations(user.id)) {
+      throw new ApiError(ApiStatusEnum.USER_HAS_RESERVATIONS, BadRequestException);
+    }
 
-  //   const ranked_up: User | undefined = await this.userRepository.rankUpTo(
-  //     user,
-  //     rank,
-  //   );
+    const ranked_up: User | undefined = await this.userRepository.rankUpTo(
+      user,
+      rank,
+    );
 
-  //   if (ranked_up === undefined) {
-  //     return false;
-  //   }
-  //   return true;
-  // }
+    if (ranked_up === undefined) {
+      return false;
+    }
+    return true;
+  }
 
 
   async getUserById(id: string, relations = false): Promise<User> {
