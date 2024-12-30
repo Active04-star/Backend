@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isNotEmpty } from 'class-validator';
 import { AuthRegister } from 'src/dtos/user/auth-register.dto';
@@ -7,7 +7,10 @@ import { LocalRegister } from 'src/dtos/user/local-register.dto';
 import { UpdateUser } from 'src/dtos/user/update-user.dto';
 import { UserList } from 'src/dtos/user/users-list.dto';
 import { User } from 'src/entities/user.entity';
+import { ApiStatusEnum } from 'src/enums/HttpStatus.enum';
+import { ReservationStatus } from 'src/enums/reservationStatus.enum';
 import { UserRole } from 'src/enums/roles.enum';
+import { ApiError } from 'src/helpers/api-error-class';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -18,18 +21,25 @@ export class UserRepository {
 
   async hasActiveReservations(userId: string) {
     const user = await this.userRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.reservations', 'reservation') 
-      .where('user.id = :userId', { userId }) 
-      .andWhere('reservation.status = :status', { status: 'ACTIVE' }) 
-      .getOne(); 
+    .createQueryBuilder('user')
+    .leftJoinAndSelect('user.reservations', 'reservation')
+    .where('user.id = :userId', { userId })
+    .getOne();
 
-    if (user && user.reservations.length > 0) {
-      return true; 
-    } else {
-      return false; 
-    }
+  if (!user) {
+    throw new ApiError(
+      ApiStatusEnum.USER_NOT_FOUND,
+      InternalServerErrorException,
+    );
   }
+
+  const activeReservations = user.reservations?.filter(reservation => reservation.status === ReservationStatus.ACTIVE) || [];
+
+  console.log('Active Reservations:', activeReservations);
+
+  return activeReservations.length > 0;
+  }
+
   async deleteUser(userInstance: User): Promise<boolean> {
     const found_user: User | undefined =
       await this.userRepository.remove(userInstance);
