@@ -21,23 +21,24 @@ export class UserRepository {
 
   async hasActiveReservations(userId: string) {
     const user = await this.userRepository
-    .createQueryBuilder('user')
-    .leftJoinAndSelect('user.reservations', 'reservation')
-    .where('user.id = :userId', { userId })
-    .getOne();
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.reservations', 'reservation')
+      .where('user.id = :userId', { userId })
+      .getOne();
 
-  if (!user) {
-    throw new ApiError(
-      ApiStatusEnum.USER_NOT_FOUND,
-      InternalServerErrorException,
-    );
-  }
+    if (!user) {
+      throw new ApiError(
+        ApiStatusEnum.USER_NOT_FOUND,
+        InternalServerErrorException,
+      );
+    }
 
-  const activeReservations = user.reservations?.filter(reservation => reservation.status === ReservationStatus.ACTIVE) || [];
+    const activeReservations =
+      user.reservations?.filter(
+        (reservation) => reservation.status === ReservationStatus.ACTIVE,
+      ) || [];
 
-  console.log('Active Reservations:', activeReservations);
-
-  return activeReservations.length > 0;
+    return activeReservations.length > 0;
   }
 
   async deleteUser(userInstance: User): Promise<boolean> {
@@ -71,8 +72,7 @@ export class UserRepository {
 
   async rankUpTo(user: User, role: UserRole): Promise<User> {
     user.role = role;
-    await this.userRepository.save(user);
-    return await this.getUserById(user.id);
+    return await this.userRepository.save(user);
   }
 
   async getUserById(id: string, relations = false): Promise<User | undefined> {

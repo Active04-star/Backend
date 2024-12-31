@@ -2,6 +2,7 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { UserRepository } from './user.repository';
@@ -77,28 +78,29 @@ export class UserService {
     return new UserClean();
   }
 
-  async hasActiveReservations(userId: string): Promise<boolean> {
-    return await this.userRepository.hasActiveReservations(userId);
-  }
-
-  async rankUpTo(user: User, rank: UserRole): Promise<boolean> {
-    const hasreservations: Boolean = await this.hasActiveReservations(user.id);
+  async hasActiveReservations(userId: string) {
+    const hasreservations: Boolean =
+      await this.userRepository.hasActiveReservations(userId);
     if (hasreservations) {
       throw new ApiError(
         ApiStatusEnum.USER_HAS_RESERVATIONS,
         BadRequestException,
       );
     }
+  }
 
+  async rankUpTo(user: User, rank: UserRole): Promise<void> {
     const ranked_up: User | undefined = await this.userRepository.rankUpTo(
       user,
       rank,
     );
 
-    if (ranked_up === undefined) {
-      return false;
+    if (!ranked_up) {
+      throw new ApiError(
+        ApiStatusEnum.USER_RANKUP_FAILED,
+        InternalServerErrorException,
+      );
     }
-    return true;
   }
 
   async getUserById(id: string, relations = false): Promise<User> {
