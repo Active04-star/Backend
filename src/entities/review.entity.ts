@@ -9,6 +9,7 @@ import {
   AfterUpdate,
   AfterRemove,
   getRepository,
+  JoinColumn,
 } from 'typeorm';
 import { User } from './user.entity';
 import { SportCenter } from './sportcenter.entity';
@@ -40,6 +41,7 @@ export class Review {
     nullable: true,
     onDelete: 'CASCADE',
   })
+  @JoinColumn() 
   reservation: Reservation;
 
   @ManyToOne(() => User, (user) => user.reviews, { onDelete: 'CASCADE' })

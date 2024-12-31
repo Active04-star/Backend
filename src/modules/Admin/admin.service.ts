@@ -12,14 +12,24 @@ import { Reservation } from 'src/entities/reservation.entity';
 import { ReservationStatus } from 'src/enums/reservationStatus.enum';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class AdminService {
+
   constructor(
     @InjectRepository(Reservation)
     private reservationRepository: Repository<Reservation>,
     private readonly adminRepository: AdminRepository,
+    // private userService:UserService
   ) { }
+
+
+ /* async promoteUser(id: string) {
+    const user:User=await this.userService.getUserById(id)
+     //obtener data del formulario , el admin crea un nuevo user y se asgina el rol de admin a ese user .
+     //se manda un email a ese user para activar su cuenta 
+}*/
 
   async getUsers(page: number, limit: number): Promise<UserList> {
     const found_users: UserList = await this.adminRepository.getUsers(
