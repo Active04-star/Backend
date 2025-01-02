@@ -16,12 +16,10 @@ export class Field_Block_Service {
      private readonly fieldService: Field_Service,
   ) { }
 
-async getFiedlBlocks(fieldId:string){
-const field:Field=await this.fieldService.findById(fieldId)
-return field.blocks
-}
-
-
+  async getFiedlBlocks(fieldId: string) {
+    const field: Field = await this.fieldService.findById(fieldId)
+    return field.blocks
+  }
 
 
   async createFieldBlocks(field: Field, sportCenterSchedule: SportCenter_Schedule) {
