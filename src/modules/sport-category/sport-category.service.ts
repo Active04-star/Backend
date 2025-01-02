@@ -16,9 +16,8 @@ import { Sport_Category } from 'src/entities/sport_category.entity';
 export class Sport_Category_Service {
   constructor(
     private readonly sportCategoryRepository: Sport_Category_Repository,
-    @Inject(forwardRef(() => SportCenterService))
-    private sportCenterService: SportCenterService,
-  ) {}
+    @Inject(forwardRef(() => SportCenterService)) private sportCenterService: SportCenterService,
+  ) { }
 
   async createSportCategory(
     sportCenterId: string,
@@ -71,7 +70,7 @@ export class Sport_Category_Service {
     return categories;
   }
 
-  async deleteSportCategory(id:string){
+  async deleteSportCategory(id: string) {
     const found_sport: Sport_Category = await this.findById(id);
     const was_deleted: Sport_Category = await this.sportCategoryRepository.deleteSportCategory(found_sport);
 
