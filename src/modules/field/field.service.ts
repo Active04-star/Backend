@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { Field_Repository } from './field.repository';
 import { SportCenterService } from '../sport-center/sport-center.service';
 import { SportCenter } from 'src/entities/sportcenter.entity';
@@ -21,6 +21,7 @@ export class Field_Service {
     private sportCenterService: SportCenterService,
     private sportCategoryService: Sport_Category_Service,
     private reservationService: Reservation_Service,
+    @Inject(forwardRef(() => Field_Block_Service))
     private fieldblockService: Field_Block_Service
   ) { }
 
