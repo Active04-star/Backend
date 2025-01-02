@@ -12,7 +12,8 @@ export class Field_Block_Service {
   constructor(
     @InjectRepository(Field_Block) private fieldBlockRepository: Repository<Field_Block>,
     // @InjectRepository(SportCenter_Schedule) private sportCenterSchedule: Repository<SportCenter_Schedule>,
-    @Inject(forwardRef(() => Field_Service)) private fieldService: Field_Service,
+    @Inject(forwardRef(() => Field_Service))
+     private readonly fieldService: Field_Service,
   ) { }
 
   async getFiedlBlocks(fieldId: string) {

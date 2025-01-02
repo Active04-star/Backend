@@ -21,7 +21,8 @@ export class Field_Service {
     private sportCenterService: SportCenterService,
     private sportCategoryService: Sport_Category_Service,
     private reservationService: Reservation_Service,
-    @Inject(forwardRef(() => Field_Block_Service)) private fieldblockService: Field_Block_Service
+    @Inject(forwardRef(() => Field_Block_Service))
+    private fieldblockService: Field_Block_Service
   ) { }
 
 
