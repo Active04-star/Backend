@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Field_Block } from "src/entities/field_blocks.entity";
 import { SportCenter_Schedule } from "src/entities/sportcenter_schedules.entity";
@@ -12,15 +12,13 @@ export class Field_Block_Service {
   constructor(
     @InjectRepository(Field_Block) private fieldBlockRepository: Repository<Field_Block>,
     // @InjectRepository(SportCenter_Schedule) private sportCenterSchedule: Repository<SportCenter_Schedule>,
-     private readonly fieldService: Field_Service,
+    @Inject(forwardRef(() => Field_Service)) private fieldService: Field_Service,
   ) { }
 
-async getFiedlBlocks(fieldId:string){
-const field:Field=await this.fieldService.findById(fieldId)
-return field.blocks
-}
-
-
+  async getFiedlBlocks(fieldId: string) {
+    const field: Field = await this.fieldService.findById(fieldId)
+    return field.blocks
+  }
 
 
   async createFieldBlocks(field: Field, sportCenterSchedule: SportCenter_Schedule) {

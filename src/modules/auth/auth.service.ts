@@ -5,13 +5,7 @@ import { User } from 'src/entities/user.entity';
 import { isNotEmpty } from 'class-validator';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import {
-  BadRequestException,
-  ConflictException,
-  Injectable,
-  InternalServerErrorException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { UserClean } from 'src/dtos/user/user-clean.dto';
 import { ApiStatusEnum } from 'src/enums/HttpStatus.enum';
 import { LoginResponse } from 'src/dtos/user/login-response.dto';
@@ -38,13 +32,15 @@ export class AuthService {
     try {
       const { email, password, confirm_password, ...rest_user } = userObject;
 
+      const lower_mail = email.toLowerCase();
+
       if (password !== confirm_password) {
         throw new ApiError(ApiStatusEnum.PASSWORDS_DONT_MATCH, BadRequestException);
 
       }
 
       const is_existent: User | undefined =
-        await this.userService.getUserByMail(email);
+        await this.userService.getUserByMail(lower_mail);
 
       if (isNotEmpty(is_existent)) {
         throw new ApiError(ApiStatusEnum.MAIL_IN_USE, ConflictException);
@@ -58,17 +54,17 @@ export class AuthService {
 
       const created: UserClean = await this.userService.createUser({
         ...rest_user,
-        email,
+        email: lower_mail,
         password: hashed_password,
       });
 
       id = created.id;
 
-      await this.auth0Service.syncUser({ name: rest_user.name, email, password, id: created.id });
+      await this.auth0Service.syncUser({ name: rest_user.name, email: lower_mail, password, id: created.id });
 
       await this.mailService.sendMail({
         from: 'ActiveProject <activeproject04@gmail.com>',
-        to: email,
+        to: lower_mail,
         subject: 'Welcome to our app',
         template: 'registration',
         context: {
@@ -92,9 +88,11 @@ export class AuthService {
 
   async loginOrRegister(userObject: AuthRegister): Promise<LoginResponse> {
     const { email, sub, ...rest } = userObject;
+    const lower_mail = email.toLowerCase();
+
     try {
 
-      const found_user: User | undefined = await this.userService.getUserByMail(email);
+      const found_user: User | undefined = await this.userService.getUserByMail(lower_mail);
 
       console.log(found_user || "Usuario no encontrado. Creando un nuevo registro de usuario");
       let created: UserClean;
@@ -128,12 +126,13 @@ export class AuthService {
           };
         } else {
           throw new ApiError(ApiStatusEnum.TEST_ERROR, BadRequestException);
+          
         }
       }
 
       await this.mailService.sendMail({
         from: 'ActiveProject <activeproject04@gmail.com>',
-        to: email,
+        to: lower_mail,
         subject: 'Welcome to our app',
         template: 'registration',
         context: {
@@ -179,8 +178,9 @@ export class AuthService {
 
   async userLogin(userCredentials: UserLogin): Promise<LoginResponse> {
     const { email, password } = userCredentials;
+    const lower_mail = email.toLowerCase();
 
-    const user: User | undefined = await this.userService.getUserByMail(email);
+    const user: User | undefined = await this.userService.getUserByMail(lower_mail);
 
     if (isNotEmpty(user) && user.was_banned) {
       throw new ApiError(ApiStatusEnum.USER_DELETED, UnauthorizedException);
@@ -216,4 +216,5 @@ export class AuthService {
 
     throw new ApiError(ApiStatusEnum.INVALID_CREDENTIALS, UnauthorizedException);
   }
+
 }

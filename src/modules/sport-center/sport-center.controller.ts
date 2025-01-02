@@ -1,21 +1,5 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Post,
-  Put,
-  Query,
-} from '@nestjs/common';
-import {
-  ApiBody,
-  ApiOperation,
-  ApiParam,
-  ApiQuery,
-  ApiTags,
-} from '@nestjs/swagger';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query, } from '@nestjs/common';
+import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiTags, } from '@nestjs/swagger';
 import { SportCenterService } from './sport-center.service';
 import { CreateSportCenterDto } from 'src/dtos/sportcenter/createSportCenter.dto';
 import { SportCenter } from 'src/entities/sportcenter.entity';
@@ -24,7 +8,8 @@ import { SportCenterList } from 'src/dtos/sportcenter/sport-center-list.dto';
 @ApiTags('Sport Center')
 @Controller('sportcenter')
 export class SportCenterController {
-  constructor(private readonly sportcenterService: SportCenterService) {}
+  
+  constructor(private readonly sportcenterService: SportCenterService) { }
 
   @Get('search')
   @ApiQuery({
@@ -58,26 +43,12 @@ export class SportCenterController {
     summary:
       'Obtiene lista de sportcenter ordenados por rating de mayor a menor',
   })
-  async getSportCenters(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
-    @Query('rating') rating?: number,
-    @Query('search') search?: string,
-  ): Promise<SportCenterList> {
-    return await this.sportcenterService.getSportCenters(
-      page,
-      limit,
-      false,
-      rating,
-      search,
-    );
+  async getSportCenters(@Query('page') page: number = 1, @Query('limit') limit: number = 10, @Query('rating') rating?: number, @Query('search') search?: string,): Promise<SportCenterList> {
+    return await this.sportcenterService.getSportCenters(page, limit, false, rating, search,);
   }
 
-  
+
   @Post('create')
-  //   @Roles(UserRole.CONSUMER)
-  //   @UseGuards(AuthGuard)
-  // @ApiBearerAuth()
   @ApiOperation({
     summary: 'Registra un nuevo centro deportivo',
     description: 'Crea un nuevo registro de SportCenter en el sistema.',
@@ -86,11 +57,10 @@ export class SportCenterController {
     description: 'Datos necesarios para crear un nuevo SportCenter',
     type: CreateSportCenterDto,
   })
-  async createSportCenter(
-    @Body() data: CreateSportCenterDto,
-  ): Promise<SportCenter> {
+  async createSportCenter(@Body() data: CreateSportCenterDto,): Promise<SportCenter> {
     return await this.sportcenterService.createSportCenter(data);
   }
+
 
   @Get(':id')
   @ApiOperation({
@@ -106,7 +76,4 @@ export class SportCenterController {
     return await this.sportcenterService.getById(id);
   }
 
-
-
-  
 }
