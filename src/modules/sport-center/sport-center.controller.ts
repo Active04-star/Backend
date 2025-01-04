@@ -1,9 +1,10 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query, } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiTags, } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query, UseGuards, } from '@nestjs/common';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiQuery, ApiTags, } from '@nestjs/swagger';
 import { SportCenterService } from './sport-center.service';
 import { CreateSportCenterDto } from 'src/dtos/sportcenter/createSportCenter.dto';
 import { SportCenter } from 'src/entities/sportcenter.entity';
 import { SportCenterList } from 'src/dtos/sportcenter/sport-center-list.dto';
+import { AuthGuard } from 'src/guards/auth-guard.guard';
 
 @ApiTags('Sport Center')
 @Controller('sportcenter')
@@ -49,6 +50,8 @@ export class SportCenterController {
 
 
   @Post('create')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   @ApiOperation({
     summary: 'Registra un nuevo centro deportivo',
     description: 'Crea un nuevo registro de SportCenter en el sistema.',
