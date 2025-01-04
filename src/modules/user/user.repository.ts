@@ -17,7 +17,7 @@ import { Repository } from 'typeorm';
 export class UserRepository {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
-  ) {}
+  ) { }
 
   async hasActiveReservations(userId: string) {
     const user = await this.userRepository
@@ -60,14 +60,10 @@ export class UserRepository {
     return user;
   }
 
-  async updateUser(
-    actual_user: User,
-    modified_user: UpdateUser,
-  ): Promise<User> {
+  async updateUser(actual_user: User, modified_user: UpdateUser): Promise<User> {
     this.userRepository.merge(actual_user, modified_user);
-    await this.userRepository.save(actual_user);
 
-    return actual_user;
+    return await this.userRepository.save(actual_user);
   }
 
   async rankUpTo(user: User, role: UserRole): Promise<User> {

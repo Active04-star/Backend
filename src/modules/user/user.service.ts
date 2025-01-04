@@ -72,7 +72,7 @@ export class UserService {
       throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, NotFoundException);
     }
 
-    return new UserClean();
+    return await this.userRepository.updateUser(found_user, modified_user);
   }
 
 
