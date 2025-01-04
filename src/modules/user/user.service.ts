@@ -22,6 +22,16 @@ export class UserService {
   constructor(private readonly userRepository: UserRepository) { }
 
 
+  async putAuthToken(user: User, sub: string): Promise<void> {
+    const updated_user: User | undefined = await this.userRepository.updateUser(user, { authtoken: sub });
+
+    if (!updated_user) {
+      throw new ApiError(ApiStatusEnum.USER_UPDATE_FAILED, InternalServerErrorException);
+    }
+
+  }
+
+
   async getManagerSportCenter(id: string): Promise<{ id: string }> {
     const found_user: User | undefined = await this.userRepository.getUserById(id, true);
 
@@ -65,14 +75,22 @@ export class UserService {
   }
 
 
-  async updateUser(id: string, modified_user: UpdateUser): Promise<UserClean> {
+  /**
+   * Los unicos campos de usuario que deben ser actualizados por esta funcion son:
+   * - `name`
+   * - `profile_image`
+   * - `authtoken`
+   * - `password`
+   */
+  async updateUser(id: string, modified_user: Partial<Pick<User, "name" | "profile_image" | "authtoken" | "password">>): Promise<UserClean> {
     const found_user: User | undefined = await this.userRepository.getUserById(id);
 
     if (isEmpty(found_user)) {
       throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, NotFoundException);
     }
 
-    return await this.userRepository.updateUser(found_user, modified_user);
+    const { authtoken, password, ...clean_user } = await this.userRepository.updateUser(found_user, modified_user);
+    return clean_user;
   }
 
 
