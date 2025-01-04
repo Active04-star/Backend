@@ -71,10 +71,10 @@ export class UserRepository {
     return await this.userRepository.save(user);
   }
 
-  async getUserById(id: string, relations = false): Promise<User | undefined> {
+  async getUserById(id: string): Promise<User | undefined> {
     const found_user: User | null = await this.userRepository.findOne({
       where: { id: id },
-      relations: { managed_centers: relations },
+      relations: { managed_centers: true },
     });
     return found_user === null ? undefined : found_user;
   }

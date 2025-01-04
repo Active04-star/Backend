@@ -15,6 +15,7 @@ import { UpdateUser } from 'src/dtos/user/update-user.dto';
 import { ApiError } from 'src/helpers/api-error-class';
 import { UserRole } from 'src/enums/roles.enum';
 import { AuthRegister } from 'src/dtos/user/auth-register.dto';
+import { SportCenter } from 'src/entities/sportcenter.entity';
 
 @Injectable()
 export class UserService {
@@ -22,19 +23,7 @@ export class UserService {
   constructor(private readonly userRepository: UserRepository) { }
 
 
-  async getManagerSportCenter(id: string): Promise<{ id: string }> {
-    const found_user: User | undefined = await this.userRepository.getUserById(id, true);
-
-    if (isEmpty(found_user)) {
-      throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, NotFoundException);
-
-    } else if (found_user.managed_centers.length === 0) {
-      throw new ApiError(ApiStatusEnum.NO_CENTER_FOR_THIS_USER, BadRequestException);
-
-    }
-
-    return { id: found_user.managed_centers[0].id };
-  }
+ 
 
 
   async deleteUser(id: string): Promise<boolean> {
@@ -96,7 +85,7 @@ export class UserService {
 
 
   async getUserById(id: string, relations = false): Promise<User> {
-    const found_user: User | undefined = await this.userRepository.getUserById(id, relations);
+    const found_user: User | undefined = await this.userRepository.getUserById(id);
 
     if (isEmpty(found_user)) {
       throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, NotFoundException);

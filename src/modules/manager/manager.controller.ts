@@ -1,20 +1,55 @@
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Put } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiParam } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+} from '@nestjs/swagger';
 import { Field } from 'src/entities/field.entity';
 import { UpdateSportCenterDto } from 'src/dtos/sportcenter/updateSportCenter.dto';
 import { SportCenterService } from 'src/modules/sport-center/sport-center.service';
 import { ApiResponse } from 'src/dtos/api-response';
 import { ManagerService } from './manager.service';
+import { SportCenter } from 'src/entities/sportcenter.entity';
+import { Roles } from 'src/decorators/roles.decorator';
+import { UserRole } from 'src/enums/roles.enum';
+import { AuthGuard } from 'src/guards/auth-guard.guard';
+import { RolesGuard } from 'src/guards/roles.guard';
 
 @Controller('manager')
 export class ManagerController {
+  constructor(
+    private readonly managerService: ManagerService,
+    private sportCenterService: SportCenterService,
+  ) {}
 
-  constructor(private readonly managerService: ManagerService, private sportCenterService: SportCenterService) { }
+  @Get('center/:id')
+  @ApiOperation({
+    summary: 'Obtiene el ID del centro deportivo que administra un usuario',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID de usuario',
+  })
+  async getManagerSportCenter(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<SportCenter> {
+    return await this.managerService.getManagerSportCenter(id);
+  }
 
   @Get('fields/:centerId')
   // @Roles(UserRole.MANAGER)
-  //@UseGuards(AuthGuard)
-  //@ApiBearerAuth()
+  // @UseGuards(AuthGuard, RolesGuard)
+  // @ApiBearerAuth()
   @ApiOperation({
     summary: 'optiene una lista de las canchas',
     description:
@@ -25,15 +60,16 @@ export class ManagerController {
     description: 'ID del centro deportivo',
     example: '936c7033-6020-41da-be01-d50b42250018',
   })
-  async getFields(@Param('centerId', ParseUUIDPipe) centerId: string): Promise<Field[]> {
-    return await this.managerService.getFields(centerId);
+  async getFields(
+    @Param('centerId', ParseUUIDPipe) centerId: string,
+  ): Promise<Field[]> {
+    return await this.managerService.getManagerFields(centerId);
   }
 
-
   @Get('reservations/:managerId')
-  // @Roles(UserRole.MANAGER)
-  //@UseGuards(AuthGuard)
-  //@ApiBearerAuth()
+  @Roles(UserRole.MANAGER)
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'obtiene una lista de las reservas de una cancha ',
     description:
@@ -45,14 +81,13 @@ export class ManagerController {
     example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
   })
   async getReservations(@Param('managerId', ParseUUIDPipe) managerId: string) {
-    return await this.managerService.getReservations(managerId);
+    return await this.managerService.getManagerReservations(managerId);
   }
 
-
   @Put('update-sportcenter/:id')
-  // @Roles(UserRole.CONSUMER, UserRole.MANAGER)
-  // @UseGuards(AuthGuard)
-  // @ApiBearerAuth()
+  @Roles(UserRole.MANAGER)
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Actualiza un SportCenter por su ID',
     description: 'Permite actualizar los datos de un SportCenter existente.',
@@ -66,10 +101,12 @@ export class ManagerController {
     description: 'Datos necesarios para actualizar un SportCenter',
     type: UpdateSportCenterDto,
   })
-  async updateSportCenter(@Param('id', ParseUUIDPipe) id: string, @Body() data: UpdateSportCenterDto) {
+  async updateSportCenter(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() data: UpdateSportCenterDto,
+  ) {
     return await this.sportCenterService.updateSportCenter(id, data);
   }
-
 
   @Delete('ban-unban/:id')
   //   @Roles(UserRole.MANAGER)
@@ -85,17 +122,19 @@ export class ManagerController {
     description: 'ID del Centro deportivo a eliminar',
     example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
   })
-  async banOrUnBanCenter(@Param('id', ParseUUIDPipe) id: string): Promise<ApiResponse> {
+  async banOrUnBanCenter(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<ApiResponse> {
     return await this.sportCenterService.banOrUnBanCenter(id);
   }
-
 
   @Put('publish/:sportCenterId/:userId')
   //   @Roles(UserRole.MANAGER)
   //   @UseGuards(AuthGuard)
   // @ApiBearerAuth()
   @ApiOperation({
-    summary: 'Activa un SportCenter (todavia no esta implementado, se va a usar para que se asegure que el centro ya tenga un horario asignado y canchas mas deportes y no se vea en el feed vacio',
+    summary:
+      'Activa un SportCenter (todavia no esta implementado, se va a usar para que se asegure que el centro ya tenga un horario asignado y canchas mas deportes y no se vea en el feed vacio',
     description: 'Activa un centro deportivo asociado a un usuario.',
   })
   @ApiParam({
@@ -112,11 +151,8 @@ export class ManagerController {
     @Param('userId', ParseUUIDPipe) userId: string,
     @Param('sportCenterId', ParseUUIDPipe) sportCenterId: string,
   ) {
-    return await this.managerService.publish(
-      userId,
-      sportCenterId,
-    );
-  } 
+    return await this.managerService.publish(userId, sportCenterId);
+  }
 
   /**@Put('disable/:sportCenterId/:userId')
   //   @Roles(UserRole.MANAGER)
@@ -147,5 +183,4 @@ export class ManagerController {
     );
   }
 */
- 
 }
