@@ -95,7 +95,7 @@ export class SportCenterRepository {
 
   async createSportCenter(
     future_manager: User,
-    sportCenterData: Omit<CreateSportCenterDto, 'manager' | 'images'>,
+    sportCenterData: Omit<CreateSportCenterDto, 'manager'>,
     images?: Image[],
   ): Promise<SportCenter | undefined> {
     const saved_sportcenter: SportCenter =
@@ -103,6 +103,7 @@ export class SportCenterRepository {
         this.sportCenterRepository.create({
           ...sportCenterData,
           main_manager: future_manager,
+          status:Sport_Center_Status.PUBLISHED,
           photos: images || undefined,
         }),
       );
