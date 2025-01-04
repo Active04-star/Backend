@@ -90,6 +90,34 @@ export class ManagerController {
   }
 
 
+  @Put('publish/:sportCenterId/:userId')
+  //   @Roles(UserRole.MANAGER)
+  //   @UseGuards(AuthGuard)
+  // @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Activa un SportCenter (todavia no esta implementado, se va a usar para que se asegure que el centro ya tenga un horario asignado y canchas mas deportes y no se vea en el feed vacio',
+    description: 'Activa un centro deportivo asociado a un usuario.',
+  })
+  @ApiParam({
+    name: 'sportCenterId',
+    description: 'ID del SportCenter a activar',
+    example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
+  })
+  @ApiParam({
+    name: 'userId',
+    description: 'ID del usuario asociado al SportCenter',
+    example: 'a1b2c3d4-5678-9101-1121-abcdef654321',
+  })
+  async publishSportCenter(
+    @Param('userId', ParseUUIDPipe) userId: string,
+    @Param('sportCenterId', ParseUUIDPipe) sportCenterId: string,
+  ) {
+    return await this.managerService.publish(
+      userId,
+      sportCenterId,
+    );
+  } 
+
   /**@Put('disable/:sportCenterId/:userId')
   //   @Roles(UserRole.MANAGER)
   //   @UseGuards(AuthGuard)
@@ -118,33 +146,6 @@ export class ManagerController {
       Sport_Center_Status.DISABLE,
     );
   }
-
-  @Put('publish/:sportCenterId/:userId')
-  //   @Roles(UserRole.MANAGER)
-  //   @UseGuards(AuthGuard)
-  // @ApiBearerAuth()
-  @ApiOperation({
-    summary: 'Activa un SportCenter (No se va a usar, queda como extra)',
-    description: 'Activa un centro deportivo asociado a un usuario.',
-  })
-  @ApiParam({
-    name: 'sportCenterId',
-    description: 'ID del SportCenter a activar',
-    example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
-  })
-  @ApiParam({
-    name: 'userId',
-    description: 'ID del usuario asociado al SportCenter',
-    example: 'a1b2c3d4-5678-9101-1121-abcdef654321',
-  })
-  async publishSportCenter(
-    @Param('userId', ParseUUIDPipe) userId: string,
-    @Param('sportCenterId', ParseUUIDPipe) sportCenterId: string,
-  ) {
-    return await this.sportcenterService.updateStatus(
-      userId,
-      sportCenterId,
-      Sport_Center_Status.PUBLISHED,
-    );
-  } */
+*/
+ 
 }

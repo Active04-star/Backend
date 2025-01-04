@@ -10,6 +10,9 @@ import { Reservation } from 'src/entities/reservation.entity';
 
 @Injectable()
 export class ManagerService {
+  publish(userId: string, sportCenterId: string) {
+    throw new Error('Method not implemented.');
+  }
   constructor(
     private fieldService: Field_Service,
     private userService: UserService,
