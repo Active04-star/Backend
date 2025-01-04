@@ -20,6 +20,7 @@ export class Field_Service {
     private readonly fieldRepository: Field_Repository,
     private sportCenterService: SportCenterService,
     private sportCategoryService: Sport_Category_Service,
+    @Inject(forwardRef(() => Reservation_Service))
     private reservationService: Reservation_Service,
     @Inject(forwardRef(() => Field_Block_Service))
     private fieldblockService: Field_Block_Service
@@ -90,6 +91,7 @@ export class Field_Service {
 
     }
   }
+
 
 
   async deleteField(id: string): Promise<ApiResponse> {
