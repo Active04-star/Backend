@@ -79,10 +79,11 @@ export enum ApiStatusEnum {
   FIELD_CREATION_FAILED = 'No se pudo crear una nueva cancha',
   FIELD_BLOCK_CREATION_FAILED='Se produjo un error creando los bloques de las canchas',
 
-
   SUBSCRIPTION_PAYMENT_FAILED = 'No se pudo crear el pago de la subscripcion',
 
   PAYMENT_NOT_FOUND = 'Pago no entonctrado',
   PAYMENT_CREATION_FAILED = 'No se pudo crear el pago',
   INVALID_RESERVATION_STATUS = 'Estado de la reserva invalido',
+  NO_TOKEN_PROVIDED = "No se proporcionó ningún token",
+  INVALID_TOKEN = "el token es invalido o ha expirado",
 }
