@@ -11,9 +11,10 @@ import { AuthGuard } from "src/guards/auth-guard.guard";
 import { Roles } from "src/decorators/roles.decorator";
 import { UserRole } from "src/enums/roles.enum";
 
-@ApiTags("User")
-@Controller("user")
+@ApiTags('User')
+@Controller('user')
 export class UserController {
+
 
     constructor(private readonly userService: UserService) { }
 
@@ -44,25 +45,23 @@ export class UserController {
         return await this.userService.updateUser(id, modified_user);
     }
 
-
-    @Get("center/:id")
-    @ApiOperation({ summary: 'Obtiene el ID del centro deportivo que administra un usuario' })
-    @ApiParam({
-        name: "id",
-        description: 'ID de usuario',
-    })
-    async getManagerSportCenter(@Param("id", ParseUUIDPipe) id: string): Promise<{ id: string }> {
-        return await this.userService.getManagerSportCenter(id);
+    if (isNotEmpty(modified_user.password)) {
+      throw new ApiError(
+        ApiStatusEnum.USER_UPDATE_FAILED,
+        BadRequestException,
+        "Password can't be updated from this endpoint",
+      );
     }
 
+    return await this.userService.updateUser(id, modified_user);
+  }
 
-    @Get("solo-para-testing/:id")
-    @ApiParam({
-        name: "id",
-        description: 'ID de usuario',
-    })
-    async getUserById(@Param("id", ParseUUIDPipe) id: string): Promise<User> {
-        return await this.userService.getUserById(id);
-    }
-
+  @Get('solo-para-testing/:id')
+  @ApiParam({
+    name: 'id',
+    description: 'ID de usuario',
+  })
+  async getUserById(@Param('id', ParseUUIDPipe) id: string): Promise<User> {
+    return await this.userService.getUserById(id);
+  }
 }
