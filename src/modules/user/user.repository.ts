@@ -60,7 +60,7 @@ export class UserRepository {
     return user;
   }
 
-  async updateUser(actual_user: User, modified_user: UpdateUser): Promise<User> {
+  async updateUser(actual_user: User, modified_user: Partial<User>): Promise<User> {
     this.userRepository.merge(actual_user, modified_user);
 
     return await this.userRepository.save(actual_user);

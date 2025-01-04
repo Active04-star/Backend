@@ -135,7 +135,7 @@ export class AuthService {
           // };
 
         } else if (found_user.authtoken === null) {
-          await this.userService.updateUser(found_user.id, { authtoken: sub });
+          await this.userService.putAuthToken(found_user, sub);
           return this.signToken(found_user);
 
         } else {
