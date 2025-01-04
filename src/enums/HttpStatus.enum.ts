@@ -95,4 +95,5 @@ export enum ApiStatusEnum {
   INSUFFICIENT_PERMISSIONS = 'No tienes permisos para hacer eso',
   NOT_ALLOWED_HERE = 'No estás permitido aqui!',
   TEST_ERROR = 'Error de prueba, debe ser eliminado en modo produccion!',
+  RATING_OUT_OF_BOUNDS = "La calificacion debe estar entre 1 y 5",
 }
