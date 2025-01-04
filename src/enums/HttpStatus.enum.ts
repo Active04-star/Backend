@@ -21,8 +21,8 @@ export enum ApiStatusEnum {
   NO_CENTER_FOR_THIS_USER = 'No hay centros deportivos para este usuario',
   USER_IS_THIRD_PARTY = 'Este usuario se registró con una cuenta de terceros',
   USER_IS_LOCAL = 'Este usuario se registró con una cuenta local',
-  USER_HAS_RESERVATIONS='Usuario tiene reservas activas',
-  
+  USER_HAS_RESERVATIONS = 'Usuario tiene reservas activas',
+
   RANKING_UP_FAIL = 'Error al mejorar el rango del usuario',
   RANKING_UP_SUCCESS = 'El rol de este usuario ha cambiado',
 
@@ -77,12 +77,15 @@ export enum ApiStatusEnum {
   FIELD_DELETION_FAILED = 'No se pudo eliminar esta cancha',
   FIELD_NOT_FOUND = 'No se pudo encontrar esta cancha',
   FIELD_CREATION_FAILED = 'No se pudo crear una nueva cancha',
-  FIELD_BLOCK_CREATION_FAILED='Se produjo un error creando los bloques de las canchas',
-
+  FIELD_BLOCK_CREATION_FAILED = 'Se produjo un error creando los bloques de las canchas',
 
   SUBSCRIPTION_PAYMENT_FAILED = 'No se pudo crear el pago de la subscripcion',
 
   PAYMENT_NOT_FOUND = 'Pago no entonctrado',
   PAYMENT_CREATION_FAILED = 'No se pudo crear el pago',
   INVALID_RESERVATION_STATUS = 'Estado de la reserva invalido',
+  FIELD_BLOCK_NOT_FOUND = 'No se encontro el field block',
+  FIELD_BLOCK_ALREADY_RESERVED = "Ya se reservo este horario",
+  PAYMENT_ALREADY_EXISTS = "PAYMENT_ALREADY_EXISTS",
+  
 }

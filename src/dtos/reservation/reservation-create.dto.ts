@@ -1,12 +1,4 @@
-import {
-  IsNotEmpty,
-  IsString,
-  IsUUID,
-  IsDate,
-  Matches,
-  IsEnum,
-} from 'class-validator';
-import { SportType } from 'src/enums/sportType.enum';
+import { IsNotEmpty, IsString, IsUUID, IsDate } from 'class-validator';
 
 export class createReservationDto {
   @IsNotEmpty()
@@ -16,20 +8,13 @@ export class createReservationDto {
 
   @IsNotEmpty()
   @IsString()
-  @Matches(/^([01]?[0-9]|2[0-3]):([0-5]?[0-9])$/, {
-    message: 'debe ser de formato HH:MM',
-  })
-  timeSlot: string;
-
-  @IsNotEmpty()
-  @IsString()
   @IsUUID()
   userId: string;
 
   @IsNotEmpty()
   @IsString()
   @IsUUID()
-  fieldId: string; 
+  fieldId: string;
 
   @IsNotEmpty()
   @IsString()
