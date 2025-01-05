@@ -18,6 +18,7 @@ export enum ApiStatusEnum {
   PASSWORD_UPDATE_FAILED = 'Error al actualizar la contraseña',
   PASSWORDS_DONT_MATCH = 'Las contraseñas no coinciden',
   HASHING_FAILED = 'Encriptado de contraseña fallido!',
+  PASSWORD_SAME_AS_OLD = "La nueva contraseña no puede ser igual a la anterior",
 
   // User
   USER_DELETED = 'Este usuario fue eliminado!',
@@ -96,4 +97,9 @@ export enum ApiStatusEnum {
   NOT_ALLOWED_HERE = 'No estás permitido aqui!',
   TEST_ERROR = 'Error de prueba, debe ser eliminado en modo produccion!',
   RATING_OUT_OF_BOUNDS = "La calificacion debe estar entre 1 y 5",
+
+  // Categories
+  CATEGORY_ALREADY_EXISTS = "Ya hay una categoria con ese nombre!",
+  CATEGORY_CREATION_FAILED = "No se pudo crear esta categoria",
+  CATEGORY_NOT_FOUND = "No se encontró ninguna categoria",
 }

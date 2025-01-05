@@ -1,13 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsNotEmpty,
-  Min,
-  Max,
-  IsInt,
-  IsUUID,
-  IsDecimal,
-  IsOptional,
-} from 'class-validator';
+import { IsNotEmpty, Min, Max, IsInt, IsUUID, IsDecimal, IsOptional } from 'class-validator';
 
 export class FieldDto {
   @IsInt()
@@ -32,7 +24,7 @@ export class FieldDto {
   @IsInt()
   @Min(15)
   @Max(1440)
-  duration_minutes:number
+  duration_minutes: number
 
   @IsUUID()
   @IsNotEmpty()

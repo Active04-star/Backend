@@ -1,7 +1,7 @@
 import { Controller, Get, Param } from "@nestjs/common";
 import { Auth0Service } from "./auth0.service";
 
-@Controller()
+@Controller("auth0")
 export class Auth0Controller {
 
     constructor(private readonly auth0Service: Auth0Service) { }

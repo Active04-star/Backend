@@ -1,12 +1,50 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import axios from 'axios';
 import { Auth0TokenRequestDto } from 'src/dtos/auth-token-response';
+import { User } from 'src/entities/user.entity';
 import { ApiStatusEnum } from 'src/enums/HttpStatus.enum';
 import { ApiError } from 'src/helpers/api-error-class';
 
 @Injectable()
 export class Auth0Service {
+    
     constructor() { }
+
+
+    async updateUserPassword(user: User, password: string) {
+        console.log(password);
+        try {
+            const token_request: Auth0TokenRequestDto = await this.getAuthToken();
+
+            const data = JSON.stringify({
+                "password": password,
+                "connection": "Username-Password-Authentication"
+            });
+
+            const user_update_options = {
+                method: 'PATCH',
+                maxBodyLength: Infinity,
+                url: `${process.env.AUTH0_ISSUER_BASE_URL}users/${user.authtoken}`,
+                headers: {
+                    'Authorization': `Bearer ${token_request.access_token}`,
+                    'Content-type': 'application/json'
+                },
+                data: data
+            };
+
+            await axios.request(user_update_options).then((response) => {
+                console.log(response);
+
+            }).catch((error) => {
+                console.log(error);
+                throw new ApiError(ApiStatusEnum.UNKNOWN_ERROR, InternalServerErrorException, error);
+            });
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
 
     async getUserByMail(email: string): Promise<any> {
 

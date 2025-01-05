@@ -1,9 +1,12 @@
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { Field_Service } from './field.service';
 import { FieldDto } from 'src/dtos/field/createField.dto';
 import { UpdateFieldDto } from 'src/dtos/field/updateField.dto';
 import { Field } from 'src/entities/field.entity';
+import { UserRole } from 'src/enums/roles.enum';
+import { AuthGuard } from 'src/guards/auth-guard.guard';
+import { Roles } from 'src/decorators/roles.decorator';
 
 @ApiTags('Field')
 @Controller('field')
@@ -11,8 +14,8 @@ export class Field_Controller {
   constructor(private readonly fieldService: Field_Service) { }
 
   @Post()
-  // @Roles(UserRole.MANAGER)
-  // @UseGuards(AuthGuard)
+  @Roles(UserRole.MANAGER, UserRole.MAIN_MANAGER)
+  @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Registra una nueva cancha', description: 'Crea un nuevo registro de Field en el sistema.' })
   @ApiBody({ description: 'Datos necesarios para crear una nueva cancha', type: FieldDto })
@@ -37,7 +40,7 @@ export class Field_Controller {
   }
 
 
-  @Put('update')
+  @Put('update/:id')
   // @Roles(UserRole.MANAGER)
   // @UseGuards(AuthGuard)
   @ApiBearerAuth()
@@ -51,8 +54,8 @@ export class Field_Controller {
     example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
   })
   @ApiBody({ description: 'Datos necesarios para actualizar un Field', type: UpdateFieldDto })
-  async updateField(@Body() data: UpdateFieldDto): Promise<Field> {
-    return await this.fieldService.updateField(data);
+  async updateField(@Param("id", ParseUUIDPipe) id: string, @Body() data: UpdateFieldDto): Promise<Field> {
+    return await this.fieldService.updateField(id, data);
   }
 
 

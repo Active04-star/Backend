@@ -25,6 +25,47 @@ export class AuthService {
     private readonly auth0Service: Auth0Service
   ) { }
 
+
+  async updatePassword(id: string, credentials: Pick<LocalRegister, "password" | "confirm_password">): Promise<ApiResponse> {
+    const { password, confirm_password } = credentials;
+
+    if (password !== confirm_password) {
+      throw new ApiError(ApiStatusEnum.PASSWORDS_DONT_MATCH, BadRequestException);
+    }
+
+    const user: User | undefined = await this.userService.getUserById(id);
+
+    const is_same_password = await bcrypt.compare(password, user.password);
+
+    
+    if (isNotEmpty(user)) {
+
+      if(is_same_password) {
+        throw new ApiError(ApiStatusEnum.PASSWORD_SAME_AS_OLD, BadRequestException);
+  
+      }
+
+      const hashed_password = await bcrypt.hash(password, 10);
+
+      if (!hashed_password) {
+        throw new ApiError(ApiStatusEnum.HASHING_FAILED, BadRequestException);
+      }
+
+      if (isNotEmpty(user.authtoken)) {
+        await this.auth0Service.updateUserPassword(user, password);
+      }
+
+      await this.userService.updateUser(user.id, { password: hashed_password });
+
+      return { message: ApiStatusEnum.PASSWORD_UPDATE_SUCCESS };
+
+    }
+
+    throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, BadRequestException);
+
+  }
+
+
   async getAuthType(email: string): Promise<ApiResponse> {
     const lower_mail = email.toLowerCase();
     const user: User | undefined = await this.userService.getUserByMail(lower_mail);

@@ -41,13 +41,9 @@ export class SportCenterRepository {
     return remainingActiveCenters;
   }
 
-  async getSportCenters(
-    page: number,
-    limit: number,
-    show_hidden: boolean,
-    rating?: number,
-    keyword?: string,
-  ): Promise<SportCenterList> {
+
+  async getSportCenters(page: number, limit: number, show_hidden: boolean, rating?: number, keyword?: string): Promise<SportCenterList> {
+    
     const queryBuilder = this.sportCenterRepository
       .createQueryBuilder('sportcenter')
       .orderBy('sportcenter.averageRating', 'DESC', 'NULLS LAST'); // Ordena por averageRating directamente
@@ -93,6 +89,7 @@ export class SportCenterRepository {
     };
   }
 
+
   async createSportCenter(
     future_manager: User,
     sportCenterData: Omit<CreateSportCenterDto, 'manager'>,
@@ -103,13 +100,14 @@ export class SportCenterRepository {
         this.sportCenterRepository.create({
           ...sportCenterData,
           main_manager: future_manager,
-          status:Sport_Center_Status.PUBLISHED,
+          status: Sport_Center_Status.PUBLISHED,
           photos: images || undefined,
         }),
       );
 
     return saved_sportcenter === null ? undefined : saved_sportcenter;
   }
+
 
   async findOne(id: string, relations: boolean): Promise<SportCenter | undefined> {
     const found_sportcenter: SportCenter = await this.sportCenterRepository.findOne({
@@ -119,25 +117,19 @@ export class SportCenterRepository {
     return found_sportcenter === null ? undefined : found_sportcenter;
   }
 
-  async updateSportCenter(
-    sportCenter: SportCenter,
-    updateData: UpdateSportCenterDto,
-  ): Promise<SportCenter> {
-    const updatedSportCenter = this.sportCenterRepository.merge(
-      sportCenter,
-      updateData,
-    );
+
+  async updateSportCenter(sportCenter: SportCenter, updateData: UpdateSportCenterDto): Promise<SportCenter> {
+    const updatedSportCenter = this.sportCenterRepository.merge(sportCenter, updateData);
 
     return await this.sportCenterRepository.save(updatedSportCenter);
   }
 
-  async updateStatus(
-    sportCenterInstance: SportCenter,
-    status: Sport_Center_Status,
-  ) {
+
+  async updateStatus(sportCenterInstance: SportCenter, status: Sport_Center_Status) {
     sportCenterInstance.status = status;
     return await this.sportCenterRepository.save(sportCenterInstance);
   }
+
 
   async deleteSportCenter(sportCenter: SportCenter): Promise<boolean> {
     const deleted: SportCenter =
