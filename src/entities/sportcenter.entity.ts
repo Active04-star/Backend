@@ -28,7 +28,10 @@ export class SportCenter {
   @Column({ length: 120 })
   address: string;
 
-  @Column({ type: 'decimal', precision: 2, scale: 1, nullable: true })
+  @Column({ 
+    type: 'float',
+    default: 0
+  })
   averageRating: number;
 
   @Column({ default: false })
