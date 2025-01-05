@@ -45,16 +45,6 @@ export class UserController {
     }
 
 
-    @Get("center/:id")
-    @ApiOperation({ summary: 'Obtiene el ID del centro deportivo que administra un usuario' })
-    @ApiParam({
-        name: "id",
-        description: 'ID de usuario',
-    })
-    async getManagerSportCenter(@Param("id", ParseUUIDPipe) id: string): Promise<{ id: string }> {
-        return await this.userService.getManagerSportCenter(id);
-    }
-
 
     @Get("solo-para-testing/:id")
     @ApiParam({
