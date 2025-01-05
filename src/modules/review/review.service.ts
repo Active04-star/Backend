@@ -12,16 +12,20 @@ import { Reservation } from 'src/entities/reservation.entity';
 import { ApiError } from 'src/helpers/api-error-class';
 import { ApiStatusEnum } from 'src/enums/HttpStatus.enum';
 import { ApiResponse } from 'src/dtos/api-response';
+import { SportCenter } from 'src/entities/sportcenter.entity';
 
 @Injectable()
 export class ReviewService {
     constructor(
         private readonly reviewRepository: ReviewRepository,
-        private readonly userService: UserService,
         @InjectRepository(User)
         private userRepository: Repository<User>,
         @InjectRepository(Reservation)
-        private reservationRepository: Repository<Reservation>
+        private reservationRepository: Repository<Reservation>,
+        @InjectRepository(SportCenter)
+        private sportCenterRepository:Repository<SportCenter>,
+        @InjectRepository(Review) private review_Repository: Repository<Review>
+
     ) { }
 
     //No es necesario traer todas las reseñas
@@ -63,11 +67,11 @@ export class ReviewService {
                 throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, NotFoundException);
             }
 
-            const foundReservation = await this.reservationRepository.findOne({ //validacion 2. que ese usuario tenga una reserva en estado ACTIVE en esa cancha
+            const foundReservation = await this.reservationRepository.findOne({ //validacion 2. UNA VEZ QUE EL USUARIO TEMRINA LA RESERVA VA A PODER CREAR UNA RESEÑA
                 where: {
                     user: { id: userId },
                     field: { id: fieldId },
-                    status: ReservationStatus.ACTIVE,
+                    status: ReservationStatus.COMPLETED,
                 },
                 relations: ['field', 'user'],
             });
@@ -93,17 +97,33 @@ export class ReviewService {
                 user,
                 field: foundReservation.field,
                 reservation: foundReservation,
+                sportcenter:foundReservation.field.sportcenter
             });
 
             if (createReview === undefined) {
                 throw new ApiError(ApiStatusEnum.REVIEW_CREATION_FAILED, InternalServerErrorException);
             }
-
+            if (createReview.sportcenter) {
+                await this.updateSportCenterRating(createReview.sportcenter.id);
+              }
+              
             return createReview;
         } catch (error) {
             throw new ApiError(error?.message, BadRequestException, error);
         }
     }
+
+    async updateSportCenterRating(sportCenterId: string) {
+        const reviews = await this.review_Repository.find({
+          where: { sportcenter: { id: sportCenterId } }
+        });
+    
+        const average = reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length || 0;
+    
+        await this.sportCenterRepository.update(sportCenterId, {
+          averageRating: parseFloat(average.toFixed(2))
+        });
+      }
 
     async updateReview(id: string, reviewData: reviewUpdate): Promise<Review> {
         const review: Review = await this.reviewRepository.getReviewsById(id);
