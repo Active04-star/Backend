@@ -43,7 +43,6 @@ export class Field {
   // Duración de cada rango horario (por ejemplo, 1 hora por reserva)
   @Column({ type: 'int', nullable: false, default: 60 }) // Duración en minutos
   duration_minutes: number;
-  
 
   @OneToMany(() => Reservation, (reservation) => reservation.field, {
     nullable: true,

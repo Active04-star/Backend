@@ -27,8 +27,8 @@ export class Field_Service {
   ) { }
 
 
-  async updateField(data: UpdateFieldDto): Promise<Field> {
-    const field = await this.fieldRepository.findById(data.id);
+  async updateField(id: string, data: UpdateFieldDto): Promise<Field> {
+    const field = await this.fieldRepository.findById(id);
     const updatedField = await this.fieldRepository.updateField(field, data);
     return updatedField;
   }
@@ -79,7 +79,7 @@ export class Field_Service {
   async getFields(centerId: string): Promise<Field[]> {
     try {
       const found_center: SportCenter = await this.sportCenterService.getById(centerId, true);
-      
+
       if (found_center.fields === undefined || found_center.fields.length === 0) {
         throw new ApiError(ApiStatusEnum.CENTER_HAS_NO_FIELDS, NotFoundException);
 
