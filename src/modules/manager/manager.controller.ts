@@ -23,7 +23,6 @@ import { SportCenter } from 'src/entities/sportcenter.entity';
 import { Roles } from 'src/decorators/roles.decorator';
 import { UserRole } from 'src/enums/roles.enum';
 import { AuthGuard } from 'src/guards/auth-guard.guard';
-import { RolesGuard } from 'src/guards/roles.guard';
 
 @Controller('manager')
 export class ManagerController {
