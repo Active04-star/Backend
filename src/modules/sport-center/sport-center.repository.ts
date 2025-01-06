@@ -100,7 +100,7 @@ export class SportCenterRepository {
         this.sportCenterRepository.create({
           ...sportCenterData,
           main_manager: future_manager,
-          status: Sport_Center_Status.DRAFT,
+          status: Sport_Center_Status.PUBLISHED,
           photos: images || undefined,
         }),
       );
