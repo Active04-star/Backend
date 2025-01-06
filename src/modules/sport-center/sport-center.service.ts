@@ -34,7 +34,7 @@ export class SportCenterService {
 
 
   async getSportCenters(page: number, limit: number, show_hidden: boolean, rating?: number, keyword?: string): Promise<SportCenterList> {
-    if (rating < 1 || rating > 5) {
+    if (rating < 0 || rating > 5) {
       throw new ApiError(ApiStatusEnum.RATING_OUT_OF_BOUNDS, BadRequestException);
     }
 
