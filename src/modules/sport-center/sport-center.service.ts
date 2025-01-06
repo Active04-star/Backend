@@ -34,7 +34,7 @@ export class SportCenterService {
 
 
   async getSportCenters(page: number, limit: number, show_hidden: boolean, rating?: number, keyword?: string): Promise<SportCenterList> {
-    if (rating < 1 || rating > 5) {
+    if (rating < 0 || rating > 5) {
       throw new ApiError(ApiStatusEnum.RATING_OUT_OF_BOUNDS, BadRequestException);
     }
 
@@ -46,6 +46,9 @@ export class SportCenterService {
         rating,
         keyword,
       );
+
+      console.log('centers',found_centers);
+      
 
     if (found_centers.sport_centers === undefined || found_centers.sport_centers.length === 0) {
       throw new ApiError(ApiStatusEnum.CENTER_LIST_EMTPY, NotFoundException);

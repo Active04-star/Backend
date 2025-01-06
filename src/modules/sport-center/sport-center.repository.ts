@@ -43,10 +43,10 @@ export class SportCenterRepository {
 
 
   async getSportCenters(page: number, limit: number, show_hidden: boolean, rating?: number, keyword?: string): Promise<SportCenterList> {
-    
     const queryBuilder = this.sportCenterRepository
       .createQueryBuilder('sportcenter')
-      .orderBy('sportcenter.averageRating', 'DESC', 'NULLS LAST'); // Ordena por averageRating directamente
+      .leftJoinAndSelect('sportcenter.photos', 'photos')
+      .orderBy('sportcenter.averageRating', 'DESC', 'NULLS LAST');
 
     if (!show_hidden) {
       queryBuilder.andWhere('sportcenter.status = :status', {
@@ -54,40 +54,38 @@ export class SportCenterRepository {
       });
     }
 
-    // Filtro por keyword (nombre o dirección)
+    // Case-insensitive search for keyword
     if (keyword) {
       queryBuilder.andWhere(
-        '(sportcenter.name LIKE :keyword OR sportcenter.address LIKE :keyword)',
+        '(LOWER(sportcenter.name) LIKE LOWER(:keyword) OR LOWER(sportcenter.address) LIKE LOWER(:keyword))',
         { keyword: `%${keyword}%` },
       );
     }
 
-    // Filtro por rating (si se proporciona)
     if (rating !== undefined) {
-      queryBuilder.andWhere('sportcenter.averageRating >= :rating', { rating });
+      queryBuilder.andWhere('sportcenter.averageRating <= :rating', { rating });
     }
 
-    // Aplica paginación si se proporcionan page y limit
-    if (page && limit) {
-      queryBuilder.skip((page - 1) * limit).take(limit);
-    }
+    // Get total count before pagination
+    const totalCount = await queryBuilder.getCount();
 
-    const centers: SportCenter[] = await queryBuilder.getMany();
+    // Apply pagination
+    queryBuilder.skip((page - 1) * limit).take(limit);
 
-    // Ejecuta el query y devuelve los resultados
+    const centers = await queryBuilder.getMany();
+
     return {
-      items: centers.length,
+      items: totalCount,
       page: Number(page),
       limit: Number(limit),
-      total_pages: Math.ceil(centers.length / limit),
-
+      total_pages: Math.ceil(totalCount / limit),
       sport_centers: centers.map(center => ({
         ...center,
         photos: center.photos === undefined ? [] : center.photos.map(image => image.image_url)
       }))
-
     };
   }
+
 
 
   async createSportCenter(

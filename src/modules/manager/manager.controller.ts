@@ -32,6 +32,9 @@ export class ManagerController {
   ) {}
 
   @Get('center/:id')
+  @Roles(UserRole.MAIN_MANAGER)
+  @UseGuards(AuthGuard, RolesGuard)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Obtiene el ID del centro deportivo que administra un usuario',
   })
