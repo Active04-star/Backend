@@ -63,7 +63,7 @@ export class SportCenterRepository {
     }
 
     if (rating !== undefined) {
-      queryBuilder.andWhere('sportcenter.averageRating >= :rating', { rating });
+      queryBuilder.andWhere('sportcenter.averageRating <= :rating', { rating });
     }
 
     // Get total count before pagination
