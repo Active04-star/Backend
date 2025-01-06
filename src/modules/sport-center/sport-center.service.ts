@@ -47,6 +47,9 @@ export class SportCenterService {
         keyword,
       );
 
+      console.log('centers',found_centers);
+      
+
     if (found_centers.sport_centers === undefined || found_centers.sport_centers.length === 0) {
       throw new ApiError(ApiStatusEnum.CENTER_LIST_EMTPY, NotFoundException);
 
