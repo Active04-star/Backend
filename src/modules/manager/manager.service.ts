@@ -12,6 +12,8 @@ import { ApiStatusEnum } from 'src/enums/HttpStatus.enum';
 import { CreateSportCategoryDto } from 'src/dtos/sportcategory/createSportCategory.dto';
 import { Sport_Category_Service } from '../sport-category/sport-category.service';
 import { Sport_Category } from 'src/entities/sport_category.entity';
+import { Sport_Center_Status } from 'src/enums/sport_Center_Status.enum';
+import { SportCenterService } from '../sport-center/sport-center.service';
 
 @Injectable()
 export class ManagerService {
@@ -21,19 +23,36 @@ export class ManagerService {
     @InjectRepository(SportCenter)
     private sportCenterRepository: Repository<SportCenter>,
     private sportCategoryService: Sport_Category_Service,
+    private sportCenterService: SportCenterService,
   ) {}
 
- 
-  async assingCategoriesToSCenter(){
-//asigna deportes a un centro 
-
-
+  async assingCategoriesToSCenter() {
+    //asigna deportes a un centro
   }
 
+  async publishSportCenter(
+    userId: string,
+    sportCenterId: string,
+  ): Promise<SportCenter> {
+    const found_sportcenter = await this.sportCenterRepository.findOne({
+      where: { id: sportCenterId },
+    });
 
+    if (
+      !found_sportcenter.fields.length ||
+      !found_sportcenter.schedules.length
+    ) {
+      throw new ApiError(
+        ApiStatusEnum.CENTER_IS_NOT_COMPLETED,
+        BadRequestException,
+      );
+    }
 
-  async publish(userId: string, sportCenterId: string) {
-    throw new Error('Method not implemented.');
+    return await this.sportCenterService.updateStatus(
+      userId,
+      found_sportcenter.id,
+      Sport_Center_Status.PUBLISHED,
+    );
   }
 
   async getManagerSportCenter(id: string): Promise<SportCenter> {

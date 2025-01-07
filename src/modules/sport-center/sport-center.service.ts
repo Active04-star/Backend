@@ -192,32 +192,7 @@ export class SportCenterService {
     }
   }
 
-  // async publishSportCenter(userId: string, sportCenterId: string): Promise<SportCenter> {
-  //   //publicas un sportcenter que esta en draft, si el usuario con rol de user publica el sportcenter se convierte en manager
-
-  //   const user: User = await this.userService.getUserById(userId);
-
-  //   const found_sportcenter = await this.getById(sportCenterId);
-
-  //   if (found_sportcenter.status === SportCenterStatus.PUBLISHED) {
-  //     throw new ApiError(ApiStatusEnum.CENTER_ALREADY_HAS_STATE, BadRequestException, SportCenterStatus.PUBLISHED);
-  //   }
-
-  //   if (found_sportcenter.main_manager.id !== user.id) {
-  //     throw new ApiError(ApiStatusEnum.CENTER_WRONG_OWNER, BadRequestException);
-  //   }
-
-  //   return await this.sportcenterRepository.updateStatus(found_sportcenter, SportCenterStatus.PUBLISHED);
-
-  //   // if (found_sportcenter.sport_categories.length === 0 || found_sportcenter.fields.length === 0) {
-  //   //   throw new ApiError();
-  //   // }
-
-  //   // if (user.role !== 'manager') {
-  //   //   await this.rankUp(user, UserRole.MANAGER);
-  //   // }
-
-  // }
+  
 
   // async disableSportCenter(userId: string, sportCenterId: string): Promise<SportCenter> {
   //   //se desabilita un sportcenter , el usuario sigue siendo manager . el sportcenter no se va a ver por otros usuarios

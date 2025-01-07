@@ -154,7 +154,7 @@ export class ManagerController {
     @Param('userId', ParseUUIDPipe) userId: string,
     @Param('sportCenterId', ParseUUIDPipe) sportCenterId: string,
   ) {
-    return await this.managerService.publish(userId, sportCenterId);
+    return await this.managerService.publishSportCenter(userId, sportCenterId);
   }
 
   /**@Put('disable/:sportCenterId/:userId')

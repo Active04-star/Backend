@@ -46,6 +46,7 @@ export enum ApiStatusEnum {
   CENTER_HAS_NO_FIELDS = 'Este centro deportivo no tiene canchas',
   CENTER_ALREADY_HAS_SCHEDULES = "El centro ya tiene horarios asignados",
   CENTER_SCHEDULES_CREATION_FAILED = "Fallo la creacion de horarios para el centro",
+  CENTER_IS_NOT_COMPLETED='El centro no se puede publicar porque no tiene asignado horarios o no tiene canchas',
 
 
 
