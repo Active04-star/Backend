@@ -43,9 +43,9 @@ export class ReviewService {
         return founReviewsById
     }
 
-    //deberia mandar el id de un sportcenter, no de una reseña
+    // deberia mandar el id de un sportcenter, no de una reseña
     async getReviewBySportcenter(id: string): Promise<Review[]> {
-        const reviews = await this.reviewRepository.getReviewsBySportcenter(id)
+        const reviews = await this.reviewRepository.getReviewsByField(id)
 
         if (!reviews || reviews.length === 0) {
             throw new ApiError(ApiStatusEnum.REVIEWS_NOT_IN_CENTER, NotFoundException);

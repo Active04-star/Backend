@@ -7,6 +7,7 @@ import { Reservation_Repository } from './reservation.repository';
 import { Field_Block_Module } from '../field_blocks/field_schedule.module';
 import { UserModule } from '../user/user.module';
 import { Field_Module } from '../field/field.module';
+import { User } from 'src/entities/user.entity';
 
 @Module({
   imports: [
