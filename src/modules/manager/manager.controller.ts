@@ -132,7 +132,7 @@ export class ManagerController {
   }
 
   @Put('publish/:sportCenterId/:userId')
-  //   @Roles(UserRole.MANAGER)
+  //   @Roles(UserRole.MAIN_MANAGER)
   //   @UseGuards(AuthGuard)
   // @ApiBearerAuth()
   @ApiOperation({
