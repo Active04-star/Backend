@@ -1,28 +1,55 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
+import { Reflector } from "@nestjs/core";
 import { JwtService } from "@nestjs/jwt";
-import { Observable } from "rxjs";
+import { ROLES_KEY } from "src/decorators/roles.decorator";
+import { ApiStatusEnum } from "src/enums/HttpStatus.enum";
+import { UserRole } from "src/enums/roles.enum";
+import { ApiError } from "src/helpers/api-error-class";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-    constructor(private readonly jwtService: JwtService){}
-    canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
+
+    constructor(private readonly jwtService: JwtService, private readonly reflector: Reflector) { }
+
+    async canActivate(context: ExecutionContext): Promise<boolean> {
         const request = context.switchToHttp().getRequest()
+        const token = this.extractTokenFromHeader(request);
 
-        const token = request.headers.authorization?.split(' ')[1];
-        if(!token) throw new UnauthorizedException('token requerido')
+        if (!token) throw new ApiError(ApiStatusEnum.NO_TOKEN_PROVIDED, UnauthorizedException);
 
+        let payload;
         try {
-            const secret = process.env.JWT_SECRET;
-            const payload = this.jwtService.verify(token, {secret})
+            payload = await this.jwtService.verifyAsync(token, {
+                secret: process.env.JWT_SECRET,
+            });
 
-            payload.exp = new Date(payload.exp * 1000)
-            payload.iat = new Date (payload.iat * 1000)
-
-            request.user = payload
-            return true;
+            request.user = payload;
 
         } catch (error) {
-            throw new UnauthorizedException('el token es invalido o expiro')
+            throw new ApiError(ApiStatusEnum.INVALID_TOKEN, UnauthorizedException);
         }
+
+        const requiredRoles = this.reflector.get<UserRole[]>(ROLES_KEY, context.getHandler());
+
+        if (requiredRoles && requiredRoles.length > 0) {
+            const hasRole = () => requiredRoles.some((role) => role === payload.role);
+
+            if (!hasRole()) {
+                throw new ApiError(ApiStatusEnum.INSUFFICIENT_PERMISSIONS, UnauthorizedException);
+
+            }
+        }
+
+        return true;
+    }
+
+
+    private extractTokenFromHeader(request: Request): string | undefined {
+        const authHeader = request.headers['authorization'];
+
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            return authHeader.split(' ')[1];
+        }
+        return undefined;
     }
 }

@@ -28,12 +28,15 @@ export class ReviewController {
     return this.reviewService.getReviewById(id)
   }
 
-  @Get('sportcenter/:id')
-  @ApiOperation({ summary: 'Obtiene lista de reseñas por complejo' })
-  async getReviewsBySportcenter(@Param('id', ParseUUIDPipe) id: string): Promise<Review[]> {
-    return this.reviewService.getReviewBySportcenter(id)
+
+
+  @Get('field/:id')
+  @ApiOperation({ summary: 'Obtiene lista de reseñas por cancha' })
+  async getReviewsByField(@Param('id', ParseUUIDPipe) id: string): Promise<Review[]> {
+    return this.reviewService.getReviewsByField(id)
   }
 
+  
   @Post('create')
   @ApiOperation({ summary: 'Registra una nueva Reseña', description: 'Crea una nueva reseña en el sistema', })
   @ApiBody({

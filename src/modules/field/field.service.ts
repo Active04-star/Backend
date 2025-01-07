@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { Field_Repository } from './field.repository';
 import { SportCenterService } from '../sport-center/sport-center.service';
 import { SportCenter } from 'src/entities/sportcenter.entity';
@@ -11,6 +11,7 @@ import { ApiResponse } from 'src/dtos/api-response';
 import { ApiStatusEnum } from 'src/enums/HttpStatus.enum';
 import { ApiError } from 'src/helpers/api-error-class';
 import { Sport_Category } from 'src/entities/sport_category.entity';
+import { Field_Block_Service } from '../field_blocks/field_schedule.service';
 
 @Injectable()
 export class Field_Service {
@@ -19,12 +20,15 @@ export class Field_Service {
     private readonly fieldRepository: Field_Repository,
     private sportCenterService: SportCenterService,
     private sportCategoryService: Sport_Category_Service,
+    @Inject(forwardRef(() => Reservation_Service))
     private reservationService: Reservation_Service,
+    @Inject(forwardRef(() => Field_Block_Service))
+    private fieldblockService: Field_Block_Service
   ) { }
 
 
-  async updateField(data: UpdateFieldDto): Promise<Field> {
-    const field = await this.fieldRepository.findById(data.id);
+  async updateField(id: string, data: UpdateFieldDto): Promise<Field> {
+    const field = await this.fieldRepository.findById(id);
     const updatedField = await this.fieldRepository.updateField(field, data);
     return updatedField;
   }
@@ -42,6 +46,13 @@ export class Field_Service {
 
       if (created_field === undefined) {
         throw new ApiError(ApiStatusEnum.FIELD_CREATION_FAILED, InternalServerErrorException);
+      }
+
+      for (const schedule of sportCenter.schedules) {
+        const blocks = await this.fieldblockService.createFieldBlocks(created_field, schedule);
+        if (!blocks || blocks.length === 0) {
+          throw new ApiError(ApiStatusEnum.FIELD_BLOCK_CREATION_FAILED, InternalServerErrorException);
+        }
       }
 
       return await this.findById(created_field.id);
@@ -63,6 +74,24 @@ export class Field_Service {
 
     return found_field;
   }
+
+
+  async getFields(centerId: string): Promise<Field[]> {
+    try {
+      const found_center: SportCenter = await this.sportCenterService.getById(centerId, true);
+
+      if (found_center.fields === undefined || found_center.fields.length === 0) {
+        throw new ApiError(ApiStatusEnum.CENTER_HAS_NO_FIELDS, NotFoundException);
+
+      }
+
+      return found_center.fields;
+    } catch (error) {
+      throw new ApiError(error?.message, InternalServerErrorException, error);
+
+    }
+  }
+
 
 
   async deleteField(id: string): Promise<ApiResponse> {

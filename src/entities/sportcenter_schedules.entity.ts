@@ -7,7 +7,6 @@ import {
 } from 'typeorm';
 import { SportCenter } from './sportcenter.entity';
 import { DayOfWeek } from 'src/enums/dayOfWeek.enum';
-import { Field_Schedule } from './field_schedule.entity';
 
 @Entity({ name: 'sportcenter_schedules' })
 export class SportCenter_Schedule {
@@ -30,11 +29,7 @@ export class SportCenter_Schedule {
   @Column({ type: 'time', nullable: false })
   closing_time: string;
 
-  @OneToMany(
-    () => Field_Schedule,
-    (fieldSchedule) => fieldSchedule.sportcenter_schedule,
-  )
-  fieldSchedules: Field_Schedule[];
+
 
   @ManyToOne(() => SportCenter, (sportcenter) => sportcenter.schedules, {
     onDelete: 'CASCADE',

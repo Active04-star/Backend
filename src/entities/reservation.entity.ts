@@ -40,8 +40,7 @@ export class Reservation {
   @JoinColumn()
   payment: Payment;
 
-  @OneToOne(() => Review, (review) => review.reservation, { cascade: true })
-  @JoinColumn()
+  @OneToOne(() => Review, (review) => review.reservation, { nullable:true })
   review: Review;
 
 

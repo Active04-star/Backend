@@ -36,8 +36,7 @@ export class Field_Repository {
         id
       },
       relations: {
-        //RESERVACIONES A SU PROPIA RUTA Y MODULO
-        reservation: false,
+        blocks:{reservation:true}
       },
     });
 
