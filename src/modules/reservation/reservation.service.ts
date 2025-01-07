@@ -59,9 +59,12 @@ export class Reservation_Service {
             field,
             fieldBlock: field_block,
             user,
-            status: ReservationStatus.PENDING,
+            status: ReservationStatus.ACTIVE,
             ...reservationData
         });
+
+        field_block.status = BlockStatus.RESERVED;
+        await manager.save(Field_Block, field_block);
 
         // Guardar la reservación
         const created_reservation = await manager.save(reservation);
@@ -74,7 +77,8 @@ export class Reservation_Service {
         }
 
         return {
-            message: "Reservación creada exitosamente"
+            message: "Reservación creada exitosamente",
+            reservation:created_reservation
         };
     });
 }

@@ -1,44 +1,51 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Sport_Category_Service } from './sport-category.service';
 import { CreateSportCategoryDto } from 'src/dtos/sportcategory/createSportCategory.dto';
 import { Sport_Category } from 'src/entities/sport_category.entity';
+import { AuthGuard } from 'src/guards/auth-guard.guard';
+import { Roles } from 'src/decorators/roles.decorator';
+import { UserRole } from 'src/enums/roles.enum';
 
 @ApiTags('Categories')
 @Controller('categories')
 export class Sport_Category_Controller {
+  constructor(private readonly categoryService: Sport_Category_Service) {}
 
-  constructor(
-    private readonly categoryService: Sport_Category_Service,
-  ) { }
-
-
-  @Post('create')//:sportCenterId')
-  // @Roles(UserRole.ADMIN)
-  // @UseGuards(AuthGuard)
-  // @ApiBearerAuth()
+  @Post('create') 
+  @Roles(UserRole.ADMIN)
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Registra un nuevo deporte',
-    description: 'Crea una nueva categoria (solo el admin deberia poder hacer esto)',
+    description:
+      'Crea una nueva categoria (solo el admin deberia poder hacer esto)',
   })
   @ApiBody({
     description: 'Datos necesarios para crear un nuevo deporte',
     type: CreateSportCategoryDto,
   })
-  // @ApiParam({
-  //   name: 'sportCenterId',
-  //   description:
-  //     'ID del SportCenter para sincronizar el deporte con el centro deportivo',
-  //   example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
-  // })
-  async create(
-    // @Param('sportCenterId', ParseUUIDPipe) sportCenterId: string, 
-    @Body() data: CreateSportCategoryDto): Promise<Sport_Category> {
+  async create(@Body() data: CreateSportCategoryDto): Promise<Sport_Category> {
     return await this.categoryService.createSportCategory(data);
   }
 
-
-  @Get("all")
+  @Get('all')
   @ApiOperation({
     summary: 'Obtiene lista de deportes ordenados alfabeticamente',
   })
@@ -51,7 +58,6 @@ export class Sport_Category_Controller {
   async filterSportCategories(@Query('search') search?: string) {
     return await this.categoryService.filterSportCategories(search);
   }
-
 
   @Get(':id')
   @ApiOperation({
@@ -66,7 +72,6 @@ export class Sport_Category_Controller {
   async findById(@Param('id', ParseUUIDPipe) id: string) {
     return await this.categoryService.findById(id);
   }
-
 
   //NO SE VA A USAR
   // @Delete(':id')
