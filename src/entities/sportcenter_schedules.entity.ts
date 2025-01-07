@@ -23,10 +23,10 @@ export class SportCenter_Schedule {
   @Column({ nullable: false,default:true })
   isOpen: boolean;
 
-  @Column({ type: 'time', nullable: false })
+  @Column({ type: 'time', nullable: true })
   opening_time: string;
 
-  @Column({ type: 'time', nullable: false })
+  @Column({ type: 'time', nullable: true })
   closing_time: string;
 
 

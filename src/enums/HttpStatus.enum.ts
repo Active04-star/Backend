@@ -44,6 +44,10 @@ export enum ApiStatusEnum {
   CENTER_UPDATE_STATUS = 'Estado del centro modificado',
   CENTER_WRONG_OWNER = 'La cuenta asociada con este centro deportivo no coincide',
   CENTER_HAS_NO_FIELDS = 'Este centro deportivo no tiene canchas',
+  CENTER_ALREADY_HAS_SCHEDULES = "El centro ya tiene horarios asignados",
+  CENTER_SCHEDULES_CREATION_FAILED = "Fallo la creacion de horarios para el centro",
+
+
 
   // Reviews
   REVIEW_CREATION_FAILED = 'No se pudo crear una nueva reseña',
