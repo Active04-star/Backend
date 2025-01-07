@@ -33,7 +33,7 @@ export class ReviewController {
   @Get('field/:id')
   @ApiOperation({ summary: 'Obtiene lista de reseñas por cancha' })
   async getReviewsByField(@Param('id', ParseUUIDPipe) id: string): Promise<Review[]> {
-    return this.reviewService.getReviewsByField(id)
+    return this.reviewService.getReviewBySportcenter(id)
   }
 
   
