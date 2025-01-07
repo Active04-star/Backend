@@ -5,20 +5,21 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class Reservation_Repository {
-  
-  constructor(@InjectRepository(Reservation) private readonly reservationRepository: Repository<Reservation>) { }
-  
+  constructor(
+    @InjectRepository(Reservation)
+    private readonly reservationRepository: Repository<Reservation>,
+  ) {}
 
   async cancelReservation(reservation: Reservation): Promise<Reservation> {
     return await this.reservationRepository.remove(reservation);
   }
 
-
   async findById(id: string): Promise<Reservation | undefined> {
-    const found_reservation: Reservation | null = await this.reservationRepository.findOne({ where: { id: id } });
+    const found_reservation: Reservation | null =
+      await this.reservationRepository.findOne({ where: { id: id } });
 
     return found_reservation === null ? undefined : found_reservation;
   }
 
-  async createReservation() { }
+
 }
