@@ -127,9 +127,9 @@ export class ManagerController {
 
 
   @Put('publish/:sportCenterId/:userId')
-  @Roles(UserRole.MANAGER)
-  @UseGuards(AuthGuard)
-  @ApiBearerAuth()
+  // @Roles(UserRole.MANAGER)
+  // @UseGuards(AuthGuard)
+  // @ApiBearerAuth()
   @ApiOperation({
     summary:
       'Activa un SportCenter (todavia no esta implementado, se va a usar para que se asegure que el centro ya tenga un horario asignado y canchas mas deportes y no se vea en el feed vacio',
@@ -149,7 +149,7 @@ export class ManagerController {
     @Param('userId', ParseUUIDPipe) userId: string,
     @Param('sportCenterId', ParseUUIDPipe) sportCenterId: string,
   ) {
-    return await this.managerService.publish(userId, sportCenterId);
+    return await this.managerService.publishSportCenter(userId, sportCenterId);
   }
 
   /**@Put('disable/:sportCenterId/:userId')

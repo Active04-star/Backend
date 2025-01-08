@@ -15,6 +15,8 @@ import { createReservationDto } from 'src/dtos/reservation/reservation-create.dt
 import { BlockStatus, Field_Block } from 'src/entities/field_blocks.entity';
 import { Field_Service } from '../field/field.service';
 import { UserService } from '../user/user.service';
+import { isEmpty } from 'class-validator';
+import { reservationResponse } from 'src/dtos/reservation/reservation-response.dto';
 
 @Injectable()
 export class Reservation_Service {
@@ -59,9 +61,12 @@ export class Reservation_Service {
             field,
             fieldBlock: field_block,
             user,
-            status: ReservationStatus.PENDING,
+            status: ReservationStatus.ACTIVE,
             ...reservationData
         });
+
+        field_block.status = BlockStatus.RESERVED;
+        await manager.save(Field_Block, field_block);
 
         // Guardar la reservación
         const created_reservation = await manager.save(reservation);
@@ -74,7 +79,8 @@ export class Reservation_Service {
         }
 
         return {
-            message: "Reservación creada exitosamente"
+            message: "Reservación creada exitosamente",
+            reservation:created_reservation
         };
     });
 }
@@ -102,4 +108,24 @@ export class Reservation_Service {
 
     return deleted !== undefined;
   }
-}
+
+
+  async getReservationUser(id: string): Promise<Reservation[]> {
+    const getReservation = await this.reservationRepository.getReservationByUser(id)
+     
+    if(isEmpty(getReservation)) {
+      throw new ApiError(ApiStatusEnum.USER_NOT_FOUND);
+    }
+
+    return getReservation
+  }
+
+  async getReservationById(id: string): Promise<Reservation> {
+    const foundReservation = await this.reservationRepository.getReservationById(id)
+
+    if(isEmpty(foundReservation)) {
+      throw new ApiError(ApiStatusEnum.RESERVATION_NOT_FOUND);
+    }
+    return foundReservation
+  }
+  }

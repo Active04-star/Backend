@@ -50,10 +50,6 @@ export class ReviewRepository {
   ): Promise<Review> {
     review.rating = reviewData.rating ?? review.rating;
     review.comment = reviewData.comment ?? review.comment;
-
-    review.isEdited = true;
-    review.updatedAt = new Date();
-
     return this.reviewRepository.save(review);
   }
 

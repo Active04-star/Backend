@@ -28,9 +28,9 @@ export class SportCenter {
   @Column({ length: 120 })
   address: string;
 
-  @Column({ 
+  @Column({
     type: 'float',
-    default: 0
+    default: 0,
   })
   averageRating: number;
 
