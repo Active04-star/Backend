@@ -13,7 +13,6 @@ import { AuthGuard } from 'src/guards/auth-guard.guard';
 import { SportCenter_Schedule_Service } from './sportCenter_scheudle.service';
 import { Roles } from 'src/decorators/roles.decorator';
 import { UserRole } from 'src/enums/roles.enum';
-import { RolesGuard } from 'src/guards/roles.guard';
 
 @Controller()
 export class SportCenter_Schedules_Controller {
@@ -22,7 +21,7 @@ export class SportCenter_Schedules_Controller {
   @Post('create/:id')
   @Roles(UserRole.MAIN_MANAGER)
   @ApiBearerAuth()
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard)
   @ApiOperation({
     summary: 'Registra horarios del centro deportivo',
     description: 'Crea un nuevo registro de SportCenter_Scheudle en el sistema.',
