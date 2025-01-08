@@ -1,21 +1,28 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { SportCenter_Schedule_Repository } from './sportCenter_scheudle.repository';
 import { CreateSportCenterScheduleDto } from 'src/dtos/sportcenter_schedule.dto.ts/sportCenterSchedule.dto';
-import { SportCenterService } from '../sport-center/sport-center.service';
 import { SportCenter } from 'src/entities/sportcenter.entity';
 import { ApiError } from 'src/helpers/api-error-class';
 import { ApiStatusEnum } from 'src/enums/HttpStatus.enum';
 import { SportCenter_Schedule } from 'src/entities/sportcenter_schedules.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class SportCenter_Schedule_Service {
   constructor(
     private scheduleRepository:SportCenter_Schedule_Repository,
-    private readonly sportCenterService: SportCenterService,
-  ) {}
+    @InjectRepository(SportCenter)
+    private centerRepository: Repository<SportCenter>,  ) {}
 
   async createSchedule(data: CreateSportCenterScheduleDto[], id: string):Promise<SportCenter_Schedule[]> {
-    const sportcenter: SportCenter = await this.sportCenterService.getById(id);
+
+    console.log('data',data);
+    
+    const sportcenter: SportCenter = await this.centerRepository.findOne({
+      where:{main_manager:{id:id}},
+      relations:['schedules']
+    })
 
     if (sportcenter.schedules.length > 0) {
       throw new ApiError(

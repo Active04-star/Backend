@@ -38,7 +38,7 @@ export class Field {
       from: (value: string) => new Decimal(value),
     },
   })
-  price: Decimal;
+  price: Decimal | null;
 
   // Duración de cada rango horario (por ejemplo, 1 hora por reserva)
   @Column({ type: 'int', nullable: false, default: 60 }) // Duración en minutos
