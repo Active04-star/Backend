@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { reservationList } from 'src/dtos/reservation/reservation-list.dto';
+import { reservationResponse } from 'src/dtos/reservation/reservation-response.dto';
 import { SportCenterList } from 'src/dtos/sportcenter/sport-center-list.dto';
 import { LocalRegister } from 'src/dtos/user/local-register.dto';
 import { UpdateUser } from 'src/dtos/user/update-user.dto';
@@ -36,6 +38,22 @@ export class AdminRepository {
       users: users.map(
         ({ password, ...userWithoutPassword }) => userWithoutPassword,
       ),
+    };
+  }
+
+  async getReservationByDate(page: number, limit: number, startDate: Date, endDate: Date): Promise<reservationList>{
+    const query = this.reservationRepository.createQueryBuilder('reservation')
+    .where('reservation.createdAt BETWEEN :startDate AND :endDate', {startDate, endDate})
+    .skip((page - 1) * limit)
+    .take(limit)
+    const [reservations, total] = await query.getManyAndCount();
+
+    return {
+      items: total,
+      page,
+      limit,
+      total_pages: Math.ceil(total / limit),
+      reservations,
     };
   }
 

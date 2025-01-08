@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, Param } from '@nestjs/common';
 import { Field } from 'src/entities/field.entity';
 import { Field_Service } from '../field/field.service';
 import { UserService } from '../user/user.service';
@@ -14,16 +14,22 @@ import { Sport_Category_Service } from '../sport-category/sport-category.service
 import { Sport_Category } from 'src/entities/sport_category.entity';
 import { Sport_Center_Status } from 'src/enums/sport_Center_Status.enum';
 import { SportCenterService } from '../sport-center/sport-center.service';
+import { reservationList } from 'src/dtos/reservation/reservation-list.dto';
+import { SportCenterRepository } from '../sport-center/sport-center.repository';
 
 @Injectable()
 export class ManagerService {
   constructor(
     private fieldService: Field_Service,
     private userService: UserService,
-    @InjectRepository(SportCenter)
-    private sportCenterRepository: Repository<SportCenter>,
     private sportCategoryService: Sport_Category_Service,
     private sportCenterService: SportCenterService,
+    @InjectRepository(SportCenter)
+    private readonly sportCenterEntityRepository: Repository<SportCenter>,
+    @InjectRepository(Reservation)
+    private reservationRepository: Repository<Reservation>,
+    
+    private readonly sportCenterRepository: SportCenterRepository,
   ) {}
 
   async assingCategoriesToSCenter() {
@@ -34,7 +40,7 @@ export class ManagerService {
     userId: string,
     sportCenterId: string,
   ): Promise<SportCenter> {
-    const found_sportcenter = await this.sportCenterRepository.findOne({
+    const found_sportcenter = await this.sportCenterEntityRepository.findOne({ //
       where: { id: sportCenterId },
     });
 
@@ -74,7 +80,7 @@ export class ManagerService {
 
   async getManagerReservations(managerId: string) {
     const user: User = await this.userService.getUserById(managerId);
-    return await this.sportCenterRepository
+    return await this.sportCenterEntityRepository //
       .createQueryBuilder('sportCenter')
       .leftJoinAndSelect('sportCenter.fields', 'field') // Unir con las canchas
       .leftJoinAndSelect(
@@ -86,5 +92,38 @@ export class ManagerService {
       .where('sportCenter.main_manager.id = :managerId', { managerId }) // Filtrar por el manager
       .orderBy('reservation.date', 'ASC') // Ordenar reservas por fecha
       .getMany();
+  }
+
+
+  async getReservationByDate(page: number, limit: number, startDate: string, endDate: string, sportCenterId: string): Promise<reservationList>{
+    const validstartDate = new Date(startDate)
+    const validendDate = new Date(endDate)
+    if(isNaN(validstartDate.getTime()) || isNaN(validendDate.getTime())) {
+      throw new Error('las fechas no son validas')
+    }
+    const relations = false
+    const foundsportcenter = await this.sportCenterRepository.findOne(sportCenterId, relations)
+
+        if (foundsportcenter === undefined) {
+          throw new ApiError(ApiStatusEnum.CENTER_NOT_FOUND, NotFoundException);
+        }
+
+    const query = this.reservationRepository.createQueryBuilder('reservation')
+    .innerJoin('reservation.field', 'field')
+    .innerJoin('field.sportcenter', 'sportcenter')
+    .where('reservation.createdAt BETWEEN :startDate AND :endDate', {startDate, endDate})
+    .andWhere('sportcenter.id = :sportCenterId', {sportCenterId})
+    .skip((page - 1) * limit)
+    .take(limit)
+
+    const [reservations, total] = await query.getManyAndCount();
+
+    return {
+      items: total,
+      page,
+      limit,
+      total_pages: Math.ceil(total / limit),
+      reservations,
+    }
   }
 }

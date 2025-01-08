@@ -24,6 +24,8 @@ import { Roles } from 'src/decorators/roles.decorator';
 import { UserRole } from 'src/enums/roles.enum';
 import { AuthGuard } from 'src/guards/auth-guard.guard';
 import { RolesGuard } from 'src/guards/roles.guard';
+import { filterDatedto } from 'src/dtos/filter_date/filterDate.dto';
+import { reservationList } from 'src/dtos/reservation/reservation-list.dto';
 
 @ApiTags('Admin')
 @Controller('admin')
@@ -176,6 +178,44 @@ export class AdminController {
   }
 
 
+  @Get('list/reservation')
+  @ApiQuery({
+    name: 'page',
+    required: true,
+    type: Number,
+    example: 1,
+    description: 'Numero de la pagina',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: true,
+    type: Number,
+    example: 10,
+    description: 'Objetos por pagina',
+  })
+  @ApiQuery({ 
+    name: 'startDate', 
+    required: true, 
+    type: String, 
+    description: 'Fecha de inicio (formato: YYYY-MM-DD)'})
+  @ApiQuery({ 
+    name: 'endDate', 
+    required: true, 
+    type: String, 
+    description: 'Fecha de fin (formato: YYYY-MM-DD)' })
+  @ApiOperation({
+    summary: 'Obtiene una lista de reservas creadas en el tiempo establecido',
+    description: 'debe ser ejecutado por un usuario con rol admin',
+  })
+  async getUsersByDate(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string,
+  ): Promise<reservationList> {
+    return await this.adminService.getReservationByDate(page, limit, startDate, endDate);
+  }
+
 //RUTA PARA PROMOVER CREAR USUARIOS ADMIN
 //   @Put('changeAdmin/:id')
 //   @Roles(UserRole.ADMIN)
@@ -185,4 +225,3 @@ export class AdminController {
 //   }
 
 }
-//
