@@ -83,10 +83,8 @@ export class SportCenterService {
       }
 
       await this.userService.rankUpTo(future_manager, UserRole.MAIN_MANAGER);
-      console.log("3");
 
       id = created_sportcenter.id;
-      console.log("4");
 
       return await this.getById(id);
 
