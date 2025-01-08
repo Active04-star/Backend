@@ -22,7 +22,6 @@ export class ManagerService {
     private userService: UserService,
     @InjectRepository(SportCenter)
     private sportCenterRepository: Repository<SportCenter>,
-    private sportCategoryService: Sport_Category_Service,
     private sportCenterService: SportCenterService,
   ) {}
 
@@ -57,15 +56,17 @@ export class ManagerService {
 
   async getManagerSportCenter(id: string): Promise<SportCenter> {
     const found_user: User | undefined = await this.userService.getUserById(id);
+    
+        if (found_user.managed_centers.length === 0) {
+          throw new ApiError(
+            ApiStatusEnum.NO_CENTER_FOR_THIS_USER,
+            BadRequestException,
+          );
+        }
 
-    if (found_user.managed_centers.length === 0) {
-      throw new ApiError(
-        ApiStatusEnum.NO_CENTER_FOR_THIS_USER,
-        BadRequestException,
-      );
-    }
+    const sportCenter:SportCenter=await this.sportCenterRepository.findOne({where:{main_manager:{id:found_user.id}},relations:['schedules','photos','sport_categories']})
 
-    return found_user.managed_centers[0];
+    return sportCenter
   }
 
   async getManagerFields(centerId: string): Promise<Field[]> {

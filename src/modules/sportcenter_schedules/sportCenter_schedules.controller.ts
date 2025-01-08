@@ -6,7 +6,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CreateSportCenterScheduleDto } from 'src/dtos/sportcenter_schedule.dto.ts/sportCenterSchedule.dto';
 import { SportCenter_Schedule } from 'src/entities/sportcenter_schedules.entity';
 import { AuthGuard } from 'src/guards/auth-guard.guard';
@@ -14,7 +14,9 @@ import { SportCenter_Schedule_Service } from './sportCenter_scheudle.service';
 import { Roles } from 'src/decorators/roles.decorator';
 import { UserRole } from 'src/enums/roles.enum';
 
-@Controller()
+
+@ApiTags('horarios del centor')
+@Controller('schedules')
 export class SportCenter_Schedules_Controller {
   constructor(private readonly scheduleServie: SportCenter_Schedule_Service) {}
 
