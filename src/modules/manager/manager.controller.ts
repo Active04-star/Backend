@@ -23,18 +23,19 @@ import { SportCenter } from 'src/entities/sportcenter.entity';
 import { Roles } from 'src/decorators/roles.decorator';
 import { UserRole } from 'src/enums/roles.enum';
 import { AuthGuard } from 'src/guards/auth-guard.guard';
-import { RolesGuard } from 'src/guards/roles.guard';
 
 @Controller('manager')
 export class ManagerController {
+
   constructor(
     private readonly managerService: ManagerService,
     private sportCenterService: SportCenterService,
-  ) {}
+  ) { }
+
 
   @Get('center/:id')
-  @Roles(UserRole.MAIN_MANAGER)
-  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.MAIN_MANAGER, UserRole.MANAGER)
+  @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Obtiene el ID del centro deportivo que administra un usuario',
@@ -43,33 +44,32 @@ export class ManagerController {
     name: 'id',
     description: 'ID de usuario',
   })
-  async getManagerSportCenter(
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<SportCenter> {
+  async getManagerSportCenter(@Param('id', ParseUUIDPipe) id: string): Promise<SportCenter> {
     return await this.managerService.getManagerSportCenter(id);
   }
 
-  @Get('fields/:centerId')
-  // @Roles(UserRole.MANAGER)
-  // @UseGuards(AuthGuard, RolesGuard)
-  // @ApiBearerAuth()
+
+  @Get('fields/:id')
+  @Roles(UserRole.MANAGER)
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({
-    summary: 'optiene una lista de las canchas',
+    summary: 'obtiene una lista de las canchas',
     description:
       'Proporciona toda la información de las canchas del centro deportivo',
   })
   @ApiParam({
-    name: 'centerId',
+    name: 'id',
     description: 'ID del centro deportivo',
     example: '936c7033-6020-41da-be01-d50b42250018',
   })
-  async getFields(
-    @Param('centerId', ParseUUIDPipe) centerId: string,
-  ): Promise<Field[]> {
-    return await this.managerService.getManagerFields(centerId);
+  async getFields(@Param('id', ParseUUIDPipe) id: string): Promise<Field[]> {
+    return await this.managerService.getManagerFields(id);
+  
   }
 
-  @Get('reservations/:managerId')
+
+  @Get('reservations/:id')
   @Roles(UserRole.MANAGER)
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
@@ -79,13 +79,14 @@ export class ManagerController {
       'Proporciona toda la información de las canchas del centro deportivo a cargo del usuario',
   })
   @ApiParam({
-    name: 'managerId',
+    name: 'id',
     description: 'ID del usuario con rol manager',
     example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
   })
-  async getReservations(@Param('managerId', ParseUUIDPipe) managerId: string) {
-    return await this.managerService.getManagerReservations(managerId);
+  async getReservations(@Param('id', ParseUUIDPipe) id: string) {
+    return await this.managerService.getManagerReservations(id);
   }
+
 
   @Put('update-sportcenter/:id')
   @Roles(UserRole.MANAGER)
@@ -104,17 +105,12 @@ export class ManagerController {
     description: 'Datos necesarios para actualizar un SportCenter',
     type: UpdateSportCenterDto,
   })
-  async updateSportCenter(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() data: UpdateSportCenterDto,
-  ) {
+  async updateSportCenter(@Param('id', ParseUUIDPipe) id: string, @Body() data: UpdateSportCenterDto) {
     return await this.sportCenterService.updateSportCenter(id, data);
   }
 
+
   @Delete('ban-unban/:id')
-  //   @Roles(UserRole.MANAGER)
-  //   @UseGuards(AuthGuard)
-  // @ApiBearerAuth()
   @ApiOperation({
     summary: 'Elimina un Centro deportivo',
     description:
@@ -125,15 +121,14 @@ export class ManagerController {
     description: 'ID del Centro deportivo a eliminar',
     example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
   })
-  async banOrUnBanCenter(
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<ApiResponse> {
+  async banOrUnBanCenter(@Param('id', ParseUUIDPipe) id: string): Promise<ApiResponse> {
     return await this.sportCenterService.banOrUnBanCenter(id);
   }
 
+
   @Put('publish/:sportCenterId/:userId')
-  //   @Roles(UserRole.MAIN_MANAGER)
-  //   @UseGuards(AuthGuard)
+  // @Roles(UserRole.MANAGER)
+  // @UseGuards(AuthGuard)
   // @ApiBearerAuth()
   @ApiOperation({
     summary:

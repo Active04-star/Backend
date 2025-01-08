@@ -108,4 +108,5 @@ export enum ApiStatusEnum {
   CATEGORY_ALREADY_EXISTS = "Ya hay una categoria con ese nombre!",
   CATEGORY_CREATION_FAILED = "No se pudo crear esta categoria",
   CATEGORY_NOT_FOUND = "No se encontró ninguna categoria",
+  USER_ALREADY_HAS_A_CENTER = "Este usuario ya posee un centro deportivo registrado!",
 }

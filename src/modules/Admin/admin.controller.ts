@@ -20,10 +20,8 @@ import { AdminService } from './admin.service';
 import { SportCenterList } from 'src/dtos/sportcenter/sport-center-list.dto';
 import { SportCenterService } from '../sport-center/sport-center.service';
 import { Sport_Center_Status } from 'src/enums/sport_Center_Status.enum';
-import { Roles } from 'src/decorators/roles.decorator';
 import { UserRole } from 'src/enums/roles.enum';
 import { AuthGuard } from 'src/guards/auth-guard.guard';
-import { RolesGuard } from 'src/guards/roles.guard';
 
 @ApiTags('Admin')
 @Controller('admin')

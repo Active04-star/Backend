@@ -27,8 +27,8 @@ export class User {
   @Column({ unique: true, length: 50, nullable: false })
   email: string;
 
-  @Column({default:null})
-  stripeCustomerId:string
+  @Column({ default: null })
+  stripeCustomerId: string
 
   @Column({
     default:
@@ -59,10 +59,10 @@ export class User {
   @Column({ nullable: false, default: false })
   was_banned: boolean;
 
-  @OneToMany(() => Subscription_Payment, (payment) => payment.user,{nullable:true})
+  @OneToMany(() => Subscription_Payment, (payment) => payment.user, { nullable: true })
   subscriptionPayments: Subscription_Payment[];
 
-  @OneToOne(() => Subscription, (subscription) => subscription.user,{nullable:true})
+  @OneToOne(() => Subscription, (subscription) => subscription.user, { nullable: true })
   subscription: Subscription;
 
   @OneToMany(() => Payment, (payment) => payment.field, { nullable: true })
@@ -78,7 +78,7 @@ export class User {
   managed_centers: SportCenter[];
 
   @OneToMany(() => Reservation, (reservation) => reservation.user, {
-    nullable: true,cascade:true
+    nullable: true, cascade: true
   })
   reservations: Reservation[];
 
