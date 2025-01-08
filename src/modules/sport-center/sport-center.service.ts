@@ -67,6 +67,10 @@ export class SportCenterService {
     try {
       const future_manager: User = await this.userService.getUserById(manager);
 
+      if((await this.getManagerCenters(future_manager)).length > 0) {
+        throw new ApiError(ApiStatusEnum.USER_ALREADY_HAS_A_CENTER, BadRequestException);
+      }
+
       await this.userService.hasActiveReservations(future_manager.id);
 
       const created_sportcenter: SportCenter | undefined = await this.sportcenterRepository.createSportCenter(
@@ -79,8 +83,10 @@ export class SportCenterService {
       }
 
       await this.userService.rankUpTo(future_manager, UserRole.MAIN_MANAGER);
+      console.log("3");
 
       id = created_sportcenter.id;
+      console.log("4");
 
       return await this.getById(id);
 
@@ -95,7 +101,7 @@ export class SportCenterService {
         }
       }
 
-      throw new ApiError(error?.message, InternalServerErrorException, error + ' / ' + deletion_error !== undefined ? deletion_error : null);
+      throw new ApiError(error?.message, InternalServerErrorException, error + ' / ' + deletion_error !== undefined ? "deletion error: " + deletion_error : "no deletion errors found");
     }
   }
 
@@ -232,5 +238,10 @@ export class SportCenterService {
   async banOrUnBanCenter(id: string): Promise<ApiResponse> {
     const found_center: SportCenter = await this.getById(id);
     return new ApiResponse();
+  }
+
+
+  private async getManagerCenters(user: User): Promise<SportCenter[]> {
+    return await this.sportcenterRepository.getManagerCenters(user);
   }
 }

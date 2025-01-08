@@ -12,10 +12,17 @@ import { In, Repository } from 'typeorm';
 
 @Injectable()
 export class SportCenterRepository {
+
   constructor(
     @InjectRepository(SportCenter)
     private sportCenterRepository: Repository<SportCenter>,
   ) { }
+
+
+  async getManagerCenters(user: User): Promise<SportCenter[]> {
+    return await this.sportCenterRepository.find({ where: { main_manager: user } });
+  }
+
 
   async putCategoryToCenter(
     sportCategories: Sport_Category[],
@@ -87,21 +94,15 @@ export class SportCenterRepository {
   }
 
 
-
-  async createSportCenter(
-    future_manager: User,
-    sportCenterData: Omit<CreateSportCenterDto, 'manager'>,
-    images?: Image[],
-  ): Promise<SportCenter | undefined> {
-    const saved_sportcenter: SportCenter =
-      await this.sportCenterRepository.save(
-        this.sportCenterRepository.create({
-          ...sportCenterData,
-          main_manager: future_manager,
-          status: Sport_Center_Status.PUBLISHED,
-          photos: images || undefined,
-        }),
-      );
+  async createSportCenter(future_manager: User, sportCenterData: Omit<CreateSportCenterDto, 'manager'>, images?: Image[],): Promise<SportCenter | undefined> {
+    const saved_sportcenter: SportCenter = await this.sportCenterRepository.save(
+      this.sportCenterRepository.create({
+        ...sportCenterData,
+        main_manager: future_manager,
+        status: Sport_Center_Status.PUBLISHED,
+        photos: images || undefined,
+      }),
+    );
 
     return saved_sportcenter === null ? undefined : saved_sportcenter;
   }
@@ -130,8 +131,7 @@ export class SportCenterRepository {
 
 
   async deleteSportCenter(sportCenter: SportCenter): Promise<boolean> {
-    const deleted: SportCenter =
-      await this.sportCenterRepository.remove(sportCenter);
+    const deleted: SportCenter = await this.sportCenterRepository.remove(sportCenter);
 
     return deleted === undefined ? false : true;
   }

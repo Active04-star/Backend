@@ -85,7 +85,6 @@ export class UserService {
 
     if (hasreservations) {
       throw new ApiError(ApiStatusEnum.USER_HAS_RESERVATIONS, BadRequestException);
-
     }
   }
 

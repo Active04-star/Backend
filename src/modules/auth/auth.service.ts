@@ -73,11 +73,13 @@ export class AuthService {
     if (isNotEmpty(user) && user.password !== null) {
       return { message: ApiStatusEnum.USER_IS_LOCAL };
 
-    } else if (isNotEmpty(user) && user.authtoken !== null && user.password === null) {
+    }
+ 
+    if (isNotEmpty(user) && user.authtoken !== null && user.password === null) {
       return { message: ApiStatusEnum.USER_IS_THIRD_PARTY };
 
     }
-
+ 
     throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, BadRequestException);
   }
 

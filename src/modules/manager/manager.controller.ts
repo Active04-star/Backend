@@ -111,9 +111,6 @@ export class ManagerController {
 
 
   @Delete('ban-unban/:id')
-  //   @Roles(UserRole.MANAGER)
-  //   @UseGuards(AuthGuard)
-  // @ApiBearerAuth()
   @ApiOperation({
     summary: 'Elimina un Centro deportivo',
     description:
