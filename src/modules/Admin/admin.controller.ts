@@ -20,12 +20,14 @@ import { AdminService } from './admin.service';
 import { SportCenterList } from 'src/dtos/sportcenter/sport-center-list.dto';
 import { SportCenterService } from '../sport-center/sport-center.service';
 import { Sport_Center_Status } from 'src/enums/sport_Center_Status.enum';
-import { Roles } from 'src/decorators/roles.decorator';
 import { UserRole } from 'src/enums/roles.enum';
 import { AuthGuard } from 'src/guards/auth-guard.guard';
+<<<<<<< HEAD
 import { RolesGuard } from 'src/guards/roles.guard';
 import { filterDatedto } from 'src/dtos/filter_date/filterDate.dto';
 import { reservationList } from 'src/dtos/reservation/reservation-list.dto';
+=======
+>>>>>>> 0d8ddbc275dc5f0dec3cc67a904c9f8e37a8af40
 
 @ApiTags('Admin')
 @Controller('admin')

@@ -73,7 +73,7 @@ export class SportCenter {
   managers_list: Sport_Center_Managers[];
 
   @ManyToOne(() => User, (user) => user.managed_centers, {
-    nullable: false,
+    nullable: false, cascade: ["update", "remove"]
   })
   main_manager: User;
 

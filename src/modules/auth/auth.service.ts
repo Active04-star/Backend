@@ -37,12 +37,12 @@ export class AuthService {
 
     const is_same_password = await bcrypt.compare(password, user.password);
 
-    
+
     if (isNotEmpty(user)) {
 
-      if(is_same_password) {
+      if (is_same_password) {
         throw new ApiError(ApiStatusEnum.PASSWORD_SAME_AS_OLD, BadRequestException);
-  
+
       }
 
       const hashed_password = await bcrypt.hash(password, 10);
@@ -73,11 +73,13 @@ export class AuthService {
     if (isNotEmpty(user) && user.password !== null) {
       return { message: ApiStatusEnum.USER_IS_LOCAL };
 
-    } else if (isNotEmpty(user) && user.authtoken !== null && user.password === null) {
+    }
+ 
+    if (isNotEmpty(user) && user.authtoken !== null && user.password === null) {
       return { message: ApiStatusEnum.USER_IS_THIRD_PARTY };
 
     }
-
+ 
     throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, BadRequestException);
   }
 
@@ -153,27 +155,6 @@ export class AuthService {
 
         if (sub === found_user.authtoken) {
           return this.signToken(found_user);
-          // const token = this.jwtService.sign({
-          //   id: found_user.id,
-          //   email: found_user.email,
-          //   role: found_user.role,
-          // });
-
-          // return {
-          //   message: ApiStatusEnum.LOGIN_SUCCESS,
-          //   token,
-          //   user: {
-          //     id: found_user.id,
-          //     name: found_user.name,
-          //     email: found_user.email,
-          //     profile_image: found_user.profile_image,
-          //     role: found_user.role,
-          //     was_banned: found_user.was_banned,
-          //     subscription_status: found_user.subscription_status,
-          //     subscription: null,
-          //     stripeCustomerId: found_user.stripeCustomerId,
-          //   },
-          // };
 
         } else if (found_user.authtoken === null) {
           await this.userService.putAuthToken(found_user, sub);
@@ -185,35 +166,6 @@ export class AuthService {
         }
 
       }
-
-
-
-      // if (created !== undefined) {
-
-
-      // const token = this.jwtService.sign({
-      //   id: created.id,
-      //   email: created.email,
-      //   role: created.role,
-      // });
-
-      // return {
-      //   message: ApiStatusEnum.REGISTRATION_SUCCESS,
-      //   token,
-      //   user: {
-      //     id: created.id,
-      //     name: created.name,
-      //     email: created.email,
-      //     profile_image: created.profile_image,
-      //     role: created.role,
-      //     was_banned: created.was_banned,
-      //     subscription_status: created.subscription_status,
-      //     subscription: null,
-      //     stripeCustomerId: created.stripeCustomerId,
-      //   },
-      // };
-
-      // }
 
     } catch (error) {
       throw new ApiError(error?.message, InternalServerErrorException, error);
@@ -284,27 +236,6 @@ export class AuthService {
 
       if (is_valid_password) {
         return this.signToken(user);
-        // const token = this.jwtService.sign({
-        //   id: user.id,
-        //   email: user.email,
-        //   role: user.role,
-        // });
-
-        // return {
-        //   message: ApiStatusEnum.LOGIN_SUCCESS,
-        //   token,
-        //   user: {
-        //     id: user.id,
-        //     name: user.name,
-        //     email: user.email,
-        //     profile_image: user.profile_image,
-        //     role: user.role,
-        //     was_banned: user.was_banned,
-        //     subscription_status: user.subscription_status,
-        //     subscription: null,
-        //     stripeCustomerId: user.stripeCustomerId
-        //   },
-        // };
       }
     }
 

@@ -67,8 +67,9 @@ export class UserRepository {
   }
 
   async rankUpTo(user: User, role: UserRole): Promise<User> {
-    user.role = role;
-    return await this.userRepository.save(user);
+    const {managed_centers, ...user_} = user;
+    user_.role = role;
+    return await this.userRepository.save(user_);
   }
 
   async getUserById(id: string): Promise<User | undefined> {

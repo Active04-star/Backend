@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException, Param } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Field } from 'src/entities/field.entity';
 import { Field_Service } from '../field/field.service';
 import { UserService } from '../user/user.service';
@@ -6,30 +6,19 @@ import { User } from 'src/entities/user.entity';
 import { SportCenter } from 'src/entities/sportcenter.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Reservation } from 'src/entities/reservation.entity';
 import { ApiError } from 'src/helpers/api-error-class';
 import { ApiStatusEnum } from 'src/enums/HttpStatus.enum';
-import { CreateSportCategoryDto } from 'src/dtos/sportcategory/createSportCategory.dto';
-import { Sport_Category_Service } from '../sport-category/sport-category.service';
-import { Sport_Category } from 'src/entities/sport_category.entity';
 import { Sport_Center_Status } from 'src/enums/sport_Center_Status.enum';
 import { SportCenterService } from '../sport-center/sport-center.service';
-import { reservationList } from 'src/dtos/reservation/reservation-list.dto';
-import { SportCenterRepository } from '../sport-center/sport-center.repository';
 
 @Injectable()
 export class ManagerService {
   constructor(
     private fieldService: Field_Service,
     private userService: UserService,
-    private sportCategoryService: Sport_Category_Service,
-    private sportCenterService: SportCenterService,
     @InjectRepository(SportCenter)
-    private readonly sportCenterEntityRepository: Repository<SportCenter>,
-    @InjectRepository(Reservation)
-    private reservationRepository: Repository<Reservation>,
-    
-    private readonly sportCenterRepository: SportCenterRepository,
+    private sportCenterRepository: Repository<SportCenter>,
+    private sportCenterService: SportCenterService,
   ) {}
 
   async assingCategoriesToSCenter() {
@@ -40,7 +29,7 @@ export class ManagerService {
     userId: string,
     sportCenterId: string,
   ): Promise<SportCenter> {
-    const found_sportcenter = await this.sportCenterEntityRepository.findOne({ //
+    const found_sportcenter = await this.sportCenterRepository.findOne({ //
       where: { id: sportCenterId },
     });
 
@@ -63,15 +52,17 @@ export class ManagerService {
 
   async getManagerSportCenter(id: string): Promise<SportCenter> {
     const found_user: User | undefined = await this.userService.getUserById(id);
+    
+        if (found_user.managed_centers.length === 0) {
+          throw new ApiError(
+            ApiStatusEnum.NO_CENTER_FOR_THIS_USER,
+            BadRequestException,
+          );
+        }
 
-    if (found_user.managed_centers.length === 0) {
-      throw new ApiError(
-        ApiStatusEnum.NO_CENTER_FOR_THIS_USER,
-        BadRequestException,
-      );
-    }
+    const sportCenter:SportCenter=await this.sportCenterRepository.findOne({where:{main_manager:{id:found_user.id}},relations:['schedules','photos','sport_categories']})
 
-    return found_user.managed_centers[0];
+    return sportCenter
   }
 
   async getManagerFields(centerId: string): Promise<Field[]> {
@@ -80,7 +71,7 @@ export class ManagerService {
 
   async getManagerReservations(managerId: string) {
     const user: User = await this.userService.getUserById(managerId);
-    return await this.sportCenterEntityRepository //
+    return await this.sportCenterRepository //
       .createQueryBuilder('sportCenter')
       .leftJoinAndSelect('sportCenter.fields', 'field') // Unir con las canchas
       .leftJoinAndSelect(
@@ -95,35 +86,35 @@ export class ManagerService {
   }
 
 
-  async getReservationByDate(page: number, limit: number, startDate: string, endDate: string, sportCenterId: string): Promise<reservationList>{
-    const validstartDate = new Date(startDate)
-    const validendDate = new Date(endDate)
-    if(isNaN(validstartDate.getTime()) || isNaN(validendDate.getTime())) {
-      throw new Error('las fechas no son validas')
-    }
-    const relations = false
-    const foundsportcenter = await this.sportCenterRepository.findOne(sportCenterId, relations)
+  // async getReservationByDate(page: number, limit: number, startDate: string, endDate: string, sportCenterId: string): Promise<reservationList>{
+  //   const validstartDate = new Date(startDate)
+  //   const validendDate = new Date(endDate)
+  //   if(isNaN(validstartDate.getTime()) || isNaN(validendDate.getTime())) {
+  //     throw new Error('las fechas no son validas')
+  //   }
+  //   const relations = false
+  //   const foundsportcenter = await this.sportCenterRepository.findOne(sportCenterId, relations)
 
-        if (foundsportcenter === undefined) {
-          throw new ApiError(ApiStatusEnum.CENTER_NOT_FOUND, NotFoundException);
-        }
+  //       if (foundsportcenter === undefined) {
+  //         throw new ApiError(ApiStatusEnum.CENTER_NOT_FOUND, NotFoundException);
+  //       }
 
-    const query = this.reservationRepository.createQueryBuilder('reservation')
-    .innerJoin('reservation.field', 'field')
-    .innerJoin('field.sportcenter', 'sportcenter')
-    .where('reservation.createdAt BETWEEN :startDate AND :endDate', {startDate, endDate})
-    .andWhere('sportcenter.id = :sportCenterId', {sportCenterId})
-    .skip((page - 1) * limit)
-    .take(limit)
+  //   const query = this.reservationRepository.createQueryBuilder('reservation')
+  //   .innerJoin('reservation.field', 'field')
+  //   .innerJoin('field.sportcenter', 'sportcenter')
+  //   .where('reservation.createdAt BETWEEN :startDate AND :endDate', {startDate, endDate})
+  //   .andWhere('sportcenter.id = :sportCenterId', {sportCenterId})
+  //   .skip((page - 1) * limit)
+  //   .take(limit)
 
-    const [reservations, total] = await query.getManyAndCount();
+  //   const [reservations, total] = await query.getManyAndCount();
 
-    return {
-      items: total,
-      page,
-      limit,
-      total_pages: Math.ceil(total / limit),
-      reservations,
-    }
-  }
+  //   return {
+  //     items: total,
+  //     page,
+  //     limit,
+  //     total_pages: Math.ceil(total / limit),
+  //     reservations,
+  //   }
+  // }
 }

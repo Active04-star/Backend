@@ -23,7 +23,6 @@ export class UserService {
   constructor(private readonly userRepository: UserRepository) { }
 
 
-
   async putAuthToken(user: User, sub: string): Promise<void> {
     const updated_user: User | undefined = await this.userRepository.updateUser(user, { authtoken: sub });
 
@@ -86,7 +85,6 @@ export class UserService {
 
     if (hasreservations) {
       throw new ApiError(ApiStatusEnum.USER_HAS_RESERVATIONS, BadRequestException);
-
     }
   }
 

@@ -21,6 +21,7 @@ export class SportCenter_Schedule_Repository {
 
     for (const scheduleDto of schedules) {
         const { day, isOpen, opening_time, closing_time } = scheduleDto;
+  console.log('shceudledto',scheduleDto);
   
   
   
