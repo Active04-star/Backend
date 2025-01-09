@@ -108,9 +108,16 @@ export class UserService {
   }
 
 
+  // async banOrUnban(id: string): Promise<User> {
+  //   const found_user: User = await this.userRepository.banOrUnban(id);
+
+  //   return await this.userRepository.banOrUnban(id)
+  // }
+
+
+  //! ESTA FUNCION NUNCA DEBE LANZAR ERROR
   async getUserByMail(email: string): Promise<User | undefined> {
     const found: User | undefined = await this.userRepository.getUserByMail(email);
-    //ESTA FUNCION NUNCA DEBE LANZAR ERROR
     return found;
   }
 
