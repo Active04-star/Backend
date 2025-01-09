@@ -84,7 +84,7 @@ export class AdminService {
 
     if (
       found_center.fields.some((field) =>
-        field.reservation.some((reserva) => reserva.status === 'pending'),
+        field.reservation.some((reserva) => reserva.status === ReservationStatus.ACTIVE),
       )
     ) {
       return { message: ApiStatusEnum.CENTER_DELETION_FAILED };

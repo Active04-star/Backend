@@ -6,12 +6,8 @@ import { User } from 'src/entities/user.entity';
 import { SportCenter } from 'src/entities/sportcenter.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Reservation } from 'src/entities/reservation.entity';
 import { ApiError } from 'src/helpers/api-error-class';
 import { ApiStatusEnum } from 'src/enums/HttpStatus.enum';
-import { CreateSportCategoryDto } from 'src/dtos/sportcategory/createSportCategory.dto';
-import { Sport_Category_Service } from '../sport-category/sport-category.service';
-import { Sport_Category } from 'src/entities/sport_category.entity';
 import { Sport_Center_Status } from 'src/enums/sport_Center_Status.enum';
 import { SportCenterService } from '../sport-center/sport-center.service';
 
@@ -34,8 +30,13 @@ export class ManagerService {
     sportCenterId: string,
   ): Promise<SportCenter> {
     const found_sportcenter = await this.sportCenterRepository.findOne({
-      where: { id: sportCenterId },
+      where: { id: sportCenterId, main_manager: { id: userId } },
+      relations: ['schedules', 'fields'],
     });
+
+    if (!found_sportcenter) {
+      throw new ApiError(ApiStatusEnum.CENTER_NOT_FOUND, BadRequestException);
+    }
 
     if (
       !found_sportcenter.fields.length ||
@@ -56,17 +57,20 @@ export class ManagerService {
 
   async getManagerSportCenter(id: string): Promise<SportCenter> {
     const found_user: User | undefined = await this.userService.getUserById(id);
-    
-        if (found_user.managed_centers.length === 0) {
-          throw new ApiError(
-            ApiStatusEnum.NO_CENTER_FOR_THIS_USER,
-            BadRequestException,
-          );
-        }
 
-    const sportCenter:SportCenter=await this.sportCenterRepository.findOne({where:{main_manager:{id:found_user.id}},relations:['schedules','photos','sport_categories']})
+    if (found_user.managed_centers.length === 0) {
+      throw new ApiError(
+        ApiStatusEnum.NO_CENTER_FOR_THIS_USER,
+        BadRequestException,
+      );
+    }
 
-    return sportCenter
+    const sportCenter: SportCenter = await this.sportCenterRepository.findOne({
+      where: { main_manager: { id: found_user.id } },
+      relations: ['schedules', 'photos', 'sport_categories'],
+    });
+
+    return sportCenter;
   }
 
   async getManagerFields(centerId: string): Promise<Field[]> {
@@ -84,7 +88,7 @@ export class ManagerService {
         'reservation.status = :status',
         { status: 'ACTIVE' },
       )
-      .where('sportCenter.main_manager.id = :managerId', { managerId }) // Filtrar por el manager
+      .where('sportCenter.main_manager.id = :managerId', { managerId: user.id }) // Filtrar por el manager
       .orderBy('reservation.date', 'ASC') // Ordenar reservas por fecha
       .getMany();
   }
