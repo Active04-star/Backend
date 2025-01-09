@@ -1,12 +1,10 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
   ParseUUIDPipe,
   Put,
-  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -14,18 +12,15 @@ import {
   ApiBody,
   ApiOperation,
   ApiParam,
-  ApiQuery,
 } from '@nestjs/swagger';
 import { Field } from 'src/entities/field.entity';
 import { UpdateSportCenterDto } from 'src/dtos/sportcenter/updateSportCenter.dto';
 import { SportCenterService } from 'src/modules/sport-center/sport-center.service';
-import { ApiResponse } from 'src/dtos/api-response';
 import { ManagerService } from './manager.service';
 import { SportCenter } from 'src/entities/sportcenter.entity';
 import { Roles } from 'src/decorators/roles.decorator';
 import { UserRole } from 'src/enums/roles.enum';
 import { AuthGuard } from 'src/guards/auth-guard.guard';
-// import { RolesGuard } from 'src/guards/roles.guard';
 
 @Controller('manager')
 export class ManagerController {
@@ -110,22 +105,6 @@ export class ManagerController {
   })
   async updateSportCenter(@Param('id', ParseUUIDPipe) id: string, @Body() data: UpdateSportCenterDto) {
     return await this.sportCenterService.updateSportCenter(id, data);
-  }
-
-
-  @Delete('ban-unban/:id')
-  @ApiOperation({
-    summary: 'Elimina un Centro deportivo',
-    description:
-      'Esta ruta permite eliminar un centro deportivo (SportCenter) de la base de datos. Si el usuario que lo gestiona (manager) tiene el rol de MANAGER, su rol puede ser afectado dependiendo del estado del SportCenter eliminado y de los otros SportCenters que gestione.El rol del manager solo se modifica si, tras la eliminación, no tiene otros centros en estado PUBLISHED o DISABLE.',
-  })
-  @ApiParam({
-    name: 'id',
-    description: 'ID del Centro deportivo a eliminar',
-    example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
-  })
-  async banOrUnBanCenter(@Param('id', ParseUUIDPipe) id: string): Promise<ApiResponse> {
-    return await this.sportCenterService.banOrUnBanCenter(id);
   }
 
 

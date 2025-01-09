@@ -40,13 +40,15 @@ export enum ApiStatusEnum {
   CENTER_NOT_FOUND = 'No se pudo encontra este centro deportivo',
   CENTER_DELETION_SUCCESS = 'Centro deportivo eliminado correctamente',
   CENTER_DELETION_FAILED = 'No se pudo eliminar este centro deportivo',
-  CENTER_ALREADY_HAS_STATE = 'Este centro ya está en modo',
+  CENTER_ALREADY_HAS_STATE = 'Este centro ya posee este estado!',
   CENTER_UPDATE_STATUS = 'Estado del centro modificado',
+  CENTER_UPDATE_STATUS_FAILED = 'No se pudo modificar el estado del centro',
   CENTER_WRONG_OWNER = 'La cuenta asociada con este centro deportivo no coincide',
   CENTER_HAS_NO_FIELDS = 'Este centro deportivo no tiene canchas',
   CENTER_ALREADY_HAS_SCHEDULES = "El centro ya tiene horarios asignados",
   CENTER_SCHEDULES_CREATION_FAILED = "Fallo la creacion de horarios para el centro",
-  CENTER_IS_NOT_COMPLETED='El centro no se puede publicar porque no tiene asignado horarios o no tiene canchas',
+  CENTER_IS_NOT_COMPLETED = 'El centro no se puede publicar porque no tiene asignado horarios o no tiene canchas',
+  CENTER_HAS_PENDING_RESERVATIONS = 'El centro aun tiene reservaciones pendientes',
 
   // Reviews
   REVIEW_CREATION_FAILED = 'No se pudo crear una nueva reseña',
