@@ -13,6 +13,8 @@ import { ReservationStatus } from 'src/enums/reservationStatus.enum';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserService } from '../user/user.service';
+import { reservationResponse } from 'src/dtos/reservation/reservation-response.dto';
+import { reservationList } from 'src/dtos/reservation/reservation-list.dto';
 
 @Injectable()
 export class AdminService {
@@ -41,6 +43,21 @@ export class AdminService {
       throw new ApiError(ApiStatusEnum.USER_LIST_EMPTY, NotFoundException);
     }
     return found_users;
+  }
+// agregar error a enum
+  async getReservationByDate(page: number, limit: number, startDate: string, endDate: string): Promise<reservationList> {
+    const validstartDate = new Date(startDate)
+    const validendDate = new Date(endDate)
+    if(isNaN(validstartDate.getTime()) || isNaN(validendDate.getTime())) {
+      throw new Error('las fechas no son validas')
+    }
+
+    const foundReservation: reservationList = await this.adminRepository.getReservationByDate(page, limit, validstartDate, validendDate)
+
+    if (foundReservation.reservations.length === 0) {
+      throw new ApiError(ApiStatusEnum.RESERVATION_NOT_FOUND, NotFoundException)
+    }
+    return foundReservation
   }
 
   async banOrUnbanUser(id: string): Promise<ApiResponse> {
@@ -84,7 +101,7 @@ export class AdminService {
 
     if (
       found_center.fields.some((field) =>
-        field.reservation.some((reserva) => reserva.status === 'pending'),
+        field.reservation.some((reserva) => reserva.status === ReservationStatus.ACTIVE),
       )
     ) {
       return { message: ApiStatusEnum.CENTER_DELETION_FAILED };
@@ -128,4 +145,6 @@ export class AdminService {
       return { message: ApiStatusEnum.CENTER_UPDATE_STATUS };
     }
   }
+
+
 }

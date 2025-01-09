@@ -6,6 +6,7 @@ import {
   Param,
   ParseUUIDPipe,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -13,6 +14,7 @@ import {
   ApiBody,
   ApiOperation,
   ApiParam,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { Field } from 'src/entities/field.entity';
 import { UpdateSportCenterDto } from 'src/dtos/sportcenter/updateSportCenter.dto';
@@ -23,6 +25,7 @@ import { SportCenter } from 'src/entities/sportcenter.entity';
 import { Roles } from 'src/decorators/roles.decorator';
 import { UserRole } from 'src/enums/roles.enum';
 import { AuthGuard } from 'src/guards/auth-guard.guard';
+// import { RolesGuard } from 'src/guards/roles.guard';
 
 @Controller('manager')
 export class ManagerController {
@@ -127,9 +130,9 @@ export class ManagerController {
 
 
   @Put('publish/:sportCenterId/:userId')
-  // @Roles(UserRole.MANAGER)
-  // @UseGuards(AuthGuard)
-  // @ApiBearerAuth()
+  @Roles(UserRole.MANAGER)
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({
     summary:
       'Activa un SportCenter (todavia no esta implementado, se va a usar para que se asegure que el centro ya tenga un horario asignado y canchas mas deportes y no se vea en el feed vacio',
@@ -151,6 +154,51 @@ export class ManagerController {
   ) {
     return await this.managerService.publishSportCenter(userId, sportCenterId);
   }
+
+  // @Get('list/reservation/:sportCenterId')
+  // @ApiQuery({
+  //     name: 'page',
+  //     required: true,
+  //     type: Number,
+  //     example: 1,
+  //     description: 'Numero de la pagina',
+  //   })
+  //   @ApiQuery({
+  //     name: 'limit',
+  //     required: true,
+  //     type: Number,
+  //     example: 10,
+  //     description: 'Objetos por pagina',
+  //   })
+  //   @ApiQuery({ 
+  //     name: 'startDate', 
+  //     required: true, 
+  //     type: String, 
+  //     description: 'Fecha de inicio (formato: YYYY-MM-DD)'})
+  //   @ApiQuery({ 
+  //     name: 'endDate', 
+  //     required: true, 
+  //     type: String, 
+  //     description: 'Fecha de fin (formato: YYYY-MM-DD)' })
+  //   @ApiOperation({
+  //     summary: 'Obtiene una lista de reservas creadas en el tiempo establecido',
+  //     description: 'debe ser ejecutado por un usuario con rol manager',
+  //   })
+  //   @ApiParam({
+  //     name: 'sportCenterId',
+  //     description: 'ID del SportCenter asociado al Manager',
+  //     example: 'a1b2c3d4-5678-9101-1121-abcdef654321',
+  //   })
+
+  //  async getUsersByDate(
+  //     @Query('page') page: number = 1,
+  //     @Query('limit') limit: number = 10,
+  //     @Query('startDate') startDate: string,
+  //     @Query('endDate') endDate: string,
+  //     @Param('sportCenterId', ParseUUIDPipe) sportCenterId: string,
+  //   ): Promise<reservationList> {
+  //     return await this.managerService.getReservationByDate(page, limit, startDate, endDate, sportCenterId);
+  //   }
 
   /**@Put('disable/:sportCenterId/:userId')
   //   @Roles(UserRole.MANAGER)

@@ -59,11 +59,13 @@ export class SportCenter {
 
   @OneToMany(() => SportCenter_Schedule, (schedule) => schedule.sportcenter, {
     cascade: true,
+    onDelete:'CASCADE'
   })
   schedules: SportCenter_Schedule[];
 
   @OneToMany(() => Field, (field) => field.sportcenter, {
     cascade: true,
+    onDelete:'CASCADE'
   })
   fields: Field[];
 

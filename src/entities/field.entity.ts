@@ -38,7 +38,7 @@ export class Field {
       from: (value: string) => new Decimal(value),
     },
   })
-  price: Decimal;
+  price: Decimal | null;
 
   // Duración de cada rango horario (por ejemplo, 1 hora por reserva)
   @Column({ type: 'int', nullable: false, default: 60 }) // Duración en minutos
@@ -52,17 +52,16 @@ export class Field {
   @OneToMany(() => Payment, (payment) => payment.field)
   payments: Payment[];
 
-  @OneToMany(() => Field_Block, (block) => block.field, { cascade: true })
+  @OneToMany(() => Field_Block, (block) => block.field, { cascade: true ,onDelete:'CASCADE'})
   blocks: Field_Block[];
 
-  @OneToMany(() => Image, (photos) => photos.field, { nullable: true })
+  @OneToMany(() => Image, (photos) => photos.field, { nullable: true ,onDelete:'CASCADE'})
   photos: Image[];
 
-  @OneToMany(() => Review, (review) => review.sportcenter, { nullable: true })
+  @OneToMany(() => Review, (review) => review.sportcenter, { nullable: true,onDelete:'CASCADE' })
   reviews: Review[];
 
   @ManyToOne(() => Sport_Category, (sportCategory) => sportCategory.field, {
-    onDelete: 'CASCADE',
     nullable: true,
   })
   sportCategory: Sport_Category;
