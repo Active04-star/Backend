@@ -22,20 +22,18 @@ import { SportCenterService } from '../sport-center/sport-center.service';
 import { Sport_Center_Status } from 'src/enums/sport_Center_Status.enum';
 import { UserRole } from 'src/enums/roles.enum';
 import { AuthGuard } from 'src/guards/auth-guard.guard';
-<<<<<<< HEAD
-import { RolesGuard } from 'src/guards/roles.guard';
 import { filterDatedto } from 'src/dtos/filter_date/filterDate.dto';
 import { reservationList } from 'src/dtos/reservation/reservation-list.dto';
-=======
->>>>>>> 0d8ddbc275dc5f0dec3cc67a904c9f8e37a8af40
 
 @ApiTags('Admin')
 @Controller('admin')
 export class AdminController {
+
   constructor(
     private readonly sportCenterService: SportCenterService,
     private readonly adminService: AdminService,
   ) {}
+
 
   @Get('list/user')
   @ApiQuery({
@@ -62,6 +60,7 @@ export class AdminController {
   ): Promise<UserList> {
     return await this.adminService.getUsers(page, limit);
   }
+
 
   @Get('list/centersban')
   @ApiQuery({
@@ -110,6 +109,7 @@ export class AdminController {
     );
   }
 
+
   @Put('ban-unban/user/:id')
   @ApiOperation({
     summary: 'Banea o desbanea con un softdelete',
@@ -121,6 +121,7 @@ export class AdminController {
   ): Promise<{ message: ApiStatusEnum }> {
     return await this.adminService.banOrUnbanUser(id);
   }
+
 
   @Put('ban-unban/sportcenter/:id')
   @ApiOperation({
@@ -217,13 +218,5 @@ export class AdminController {
   ): Promise<reservationList> {
     return await this.adminService.getReservationByDate(page, limit, startDate, endDate);
   }
-
-//RUTA PARA PROMOVER CREAR USUARIOS ADMIN
-//   @Put('changeAdmin/:id')
-//   @Roles(UserRole.ADMIN)
-//   @UseGuards(AuthGuard,RolesGuard)
-//  async promoteUser(@Param('id', ParseUUIDPipe) id: string) {
-//     return this.adminService.promoteUser(id);
-//   }
 
 }
