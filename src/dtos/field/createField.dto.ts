@@ -27,7 +27,7 @@ export class FieldDto {
   duration_minutes: number
 
   @IsUUID()
-  @IsNotEmpty()
+  @IsOptional()
   @ApiProperty({
     description: 'ID de la categoria de deporte',
   })

@@ -25,7 +25,7 @@ export class Field {
   @Column({ default: false })
   isDeleted: boolean;
 
-  @Column({ default: false })
+  @Column({ default: true })
   isACtive: boolean;
 
   @Column({
