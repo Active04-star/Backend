@@ -19,7 +19,9 @@ export class Field_Repository {
   ) { }
 
 
-
+async getFields(sportCenterId:string):Promise<Field[]>{
+return await this.fieldRepository.find({where:{sportcenter:{id:sportCenterId}},relations:['reservation','blocks','photos','reviews']})
+}
 
   async updateField(field: Field, data: UpdateFieldDto): Promise<Field> {
     const updatedField = this.fieldRepository.merge(
