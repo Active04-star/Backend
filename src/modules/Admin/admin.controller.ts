@@ -26,16 +26,15 @@ import { AuthGuard } from 'src/guards/auth-guard.guard';
 import { ReservationList } from 'src/dtos/reservation/reservation-list.dto';
 import { Roles } from 'src/decorators/roles.decorator';
 import { UpdateStatusDto } from 'src/dtos/sportcenter/update-status.dto';
+import { User } from 'src/entities/user.entity';
 
 @ApiTags('Admin')
 @Controller('admin')
 export class AdminController {
-
   constructor(
     private readonly sportCenterService: SportCenterService,
     private readonly adminService: AdminService,
-  ) { }
-
+  ) {}
 
   @Get('list/user')
   @ApiBearerAuth()
@@ -59,11 +58,24 @@ export class AdminController {
     summary: 'Obtiene una lista de usuarios',
     description: 'debe ser ejecutado por un usuario con rol admin',
   })
-  async getUsers(@Query('page') page: number = 1, @Query('limit') limit: number = 10): Promise<UserList> {
+  async getUsers(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ): Promise<UserList> {
     return await this.adminService.getUsers(page, limit);
-    
   }
 
+  @Get('premiumUsers')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({
+    summary: 'Obtiene un array de usuarios premium',
+    description: 'debe ser ejecutado por un usuario con rol admin',
+  })
+  async getPremiumUsers(): Promise<User[]> {
+    return await this.adminService.getPremiumUsers();
+  }
 
   @Get('list/centersban')
   @ApiBearerAuth()
@@ -106,9 +118,14 @@ export class AdminController {
     @Query('rating') rating?: number,
     @Query('search') search?: string,
   ): Promise<SportCenterList> {
-    return await this.sportCenterService.getSportCenters(page, limit, true, rating, search);
+    return await this.sportCenterService.getSportCenters(
+      page,
+      limit,
+      true,
+      rating,
+      search,
+    );
   }
-
 
   @Put('ban-unban/user/:id')
   @ApiBearerAuth()
@@ -119,10 +136,11 @@ export class AdminController {
     description:
       'recibe el id de un usuario por parametro y actualiza el estado was_banned del usuario',
   })
-  async banOrUnbanUser(@Param('id', ParseUUIDPipe) id: string): Promise<{ message: ApiStatusEnum }> {
+  async banOrUnbanUser(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<{ message: ApiStatusEnum }> {
     return await this.adminService.banOrUnbanUser(id);
   }
-
 
   @Put('ban-unban/sportcenter/:id')
   @ApiBearerAuth()
@@ -137,10 +155,12 @@ export class AdminController {
     description: 'Nuevo estado del sportcenter',
     type: UpdateStatusDto,
   })
-  async banOrUnbanCenter(@Param('id', ParseUUIDPipe) id: string, @Body() body: { status: Sport_Center_Status }): Promise<{ message: ApiStatusEnum }> {
+  async banOrUnbanCenter(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() body: { status: Sport_Center_Status },
+  ): Promise<{ message: ApiStatusEnum }> {
     return await this.adminService.banOrUnbanCenter(id, body.status);
   }
-
 
   @Put('force-ban/:id')
   @ApiBearerAuth()
@@ -151,10 +171,11 @@ export class AdminController {
     description:
       'recibe el id del sportcenter y actualiza su estado sportCenterStatus',
   })
-  async forceBan(@Param('id', ParseUUIDPipe) id: string): Promise<{ message: ApiStatusEnum }> {
+  async forceBan(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<{ message: ApiStatusEnum }> {
     return await this.adminService.forceBan(id);
   }
-
 
   @Get('list/reservation')
   @ApiBearerAuth()
@@ -178,13 +199,13 @@ export class AdminController {
     name: 'startDate',
     required: true,
     type: String,
-    description: 'Fecha de inicio (formato: YYYY-MM-DD)'
+    description: 'Fecha de inicio (formato: YYYY-MM-DD)',
   })
   @ApiQuery({
     name: 'endDate',
     required: true,
     type: String,
-    description: 'Fecha de fin (formato: YYYY-MM-DD)'
+    description: 'Fecha de fin (formato: YYYY-MM-DD)',
   })
   @ApiOperation({
     summary: 'Obtiene una lista de reservas creadas en el tiempo establecido',
@@ -196,7 +217,11 @@ export class AdminController {
     @Query('startDate') startDate: string,
     @Query('endDate') endDate: string,
   ): Promise<ReservationList> {
-    return await this.adminService.getReservationByDate(page, limit, startDate, endDate);
+    return await this.adminService.getReservationByDate(
+      page,
+      limit,
+      startDate,
+      endDate,
+    );
   }
-
 }
