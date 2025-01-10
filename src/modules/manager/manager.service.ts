@@ -79,7 +79,7 @@ export class ManagerService {
 
   async getManagerReservations(managerId: string) {
     const user: User = await this.userService.getUserById(managerId);
-    return await this.sportCenterRepository
+    return await this.sportCenterRepository //
       .createQueryBuilder('sportCenter')
       .leftJoinAndSelect('sportCenter.fields', 'field') // Unir con las canchas
       .leftJoinAndSelect(
@@ -92,4 +92,37 @@ export class ManagerService {
       .orderBy('reservation.date', 'ASC') // Ordenar reservas por fecha
       .getMany();
   }
+
+
+  // async getReservationByDate(page: number, limit: number, startDate: string, endDate: string, sportCenterId: string): Promise<reservationList>{
+  //   const validstartDate = new Date(startDate)
+  //   const validendDate = new Date(endDate)
+  //   if(isNaN(validstartDate.getTime()) || isNaN(validendDate.getTime())) {
+  //     throw new Error('las fechas no son validas')
+  //   }
+  //   const relations = false
+  //   const foundsportcenter = await this.sportCenterRepository.findOne(sportCenterId, relations)
+
+  //       if (foundsportcenter === undefined) {
+  //         throw new ApiError(ApiStatusEnum.CENTER_NOT_FOUND, NotFoundException);
+  //       }
+
+  //   const query = this.reservationRepository.createQueryBuilder('reservation')
+  //   .innerJoin('reservation.field', 'field')
+  //   .innerJoin('field.sportcenter', 'sportcenter')
+  //   .where('reservation.createdAt BETWEEN :startDate AND :endDate', {startDate, endDate})
+  //   .andWhere('sportcenter.id = :sportCenterId', {sportCenterId})
+  //   .skip((page - 1) * limit)
+  //   .take(limit)
+
+  //   const [reservations, total] = await query.getManyAndCount();
+
+  //   return {
+  //     items: total,
+  //     page,
+  //     limit,
+  //     total_pages: Math.ceil(total / limit),
+  //     reservations,
+  //   }
+  // }
 }

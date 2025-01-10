@@ -33,10 +33,10 @@ export class Field {
     precision: 10,
     scale: 2,
     nullable: false,
-    default: 0,
+    default: new Decimal("0.00"),
     transformer: {
-      to: (value: Decimal | null) => (value !== null ? value.toNumber() : null),
-      from: (value: string | null) => (value !== null ? new Decimal(value) : null),
+      from: (value: string) => value !== null ? new Decimal(value) : new Decimal("0.00"),
+      to: (value: Decimal) => value !== null ? value.toNumber() : "0.00",
     },
   })
   price: Decimal | null;
