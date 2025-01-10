@@ -41,7 +41,7 @@ export class Field_Service {
   async createField(fieldData: FieldDto): Promise<Field> {
     try {
       const sportCenter: SportCenter = await this.sportCenterService.getById(
-        fieldData.sportCenterId,
+        fieldData.sportCenterId,true
       );
 
       const sportCategory: Sport_Category | null = fieldData.sportCategoryId
