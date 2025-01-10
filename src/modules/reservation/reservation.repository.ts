@@ -40,11 +40,19 @@ export class Reservation_Repository {
 
     async getResevationCron(): Promise<Reservation[]> {
       const now = new Date()
-      const oneHour = new Date(now.getTime() + 60 * 60 * 1000)
+
+      const oneHour = new Date(now)
+      oneHour.setHours(now.getHours() + 1)
+      const startRange = new Date(oneHour)
+      startRange.setSeconds(0,0)
+
+      const endRange = new Date(oneHour)
+      endRange.setSeconds(59, 999)
+
       return await this.reservationRepository
       .createQueryBuilder('reservation')
       .where('reservation.status = :status', {status: 'active'})
-      .andWhere('reservation.date BETWEEN :oneHour', {oneHour})
+      .andWhere('reservation.date BETWEEN :startRange AND :endRange', {startRange, endRange})
       .getMany()
     }
 
