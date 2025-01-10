@@ -18,6 +18,6 @@ import { notificationGateway } from '../notification.gateway.ts/websocket.gatewa
   ],
   controllers: [Reservation_Controller],
   providers: [Reservation_Service, Reservation_Repository, notificationGateway],
-  exports: [Reservation_Service],
+  exports: [Reservation_Service, Reservation_Repository],
 })
 export class Reservation_Module {}
