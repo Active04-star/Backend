@@ -8,6 +8,7 @@ import { Field_Block_Module } from '../field_blocks/field_schedule.module';
 import { UserModule } from '../user/user.module';
 import { Field_Module } from '../field/field.module';
 import { User } from 'src/entities/user.entity';
+import { notificationGateway } from '../notification.gateway.ts/websocket.gateway';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { User } from 'src/entities/user.entity';
     TypeOrmModule.forFeature([Reservation]),
   ],
   controllers: [Reservation_Controller],
-  providers: [Reservation_Service, Reservation_Repository],
+  providers: [Reservation_Service, Reservation_Repository, notificationGateway],
   exports: [Reservation_Service],
 })
 export class Reservation_Module {}

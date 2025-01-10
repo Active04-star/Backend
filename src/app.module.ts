@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Inject, Module } from '@nestjs/common';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -23,6 +23,10 @@ import { Reservation_Module } from './modules/reservation/reservation.module';
 import { SportCenter_Schedule_Module } from './modules/sportcenter_schedules/sportCenter_schedule.module';
 import { ManagerModule } from './modules/manager/manager.module';
 import { Field_Block_Module } from './modules/field_blocks/field_schedule.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { ScheduleTaskModule } from './modules/task/task.module';
+import { ScheduleTaskService } from './modules/task/task.service';
+import { notificationGateway } from './modules/notification.gateway.ts/websocket.gateway';
 
 @Module({
   imports: [
@@ -44,6 +48,8 @@ import { Field_Block_Module } from './modules/field_blocks/field_schedule.module
       signOptions: { expiresIn: '1h' },
       secret: process.env.JWT_SECRET,
     }),
+
+    ScheduleModule.forRoot(),
 
     MailerModule.forRootAsync({
       imports: [ConfigModule],
@@ -87,7 +93,9 @@ import { Field_Block_Module } from './modules/field_blocks/field_schedule.module
     Reservation_Module,
     SportCenter_Schedule_Module,
     ManagerModule,
-    Field_Block_Module
+    Field_Block_Module,
+    ScheduleTaskModule,
+    notificationGateway
   ],
   controllers: [],
   providers: [],
