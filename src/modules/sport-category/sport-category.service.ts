@@ -1,13 +1,5 @@
-import {
-  BadRequestException,
-  forwardRef,
-  Inject,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { Sport_Category_Repository } from './sport-category.repository';
-import { SportCenterService } from '../sport-center/sport-center.service';
 import { CreateSportCategoryDto } from 'src/dtos/sportcategory/createSportCategory.dto';
 import { Sport_Category } from 'src/entities/sport_category.entity';
 import { ApiError } from 'src/helpers/api-error-class';
@@ -18,14 +10,12 @@ export class Sport_Category_Service {
 
   constructor(
     private readonly categoryRepository: Sport_Category_Repository,
-    @Inject(forwardRef(() => SportCenterService)) private sportCenterService: SportCenterService,
   ) { }
 
 
   async createSportCategory(data: CreateSportCategoryDto): Promise<Sport_Category> {
 
     try {
-
       const repeatedName = await this.categoryRepository.findByName(data.name);
 
       if (repeatedName)
@@ -44,6 +34,7 @@ export class Sport_Category_Service {
     }
   }
 
+
   async findById(sportCategoryId: string): Promise<Sport_Category> {
     const sportCategory: Sport_Category | undefined = await this.categoryRepository.findById(sportCategoryId);
 
@@ -54,6 +45,7 @@ export class Sport_Category_Service {
     return sportCategory;
   }
 
+
   async filterSportCategories(search?: string) {
     const sportCategories: Sport_Category[] = await this.categoryRepository.filteredCategories(search);
 
@@ -62,14 +54,6 @@ export class Sport_Category_Service {
     }
 
     return sportCategories;
-  }
-
-  async searchCategories(names: string[]) {
-    const categories = await this.categoryRepository.searchCategories(names);
-    if (categories.length === 0) {
-      throw new InternalServerErrorException('Ocurrio un error buscando deportes ');
-    }
-    return categories;
   }
 
   // async deleteSportCategory(id: string) {
