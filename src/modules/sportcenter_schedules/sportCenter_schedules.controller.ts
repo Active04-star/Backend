@@ -18,15 +18,16 @@ import { UserRole } from 'src/enums/roles.enum';
 @ApiTags('horarios del centor')
 @Controller('schedules')
 export class SportCenter_Schedules_Controller {
-  constructor(private readonly scheduleServie: SportCenter_Schedule_Service) {}
+
+  constructor(private readonly scheduleServie: SportCenter_Schedule_Service) { }
 
   @Post('create/:id')
-  @Roles(UserRole.MAIN_MANAGER)
+  @Roles(UserRole.MAIN_MANAGER, UserRole.MANAGER)
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
   @ApiOperation({
     summary: 'Registra horarios del centro deportivo',
-    description: 'Crea un nuevo registro de SportCenter_Scheudle en el sistema.',
+    description: 'Crea una nueva tabla de horarios para un centro deportivo.',
   })
   @ApiBody({
     description: 'Datos necesarios para crear un nuevo SportCenter_Schedule',
@@ -37,10 +38,7 @@ export class SportCenter_Schedules_Controller {
     description: 'ID del SportCenter',
     example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
   })
-  async createScheduel(
-    @Body() data: CreateSportCenterScheduleDto[],
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<SportCenter_Schedule[]> {
+  async createSchedule(@Body() data: CreateSportCenterScheduleDto[], @Param('id', ParseUUIDPipe) id: string): Promise<SportCenter_Schedule[]> {
     return await this.scheduleServie.createSchedule(data, id);
   }
 }

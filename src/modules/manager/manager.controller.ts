@@ -1,19 +1,5 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Put,
-  UseGuards,
-} from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiBody,
-  ApiOperation,
-  ApiParam,
-} from '@nestjs/swagger';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Put, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam } from '@nestjs/swagger';
 import { Field } from 'src/entities/field.entity';
 import { UpdateSportCenterDto } from 'src/dtos/sportcenter/updateSportCenter.dto';
 import { SportCenterService } from 'src/modules/sport-center/sport-center.service';
@@ -65,7 +51,7 @@ export class ManagerController {
   })
   async getFields(@Param('id', ParseUUIDPipe) id: string): Promise<Field[]> {
     return await this.managerService.getManagerFields(id);
-  
+
   }
 
 
@@ -152,52 +138,5 @@ export class ManagerController {
   ) {
     return await this.managerService.publishSportCenter(userId, sportCenterId);
   }
-
-  // @Get('list/reservation/:sportCenterId')
-  // @ApiQuery({
-  //     name: 'page',
-  //     required: true,
-  //     type: Number,
-  //     example: 1,
-  //     description: 'Numero de la pagina',
-  //   })
-  //   @ApiQuery({
-  //     name: 'limit',
-  //     required: true,
-  //     type: Number,
-  //     example: 10,
-  //     description: 'Objetos por pagina',
-  //   })
-  //   @ApiQuery({ 
-  //     name: 'startDate', 
-  //     required: true, 
-  //     type: String, 
-  //     description: 'Fecha de inicio (formato: YYYY-MM-DD)'})
-  //   @ApiQuery({ 
-  //     name: 'endDate', 
-  //     required: true, 
-  //     type: String, 
-  //     description: 'Fecha de fin (formato: YYYY-MM-DD)' })
-  //   @ApiOperation({
-  //     summary: 'Obtiene una lista de reservas creadas en el tiempo establecido',
-  //     description: 'debe ser ejecutado por un usuario con rol manager',
-  //   })
-  //   @ApiParam({
-  //     name: 'sportCenterId',
-  //     description: 'ID del SportCenter asociado al Manager',
-  //     example: 'a1b2c3d4-5678-9101-1121-abcdef654321',
-  //   })
-
-  //  async getUsersByDate(
-  //     @Query('page') page: number = 1,
-  //     @Query('limit') limit: number = 10,
-  //     @Query('startDate') startDate: string,
-  //     @Query('endDate') endDate: string,
-  //     @Param('sportCenterId', ParseUUIDPipe) sportCenterId: string,
-  //   ): Promise<reservationList> {
-  //     return await this.managerService.getReservationByDate(page, limit, startDate, endDate, sportCenterId);
-  //   }
-
-  
 
 }

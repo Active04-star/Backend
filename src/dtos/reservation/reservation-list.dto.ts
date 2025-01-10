@@ -3,7 +3,7 @@ import { IsArray, IsInt, IsNotEmpty } from "class-validator";
 import { Reservation } from "src/entities/reservation.entity";
 
 
-export class reservationList {
+export class ReservationList {
     @IsInt()
     @IsNotEmpty()
     items: number;

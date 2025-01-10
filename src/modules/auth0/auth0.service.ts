@@ -7,12 +7,45 @@ import { ApiError } from 'src/helpers/api-error-class';
 
 @Injectable()
 export class Auth0Service {
-    
+
     constructor() { }
+
+    async blockOrUnBlock(user: User): Promise<void> {
+
+        try {
+            const token_request: Auth0TokenRequestDto = await this.getAuthToken();
+
+            const data = JSON.stringify({
+                "blocked": !user.was_banned,
+            });
+
+            const ban_user_options = {
+                method: 'PATCH',
+                maxBodyLength: Infinity,
+                url: `${process.env.AUTH0_ISSUER_BASE_URL}users/${user.authtoken}`,
+                headers: {
+                    'Authorization': `Bearer ${token_request.access_token}`,
+                    'Content-type': 'application/json'
+                },
+                data: data
+            };
+
+            await axios.request(ban_user_options).then((response) => {
+                console.log(response.data);
+
+            }).catch((error) => {
+                console.log(error);
+                throw new ApiError(ApiStatusEnum.UNKNOWN_ERROR, InternalServerErrorException, error);
+            });
+
+        } catch (error) {
+            throw error;
+        }
+    }
 
 
     async updateUserPassword(user: User, password: string) {
-        console.log(password);
+
         try {
             const token_request: Auth0TokenRequestDto = await this.getAuthToken();
 
@@ -33,7 +66,7 @@ export class Auth0Service {
             };
 
             await axios.request(user_update_options).then((response) => {
-                console.log(response);
+                console.log(response.data);
 
             }).catch((error) => {
                 console.log(error);

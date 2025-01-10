@@ -26,11 +26,9 @@ export class Field_Service {
     private readonly fieldRepository: Field_Repository,
     private sportCenterService: SportCenterService,
     private sportCategoryService: Sport_Category_Service,
-    @Inject(forwardRef(() => Reservation_Service))
-    private reservationService: Reservation_Service,
-    @Inject(forwardRef(() => Field_Block_Service))
-    private fieldblockService: Field_Block_Service,
-  ) {}
+    @Inject(forwardRef(() => Reservation_Service)) private reservationService: Reservation_Service,
+    @Inject(forwardRef(() => Field_Block_Service)) private fieldblockService: Field_Block_Service
+  ) { }
 
   async updateField(id: string, data: UpdateFieldDto): Promise<Field> {
     const field = await this.fieldRepository.findById(id);
@@ -41,19 +39,18 @@ export class Field_Service {
   async createField(fieldData: FieldDto): Promise<Field> {
     try {
       const sportCenter: SportCenter = await this.sportCenterService.getById(
-        fieldData.sportCenterId,true
+        fieldData.sportCenterId, true
       );
 
       const sportCategory: Sport_Category | null = fieldData.sportCategoryId
         ? await this.sportCategoryService.findById(fieldData.sportCategoryId)
         : null;
 
-      const created_field: Field | undefined =
-        await this.fieldRepository.createField(
-          sportCenter,
-          sportCategory,
-          fieldData,
-        );
+      const created_field: Field | undefined = await this.fieldRepository.createField(
+        sportCenter,
+        sportCategory,
+        fieldData,
+      );
 
       if (created_field === undefined) {
         throw new ApiError(
@@ -82,8 +79,7 @@ export class Field_Service {
   }
 
   async findById(id: string): Promise<Field> {
-    const found_field: Field | undefined =
-      await this.fieldRepository.findById(id);
+    const found_field: Field | undefined = await this.fieldRepository.findById(id);
 
     if (found_field === undefined) {
       throw new ApiError(ApiStatusEnum.FIELD_NOT_FOUND, NotFoundException);

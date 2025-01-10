@@ -5,7 +5,7 @@ import { User } from 'src/entities/user.entity';
 import { isNotEmpty } from 'class-validator';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { UserClean } from 'src/dtos/user/user-clean.dto';
 import { ApiStatusEnum } from 'src/enums/HttpStatus.enum';
 import { LoginResponse } from 'src/dtos/user/login-response.dto';
@@ -69,6 +69,10 @@ export class AuthService {
   async getAuthType(email: string): Promise<ApiResponse> {
     const lower_mail = email.toLowerCase();
     const user: User | undefined = await this.userService.getUserByMail(lower_mail);
+
+    if (isNotEmpty(user) && user.was_banned) {
+      throw new ApiError(ApiStatusEnum.USER_DELETED, ForbiddenException);
+    }
 
     if (isNotEmpty(user) && user.password !== null) {
       return { message: ApiStatusEnum.USER_IS_LOCAL };
@@ -222,7 +226,7 @@ export class AuthService {
     const user: User | undefined = await this.userService.getUserByMail(lower_mail);
 
     if (isNotEmpty(user) && user.was_banned) {
-      throw new ApiError(ApiStatusEnum.USER_DELETED, UnauthorizedException);
+      throw new ApiError(ApiStatusEnum.USER_DELETED, ForbiddenException);
     }
 
     if (isNotEmpty(user)) {

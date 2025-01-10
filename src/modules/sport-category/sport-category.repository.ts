@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateSportCategoryDto } from 'src/dtos/sportcategory/createSportCategory.dto';
 import { Sport_Category } from 'src/entities/sport_category.entity';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class Sport_Category_Repository {
@@ -57,17 +57,6 @@ export class Sport_Category_Repository {
 
   }
 
-
-  async searchCategories(names: string[]): Promise<Sport_Category[]> {
-    const categories: Sport_Category[] =
-      await this.categoryRepository.find({
-        where: {
-          name: In(names),
-        },
-      });
-
-    return categories;
-  }
 
   // async deleteSportCategory(sportCategory: Sport_Category): Promise<Sport_Category | undefined> {
   //   const result: Sport_Category = await this.sportCategoryRepository.remove(sportCategory);
