@@ -1,49 +1,37 @@
-import { BadRequestException, Body, Controller, Get, Param, ParseUUIDPipe, Put, Query } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Get, Param, ParseUUIDPipe, Put, UseGuards } from "@nestjs/common";
 import { UserService } from "./user.service";
-import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
 import { UserClean } from "src/dtos/user/user-clean.dto";
 import { ApiStatusEnum } from "src/enums/HttpStatus.enum";
 import { isNotEmpty, isNotEmptyObject } from "class-validator";
 import { UpdateUser } from "src/dtos/user/update-user.dto";
 import { ApiError } from "src/helpers/api-error-class";
-import { UserList } from "src/dtos/user/users-list.dto";
 import { User } from "src/entities/user.entity";
+import { AuthGuard } from "src/guards/auth-guard.guard";
+import { Roles } from "src/decorators/roles.decorator";
+import { UserRole } from "src/enums/roles.enum";
 
 @ApiTags("User")
 @Controller("user")
 export class UserController {
+
     constructor(private readonly userService: UserService) { }
-
-// en el modulo admin
-//    @Get('list')
-//    @ApiQuery({ name: 'page', required: true, type: Number, example: 1, description: 'Numero de la pagina' })
-//    @ApiQuery({ name: 'limit', required: true, type: Number, example: 10, description: 'Objetos por pagina' })
-//    @ApiOperation({ summary: 'Obtiene una lista de usuarios', description: 'debe ser ejecutado por un usuario con rol admin' })
-//    async getUsers(@Query('page') page: number = 1, @Query('limit') limit: number = 10): Promise<UserList> {
-//        return await this.userService.getUsers(page, limit);
-//    }
-
-//en el modulo de admin
-    //@Put('ban-unban/:id')
- //   @ApiOperation({
-  //      summary: 'Banea o desbanea con un softdelete',
-  //      description:
-  //          'recibe el id de un usuario por parametro y actualiza el estado was_banned del usuario',
-  //  })
-  //  async banOrUnbanUser(@Param('id', ParseUUIDPipe) id: string): Promise<{ message: ApiStatusEnum }> {
-  //      return this.userService.banOrUnbanUser(id);
-  //  }
 
 
     @Put(':id')
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard)
+    @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.USER, UserRole.MAIN_MANAGER)
+    @ApiParam({ name: "id", description: 'ID de usuario' })
     @ApiOperation({
         summary: 'actualiza la informacion de un usuario, por id y body',
-        description: 'uuid de user y objeto a actualizar (por ahora solo con nombre)(Nota: Aqui no deberia actualizarse la imagen de perfil)',
+        description: 'uuid de user y objeto a actualizar (por ahora solo con nombre)(Nota: Aqui no deberia actualizarse la imagen de perfil ni la contraseña)',
     })
     @ApiBody({
         type: UpdateUser,
     })
     async updateUser(@Param('id', ParseUUIDPipe) id: string, @Body() modified_user: UpdateUser): Promise<UserClean> {
+        console.log(modified_user);
 
         if (!isNotEmptyObject(modified_user)) {
             throw new ApiError(ApiStatusEnum.USER_UPDATE_FAILED, BadRequestException, "body values are empty");
@@ -56,13 +44,15 @@ export class UserController {
         return await this.userService.updateUser(id, modified_user);
     }
 
+
+
     @Get("solo-para-testing/:id")
     @ApiParam({
         name: "id",
         description: 'ID de usuario',
     })
     async getUserById(@Param("id", ParseUUIDPipe) id: string): Promise<User> {
-        return await this.getUserById(id);
+        return await this.userService.getUserById(id);
     }
 
 }

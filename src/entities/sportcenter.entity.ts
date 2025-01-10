@@ -11,12 +11,11 @@ import { Review } from './review.entity';
 import { User } from './user.entity';
 import { Field } from './field.entity';
 import { Image } from './image.entity';
-import { SportCenterStatus } from 'src/enums/sportCenterStatus.enum';
 import { Sport_Category } from './sport_category.entity';
 import { SportCenter_Schedule } from './sportcenter_schedules.entity';
 import { Payment } from './payment.entity';
 import { Sport_Center_Managers } from './sport_center_managers.entity';
-import { Payment_History } from './payment_hisotry.entity';
+import { Sport_Center_Status } from 'src/enums/sport_Center_Status.enum';
 
 @Entity()
 export class SportCenter {
@@ -29,7 +28,10 @@ export class SportCenter {
   @Column({ length: 120 })
   address: string;
 
-  @Column({ type: 'decimal', precision: 2, scale: 1, nullable: true })
+  @Column({
+    type: 'float',
+    default: 0,
+  })
   averageRating: number;
 
   @Column({ default: false })
@@ -37,10 +39,10 @@ export class SportCenter {
 
   @Column({
     type: 'enum',
-    enum: SportCenterStatus,
-    default: SportCenterStatus.DRAFT,
+    enum: Sport_Center_Status,
+    default: Sport_Center_Status.DRAFT,
   })
-  status: SportCenterStatus;
+  status: Sport_Center_Status;
 
   @OneToMany(() => Review, (review) => review.sportcenter, { nullable: true })
   reviews: Review[];
@@ -55,16 +57,15 @@ export class SportCenter {
   @OneToMany(() => Payment, (payment) => payment.field)
   payments: Payment[];
 
-  @OneToMany(() => Payment_History, (history) => history.payment)
-  paymentsHistory: Payment_History;
-
   @OneToMany(() => SportCenter_Schedule, (schedule) => schedule.sportcenter, {
     cascade: true,
+    onDelete:'CASCADE'
   })
   schedules: SportCenter_Schedule[];
 
   @OneToMany(() => Field, (field) => field.sportcenter, {
     cascade: true,
+    onDelete:'CASCADE'
   })
   fields: Field[];
 
@@ -74,7 +75,7 @@ export class SportCenter {
   managers_list: Sport_Center_Managers[];
 
   @ManyToOne(() => User, (user) => user.managed_centers, {
-    nullable: false,
+    nullable: false, cascade: ["update", "remove"]
   })
   main_manager: User;
 

@@ -1,6 +1,6 @@
 import { Type } from "@nestjs/class-transformer";
 import { IsArray, IsInt, IsNotEmpty } from "class-validator";
-import { SportCenter } from "src/entities/sportcenter.entity";
+import { SportCenterResponseDto } from "./sport-center-response.dto";
 
 export class SportCenterList {
     @IsInt()
@@ -19,8 +19,8 @@ export class SportCenterList {
     @IsNotEmpty()
     total_pages: number;
 
-    @Type(() => SportCenter)
+    @Type(() => SportCenterResponseDto)
     @IsNotEmpty()
     @IsArray()
-    sport_centers: SportCenter[];
+    sport_centers: SportCenterResponseDto[];
 }

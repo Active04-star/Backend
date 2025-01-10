@@ -1,18 +1,17 @@
 import { Module } from "@nestjs/common";
 import { ReviewController } from "./review.controller";
 import { ReviewService } from "./review.service";
-import { UserModule } from "../user/user.module";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { User } from "src/entities/user.entity";
 import { Review } from "src/entities/review.entity";
 import { ReviewRepository } from "./review.repository";
-import { UserRepository } from "../user/user.repository";
 import { Reservation } from "src/entities/reservation.entity";
+import { SportCenter_Module } from "../sport-center/sport-center.module";
+import { UserModule } from "../user/user.module";
 
 @Module({
-    imports: [UserModule, TypeOrmModule.forFeature([User, Review, Reservation])],
+    imports: [UserModule,SportCenter_Module,TypeOrmModule.forFeature([ Review, Reservation])],
     controllers: [ReviewController], 
-    providers: [ReviewService, ReviewRepository, UserRepository], //reservationRepository,
+    providers: [ReviewService, ReviewRepository], //reservationRepository,
     exports: []
 })
 export class ReviewModule {}

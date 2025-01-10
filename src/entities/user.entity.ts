@@ -13,7 +13,6 @@ import { SportCenter } from './sportcenter.entity';
 import { Reservation } from './reservation.entity';
 import { Payment } from './payment.entity';
 import { Sport_Center_Managers } from './sport_center_managers.entity';
-import { Payment_History } from './payment_hisotry.entity';
 import { Subscription } from './subscription.entity';
 import { Subscription_Payment } from './subscriptionPayment.entity';
 
@@ -28,8 +27,8 @@ export class User {
   @Column({ unique: true, length: 50, nullable: false })
   email: string;
 
-  @Column({default:null})
-  stripeCustomerId:string
+  @Column({ default: null })
+  stripeCustomerId: string
 
   @Column({
     default:
@@ -60,19 +59,15 @@ export class User {
   @Column({ nullable: false, default: false })
   was_banned: boolean;
 
-  @OneToMany(() => Subscription_Payment, (payment) => payment.user,{nullable:true})
+  @OneToMany(() => Subscription_Payment, (payment) => payment.user, { nullable: true })
   subscriptionPayments: Subscription_Payment[];
 
-  @OneToOne(() => Subscription, (subscription) => subscription.user,{nullable:true})
+  @OneToOne(() => Subscription, (subscription) => subscription.user, { nullable: true })
   subscription: Subscription;
 
   @OneToMany(() => Payment, (payment) => payment.field, { nullable: true })
   payments: Payment[];
 
-  @OneToMany(() => Payment_History, (history) => history.payment, {
-    nullable: true,
-  })
-  paymentHistory: Payment_History;
 
   @OneToMany(() => Review, (review) => review.user, { nullable: true })
   reviews: Review[];
@@ -83,7 +78,7 @@ export class User {
   managed_centers: SportCenter[];
 
   @OneToMany(() => Reservation, (reservation) => reservation.user, {
-    nullable: true,cascade:true
+    nullable: true, cascade: true
   })
   reservations: Reservation[];
 
@@ -96,3 +91,4 @@ export class User {
   )
   managers_list: Sport_Center_Managers[];
 }
+

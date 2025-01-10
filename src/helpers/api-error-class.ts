@@ -1,10 +1,9 @@
-import { HttpException } from "@nestjs/common";
+import { HttpException, InternalServerErrorException } from "@nestjs/common";
 import { ApiStatusEnum } from "src/enums/HttpStatus.enum";
 
 export class ApiError {
 
-    // public throw = {};
-    public exception: new (...args: any[]) => HttpException = HttpException;
+    public exception: new (...args: any[]) => HttpException = InternalServerErrorException;
     public message: string;
     public info: any;
 

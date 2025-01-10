@@ -7,88 +7,111 @@ import { Image } from 'src/entities/image.entity';
 import { Sport_Category } from 'src/entities/sport_category.entity';
 import { SportCenter } from 'src/entities/sportcenter.entity';
 import { User } from 'src/entities/user.entity';
-import { SportCenterStatus } from 'src/enums/sportCenterStatus.enum';
+import { Sport_Center_Status } from 'src/enums/sport_Center_Status.enum';
 import { In, Repository } from 'typeorm';
 
 @Injectable()
 export class SportCenterRepository {
 
-  constructor(@InjectRepository(SportCenter) private sportCenterRepository: Repository<SportCenter>) { }
+  constructor(
+    @InjectRepository(SportCenter)
+    private sportCenterRepository: Repository<SportCenter>,
+  ) { }
 
 
-  async putCategoryToCenter(sportCategories: Sport_Category[], sportCenter: SportCenter): Promise<SportCenter | undefined> {
+  async getManagerCenters(user: User): Promise<SportCenter[]> {
+    return await this.sportCenterRepository.find({ where: { main_manager: user } });
+  }
+
+
+  async putCategoryToCenter(
+    sportCategories: Sport_Category[],
+    sportCenter: SportCenter,
+  ): Promise<SportCenter | undefined> {
     sportCenter.sport_categories = [
       ...new Set([...sportCenter.sport_categories, ...sportCategories]),
     ];
 
-    const saved_sportcenter: SportCenter = await this.sportCenterRepository.save(sportCenter)
+    const saved_sportcenter: SportCenter =
+      await this.sportCenterRepository.save(sportCenter);
 
     return saved_sportcenter === null ? undefined : saved_sportcenter;
-
   }
-
 
   async countActiveAndDisable(manager: User) {
     const remainingActiveCenters = await this.sportCenterRepository.find({
       where: {
         main_manager: { id: manager.id },
-        status: In([SportCenterStatus.PUBLISHED, SportCenterStatus.DISABLE]),
+        status: In([Sport_Center_Status.PUBLISHED, Sport_Center_Status.DISABLE]),
       },
     });
-    return remainingActiveCenters
+    return remainingActiveCenters;
   }
 
 
   async getSportCenters(page: number, limit: number, show_hidden: boolean, rating?: number, keyword?: string): Promise<SportCenterList> {
-
     const queryBuilder = this.sportCenterRepository
       .createQueryBuilder('sportcenter')
-      .orderBy('sportcenter.averageRating', 'DESC', 'NULLS LAST'); // Ordena por averageRating directamente
-    //ESTA FUNCION SE DEBE REUTILIZAR PARA LOS ADMINS CAMBIANDO EL PARAMETRO EN SHOW_HIDDEN
+      .leftJoinAndSelect('sportcenter.photos', 'photos')
+      .orderBy('sportcenter.averageRating', 'DESC', 'NULLS LAST');
 
     if (!show_hidden) {
-      queryBuilder.andWhere('sportcenter.status = :status', { status: SportCenterStatus.PUBLISHED, })
+      queryBuilder.andWhere('sportcenter.status = :status', {
+        status: Sport_Center_Status.PUBLISHED,
+      });
     }
 
-    // Filtro por keyword (nombre o dirección)
+    // Case-insensitive search for keyword
     if (keyword) {
-      queryBuilder.andWhere('(sportcenter.name LIKE :keyword OR sportcenter.address LIKE :keyword)', { keyword: `%${keyword}%` });
+      queryBuilder.andWhere(
+        '(LOWER(sportcenter.name) LIKE LOWER(:keyword) OR LOWER(sportcenter.address) LIKE LOWER(:keyword))',
+        { keyword: `%${keyword}%` },
+      );
     }
 
-    // Filtro por rating (si se proporciona)
     if (rating !== undefined) {
-      queryBuilder.andWhere('sportcenter.averageRating >= :rating', { rating });
+      queryBuilder.andWhere('sportcenter.averageRating <= :rating', { rating });
     }
 
-    // Aplica paginación si se proporcionan page y limit
-    if (page && limit) {
-      queryBuilder.skip((page - 1) * limit).take(limit);
-    }
+    // Get total count before pagination
+    const totalCount = await queryBuilder.getCount();
 
-    const centers: SportCenter[] = await queryBuilder.getMany();
+    // Apply pagination
+    queryBuilder.skip((page - 1) * limit).take(limit);
 
-    // Ejecuta el query y devuelve los resultados
+    const centers = await queryBuilder.getMany();
+
     return {
-      items: centers.length,
+      items: totalCount,
       page: Number(page),
       limit: Number(limit),
-      total_pages: Math.ceil(centers.length / limit),
-      sport_centers: centers
+      total_pages: Math.ceil(totalCount / limit),
+      sport_centers: centers.map(center => ({
+        ...center,
+        photos: center.photos === undefined ? [] : center.photos.map(image => image.image_url)
+      }))
     };
   }
 
 
-  async createSportCenter(future_manager: User, sportCenterData: Omit<CreateSportCenterDto, 'manager' | "images">, images?: Image[]): Promise<SportCenter | undefined> {
-    const saved_sportcenter: SportCenter = await this.sportCenterRepository.save(this.sportCenterRepository.create({
-      ...sportCenterData, main_manager: future_manager, photos: images || undefined,
-    }));
+  async createSportCenter(future_manager: User, sportCenterData: Omit<CreateSportCenterDto, 'manager'>, images?: Image[],): Promise<SportCenter | undefined> {
+    const saved_sportcenter: SportCenter = await this.sportCenterRepository.save(
+      this.sportCenterRepository.create({
+        ...sportCenterData,
+        main_manager: future_manager,
+        status: Sport_Center_Status.PUBLISHED,
+        photos: images || undefined,
+      }),
+    );
 
     return saved_sportcenter === null ? undefined : saved_sportcenter;
   }
 
 
-  async findOne(id: string): Promise<SportCenter | undefined> {
-    const found_sportcenter: SportCenter = await this.sportCenterRepository.findOne({ where: { id: id }, relations: { photos: true } });
+  async findOne(id: string, relations: boolean): Promise<SportCenter | undefined> {
+    const found_sportcenter: SportCenter = await this.sportCenterRepository.findOne({
+      where: { id: id }, relations: relations ? ['sport_categories', 'photos', "fields"] : []
+    });
 
     return found_sportcenter === null ? undefined : found_sportcenter;
   }
@@ -101,7 +124,7 @@ export class SportCenterRepository {
   }
 
 
-  async updateStatus(sportCenterInstance: SportCenter, status: SportCenterStatus) {
+  async updateStatus(sportCenterInstance: SportCenter, status: Sport_Center_Status) {
     sportCenterInstance.status = status;
     return await this.sportCenterRepository.save(sportCenterInstance);
   }

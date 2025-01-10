@@ -1,23 +1,29 @@
-import { IsNotEmpty, IsString, IsUUID, IsDate, Matches, IsEnum } from "class-validator";
-import { SportType } from "src/enums/sportType.enum";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsString, IsUUID, IsDate } from 'class-validator';
 
-export class reservationCreate {
-    @IsNotEmpty()
-    @IsString()
-    @IsUUID()
-    sportCenterId: string;
+export class CreateReservationDto {
 
-    @IsNotEmpty()
-    @IsEnum(SportType)
-    sportType: SportType;
+  @ApiProperty({example: new Date()})
+  @IsNotEmpty()
+  @IsString()
+  @IsDate()
+  date: Date;
 
-    @IsNotEmpty()
-    @IsString()
-    @IsDate()
-    reservationDate: Date;
+  @ApiProperty({example: "uuid"})
+  @IsNotEmpty()
+  @IsString()
+  @IsUUID()
+  userId: string;
 
-    @IsNotEmpty()
-    @IsString()
-    @Matches(/^([01]?[0-9]|2[0-3]):([0-5]?[0-9])$/, {message: 'debe ser de formato HH:MM'})
-    timeSlot: string
+  @ApiProperty({example: "uuid"})
+  @IsNotEmpty()
+  @IsString()
+  @IsUUID()
+  fieldId: string;
+
+  @ApiProperty({example: "uuid"})
+  @IsNotEmpty()
+  @IsString()
+  @IsUUID()
+  fieldBlockId: string;
 }

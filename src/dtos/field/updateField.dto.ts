@@ -1,9 +1,9 @@
 import { PartialType } from "@nestjs/swagger";
 import { FieldDto } from "./createField.dto";
-import { IsNotEmpty, IsUUID } from "class-validator";
+import { IsBoolean, IsOptional } from "class-validator";
 
 export class UpdateFieldDto extends PartialType(FieldDto) {
-    @IsUUID()
-    @IsNotEmpty()
-    id: string;
-  }
+  @IsOptional()
+  @IsBoolean()
+  isACtive: boolean;
+}

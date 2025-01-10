@@ -4,15 +4,16 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { User } from "src/entities/user.entity";
 import { AdminController } from "./admin.controller";
 import { AdminService } from "./admin.service";
-import { AdminRepository } from "./admin.repository";
 import { SportCenter } from "src/entities/sportcenter.entity";
 import { Reservation } from "src/entities/reservation.entity";
-import { Sport_Center_Module } from "../sport-center/sport-center.module";
+import { SportCenter_Module } from "../sport-center/sport-center.module";
+import { AdminRepository } from "./admin.repository";
+import { Auth0Module } from "../auth0/auth0.module";
 
 @Module({
-    imports: [Sport_Center_Module,UserModule, TypeOrmModule.forFeature([User, SportCenter,Reservation])],
-    controllers: [AdminController], 
-    providers: [AdminService, AdminRepository], //reservationRepository,
-    exports: []
+    imports: [Auth0Module, SportCenter_Module, UserModule, TypeOrmModule.forFeature([User, SportCenter, Reservation])],
+    controllers: [AdminController],
+    providers: [AdminService, AdminRepository],
+    exports: [AdminService]
 })
-export class AdminModule {}
+export class AdminModule { }

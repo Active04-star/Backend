@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Inject, Module } from '@nestjs/common';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -9,16 +9,24 @@ import { UploadModule } from './modules/uploads/upload.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { join } from 'path';
 import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
-import { Sport_Center_Module } from './modules/sport-center/sport-center.module';
+import { SportCenter_Module } from './modules/sport-center/sport-center.module';
 import { Sport_Cateogry_Module } from './modules/sport-category/sport-category.module';
 import { Field_Module } from './modules/field/field.module';
 import { ReviewModule } from './modules/review/review.module';
 import { ImagesModule } from './modules/images/images.module';
 import { StripeModule } from './modules/stripe/stripe.module';
 import { AdminModule } from './modules/Admin/admin.module';
+import { Auth0Module } from './modules/auth0/auth0.module';
 import { Payment_Module } from './modules/payment/payment.module';
 import { Subscription_Module } from './modules/subscription/subscription.module';
-
+import { Reservation_Module } from './modules/reservation/reservation.module';
+import { SportCenter_Schedule_Module } from './modules/sportcenter_schedules/sportCenter_schedule.module';
+import { ManagerModule } from './modules/manager/manager.module';
+import { Field_Block_Module } from './modules/field_blocks/field_schedule.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { ScheduleTaskModule } from './modules/task/task.module';
+import { ScheduleTaskService } from './modules/task/task.service';
+import { notificationGateway } from './modules/notification.gateway.ts/websocket.gateway';
 
 @Module({
   imports: [
@@ -40,6 +48,8 @@ import { Subscription_Module } from './modules/subscription/subscription.module'
       signOptions: { expiresIn: '1h' },
       secret: process.env.JWT_SECRET,
     }),
+
+    ScheduleModule.forRoot(),
 
     MailerModule.forRootAsync({
       imports: [ConfigModule],
@@ -66,10 +76,11 @@ import { Subscription_Module } from './modules/subscription/subscription.module'
         },
       }),
     }),
-
+    
+    Auth0Module,
     ImagesModule,
     UploadModule,
-    Sport_Center_Module,
+    SportCenter_Module,
     AuthModule,
     UserModule,
     Sport_Cateogry_Module,
@@ -78,7 +89,13 @@ import { Subscription_Module } from './modules/subscription/subscription.module'
     ReviewModule,
     AdminModule,
     Payment_Module,
-    Subscription_Module
+    Subscription_Module,
+    Reservation_Module,
+    SportCenter_Schedule_Module,
+    ManagerModule,
+    Field_Block_Module,
+    ScheduleTaskModule,
+    notificationGateway
   ],
   controllers: [],
   providers: [],

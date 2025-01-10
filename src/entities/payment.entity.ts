@@ -48,8 +48,9 @@ export class Payment {
   })
   paymentMethod: PaymentMethod;
 
-  @OneToMany(() => Payment_History, (history) => history.payment, { cascade: true })
-  history: Payment_History[];
+  @OneToOne(() => Payment_History, (history) => history.payment, { cascade: true })
+  @JoinColumn()
+  history: Payment_History;
 
   // Relación con la cancha asociada al pago
   @ManyToOne(() => Field, (field) => field.payments, { nullable: true })

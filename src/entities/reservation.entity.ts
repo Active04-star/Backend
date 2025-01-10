@@ -3,7 +3,6 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -12,7 +11,7 @@ import { ReservationStatus } from 'src/enums/reservationStatus.enum';
 import { Field } from './field.entity';
 import { Payment } from './payment.entity';
 import { Review } from './review.entity';
-import { Payment_History } from './payment_hisotry.entity';
+import { Field_Block } from './field_blocks.entity';
 
 @Entity({
   name: 'reservations',
@@ -20,6 +19,11 @@ import { Payment_History } from './payment_hisotry.entity';
 export class Reservation {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
+
 
   @Column({ type: 'timestamp' })
   date: Date;
@@ -36,19 +40,17 @@ export class Reservation {
   @JoinColumn()
   payment: Payment;
 
-  @OneToOne(() => Review, (review) => review.reservation, { cascade: true })
-  @JoinColumn()
+  @OneToOne(() => Review, (review) => review.reservation, { nullable:true })
   review: Review;
 
-  @OneToMany(
-    () => Payment_History,
-    (paymentHistory) => paymentHistory.reservation,
-  )
-  paymentsHistory: Payment_History[];
 
   @ManyToOne(() => User, (user) => user.reservations, { nullable: false })
   user: User;
 
   @ManyToOne(() => Field, (field) => field.reservation, { nullable: false })
   field: Field;
+
+  @OneToOne(() => Field_Block, (fieldBlock) => fieldBlock.reservation)
+  @JoinColumn() 
+  fieldBlock: Field_Block;
 }

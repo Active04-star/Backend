@@ -1,12 +1,12 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
   ParseUUIDPipe,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -19,43 +19,33 @@ import {
 import { Sport_Category_Service } from './sport-category.service';
 import { CreateSportCategoryDto } from 'src/dtos/sportcategory/createSportCategory.dto';
 import { Sport_Category } from 'src/entities/sport_category.entity';
+import { AuthGuard } from 'src/guards/auth-guard.guard';
+import { Roles } from 'src/decorators/roles.decorator';
+import { UserRole } from 'src/enums/roles.enum';
 
-@ApiTags('Sport Categories')
-@Controller('sportCategories')
+@ApiTags('Categories')
+@Controller('categories')
 export class Sport_Category_Controller {
-  constructor(
-    private readonly sport_category_service: Sport_Category_Service,
-  ) {}
 
-  @Post('create/:sportCenterId')
-  //   @Roles(UserRole.CONSUMER,UserRole.MANAGER)
-  //   @UseGuards(AuthGuard)
+  constructor(private readonly categoryService: Sport_Category_Service) { }
+
+
+  @Post('create')
+  @Roles(UserRole.ADMIN)
+  @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Registra un nuevo deporte',
-    description: 'Crea un nuevo registro de Sport_Cateogry en el sistema.',
-  })
-  @ApiBody({
-    description: 'Datos necesarios para crear un nuevo deporte',
-    type: CreateSportCategoryDto,
-  })
-  @ApiParam({
-    name: 'sportCenterId',
     description:
-      'ID del SportCenter para sincronizar el deporte con el centro deportivo',
-    example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
+      'Crea una nueva categoria (solo el admin deberia poder hacer esto)',
   })
-  async create(
-    @Param('sportCenterId', ParseUUIDPipe) sportCenterId: string,
-    @Body() data: CreateSportCategoryDto,
-  ): Promise<Sport_Category> {
-    return await this.sport_category_service.createSportCategory(
-      sportCenterId,
-      data,
-    );
+  @ApiBody({ description: 'Datos necesarios para crear un nuevo deporte', type: CreateSportCategoryDto })
+  async create(@Body() data: CreateSportCategoryDto): Promise<Sport_Category> {
+    return await this.categoryService.createSportCategory(data);
   }
 
-  @Get()
+
+  @Get('all')
   @ApiOperation({
     summary: 'Obtiene lista de deportes ordenados alfabeticamente',
   })
@@ -65,9 +55,10 @@ export class Sport_Category_Controller {
     type: String,
     description: 'Palabra de busqueda',
   })
-  async filterSportCategories(@Query('search') search?: string) {
-    return await this.sport_category_service.filterSportCategories(search);
+  async filterSportCategories(@Query('search') search?: string): Promise<Sport_Category[]> {
+    return await this.categoryService.filterSportCategories(search);
   }
+
 
   @Get(':id')
   @ApiOperation({
@@ -79,24 +70,26 @@ export class Sport_Category_Controller {
     description: 'ID del Sport_Category que se desea obtener',
     example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
   })
-  async findById(@Param('id', ParseUUIDPipe) id: string) {
-    return await this.sport_category_service.findById(id);
+  async findById(@Param('id', ParseUUIDPipe) id: string): Promise<Sport_Category> {
+    return await this.categoryService.findById(id);
   }
 
-  @Delete(':id')
-  // @ApiBearerAuth()
-  // @Roles(UserRole.MANAGER, UserRole.CONSUMER)
-  // @UseGuards(AuthGuard)
-  @ApiOperation({
-    summary: 'Elimina un deporte',
-    description: 'recibe el id del deporte por parametro y lo remueve',
-})
-@ApiParam({
-  name: 'id',
-  description: 'ID del Sport_Category que se desea eliminar',
-  example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
-})
-  async deleteSportCategory(@Param('id', ParseUUIDPipe) id: string) {
-    return await this.sport_category_service.deleteSportCategory(id);
-  }
+
+  //! NO SE SI SE VAYA A USAR, ES COMPLICADO
+  // @Delete(':id')
+  // // @ApiBearerAuth()
+  // // @Roles(UserRole.MANAGER, UserRole.CONSUMER)
+  // // @UseGuards(AuthGuard)
+  // @ApiOperation({
+  //   summary: 'Elimina un deporte',
+  //   description: 'recibe el id del deporte por parametro y lo remueve',
+  // })
+  // @ApiParam({
+  //   name: 'id',
+  //   description: 'ID del Sport_Category que se desea eliminar',
+  //   example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
+  // })
+  // async deleteSportCategory(@Param('id', ParseUUIDPipe) id: string) {
+  //   return await this.sport_category_service.deleteSportCategory(id);
+  // }
 }
