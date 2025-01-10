@@ -25,7 +25,7 @@ export class Field {
   @Column({ default: false })
   isDeleted: boolean;
 
-  @Column({ default: false })
+  @Column({ default: true })
   isACtive: boolean;
 
   @Column({
@@ -33,9 +33,10 @@ export class Field {
     precision: 10,
     scale: 2,
     nullable: false,
+    default: 0,
     transformer: {
-      to: (value: Decimal) => value.toNumber(),
-      from: (value: string) => new Decimal(value),
+      to: (value: Decimal | null) => (value !== null ? value.toNumber() : null),
+      from: (value: string | null) => (value !== null ? new Decimal(value) : null),
     },
   })
   price: Decimal | null;
