@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseUUIDPipe,
@@ -21,6 +22,7 @@ import { SportCenter } from 'src/entities/sportcenter.entity';
 import { Roles } from 'src/decorators/roles.decorator';
 import { UserRole } from 'src/enums/roles.enum';
 import { AuthGuard } from 'src/guards/auth-guard.guard';
+import { ApiResponse } from 'src/dtos/api-response';
 
 @Controller('manager')
 export class ManagerController {
@@ -48,7 +50,7 @@ export class ManagerController {
 
 
   @Get('fields/:id')
-  @Roles(UserRole.MANAGER)
+  @Roles(UserRole.MAIN_MANAGER)
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOperation({
@@ -68,7 +70,7 @@ export class ManagerController {
 
 
   @Get('reservations/:id')
-  @Roles(UserRole.MANAGER)
+  @Roles(UserRole.MAIN_MANAGER)
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOperation({
@@ -87,7 +89,7 @@ export class ManagerController {
 
 
   @Put('update-sportcenter/:id')
-  @Roles(UserRole.MANAGER)
+  @Roles(UserRole.MAIN_MANAGER)
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOperation({
@@ -108,8 +110,25 @@ export class ManagerController {
   }
 
 
+
+  //ESTA RUTA VA A QUEDAR COMO EXTRA, EL USUARIO VA A TENER SOLAMENTE UN CENTRO , VERFICAR SI EL CENTRO TIENE CANCHAS CON RESERVAS, NO PUEDE CANCELARSLAS , SINO ESPERAR QUE NO TENGA MAS O UN PERIDOD DE TIEMPO(CRONS,EXTRA) PARA QUE EL CENTRO SE ELIMINE Y EL USUARIO PIERDA SU ROL DE MAIN_MANAGER  
+  // @Delete('ban-unban/:id')
+  // @ApiOperation({
+  //   summary: 'Elimina un Centro deportivo',
+  //   description:
+  //     'Esta ruta permite eliminar un centro deportivo (SportCenter) de la base de datos. Si el usuario que lo gestiona (manager) tiene el rol de MANAGER, su rol se va a ver afectado y el usuario va a dejar de ser main_manager',
+  // })
+  // @ApiParam({
+  //   name: 'id',
+  //   description: 'ID del Centro deportivo a eliminar',
+  //   example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
+  // })
+  // async banOrUnBanCenter(@Param('id', ParseUUIDPipe) id: string): Promise<ApiResponse> {
+  //   return await this.sportCenterService.banOrUnBanCenter(id);
+  // }
+
   @Put('publish/:sportCenterId/:userId')
-  @Roles(UserRole.MANAGER)
+  @Roles(UserRole.MAIN_MANAGER)
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOperation({
@@ -179,33 +198,6 @@ export class ManagerController {
   //     return await this.managerService.getReservationByDate(page, limit, startDate, endDate, sportCenterId);
   //   }
 
-  /**@Put('disable/:sportCenterId/:userId')
-  //   @Roles(UserRole.MANAGER)
-  //   @UseGuards(AuthGuard)
-  // @ApiBearerAuth()
-  @ApiOperation({
-    summary: 'Desactiva un SportCenter',
-    description: 'Desactiva un centro deportivo asociado a un usuario.',
-  })
-  @ApiParam({
-    name: 'sportCenterId',
-    description: 'ID del SportCenter a desactivar',
-    example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
-  })
-  @ApiParam({
-    name: 'userId',
-    description: 'ID del usuario asociado al SportCenter',
-    example: 'a1b2c3d4-5678-9101-1121-abcdef654321',
-  })
-  async disableSportCenter(
-    @Param('userId', ParseUUIDPipe) userId: string,
-    @Param('sportCenterId', ParseUUIDPipe) sportCenterId: string,
-  ) {
-    return await this.sportcenterService.updateStatus(
-      userId,
-      sportCenterId,
-      Sport_Center_Status.DISABLE,
-    );
-  }
-*/
+  
+
 }
