@@ -26,6 +26,7 @@ import { Field_Block_Module } from './modules/field_blocks/field_schedule.module
 import { ScheduleModule } from '@nestjs/schedule';
 import { ScheduleTaskModule } from './modules/task/task.module';
 import { ScheduleTaskService } from './modules/task/task.service';
+import { notificationGateway } from './modules/notification.gateway.ts/websocket.gateway';
 
 @Module({
   imports: [
@@ -93,7 +94,8 @@ import { ScheduleTaskService } from './modules/task/task.service';
     SportCenter_Schedule_Module,
     ManagerModule,
     Field_Block_Module,
-    ScheduleTaskModule
+    ScheduleTaskModule,
+    notificationGateway
   ],
   controllers: [],
   providers: [],
