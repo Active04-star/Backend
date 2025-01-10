@@ -23,7 +23,7 @@ import { SportCenterService } from '../sport-center/sport-center.service';
 import { Sport_Center_Status } from 'src/enums/sport_Center_Status.enum';
 import { UserRole } from 'src/enums/roles.enum';
 import { AuthGuard } from 'src/guards/auth-guard.guard';
-import { reservationList } from 'src/dtos/reservation/reservation-list.dto';
+import { ReservationList } from 'src/dtos/reservation/reservation-list.dto';
 import { Roles } from 'src/decorators/roles.decorator';
 import { UpdateStatusDto } from 'src/dtos/sportcenter/update-status.dto';
 
@@ -59,11 +59,9 @@ export class AdminController {
     summary: 'Obtiene una lista de usuarios',
     description: 'debe ser ejecutado por un usuario con rol admin',
   })
-  async getUsers(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
-  ): Promise<UserList> {
+  async getUsers(@Query('page') page: number = 1, @Query('limit') limit: number = 10): Promise<UserList> {
     return await this.adminService.getUsers(page, limit);
+    
   }
 
 
@@ -113,6 +111,9 @@ export class AdminController {
 
 
   @Put('ban-unban/user/:id')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @Roles(UserRole.ADMIN)
   @ApiOperation({
     summary: 'Banea o desbanea con un softdelete',
     description:
@@ -156,6 +157,9 @@ export class AdminController {
 
 
   @Get('list/reservation')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @Roles(UserRole.ADMIN)
   @ApiQuery({
     name: 'page',
     required: true,
@@ -191,7 +195,7 @@ export class AdminController {
     @Query('limit') limit: number = 10,
     @Query('startDate') startDate: string,
     @Query('endDate') endDate: string,
-  ): Promise<reservationList> {
+  ): Promise<ReservationList> {
     return await this.adminService.getReservationByDate(page, limit, startDate, endDate);
   }
 

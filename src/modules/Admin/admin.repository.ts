@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { reservationList } from 'src/dtos/reservation/reservation-list.dto';
+import { ReservationList } from 'src/dtos/reservation/reservation-list.dto';
 import { UserList } from 'src/dtos/user/users-list.dto';
 import { Reservation } from 'src/entities/reservation.entity';
 import { User } from 'src/entities/user.entity';
@@ -32,7 +32,7 @@ export class AdminRepository {
   }
 
 
-  async getReservationByDate(page: number, limit: number, startDate: Date, endDate: Date): Promise<reservationList> {
+  async getReservationByDate(page: number, limit: number, startDate: Date, endDate: Date): Promise<ReservationList> {
     const query = this.reservationRepository.createQueryBuilder('reservation')
       .where('reservation.createdAt BETWEEN :startDate AND :endDate', { startDate, endDate })
       .skip((page - 1) * limit)

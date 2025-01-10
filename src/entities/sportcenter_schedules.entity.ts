@@ -2,7 +2,6 @@ import {
   Column,
   Entity,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { SportCenter } from './sportcenter.entity';
@@ -28,8 +27,6 @@ export class SportCenter_Schedule {
 
   @Column({ type: 'time', nullable: true })
   closing_time: string;
-
-
 
   @ManyToOne(() => SportCenter, (sportcenter) => sportcenter.schedules, {
     onDelete: 'CASCADE',

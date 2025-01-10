@@ -1,11 +1,4 @@
-import {
-  IsEnum,
-  IsBoolean,
-  IsString,
-  IsNotEmpty,
-  IsOptional,
-  IsUUID,
-} from 'class-validator';
+import { IsEnum, IsBoolean, IsString, IsOptional } from 'class-validator';
 import { DayOfWeek } from 'src/enums/dayOfWeek.enum';
 
 export class CreateSportCenterScheduleDto {

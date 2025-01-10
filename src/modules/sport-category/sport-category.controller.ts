@@ -26,9 +26,11 @@ import { UserRole } from 'src/enums/roles.enum';
 @ApiTags('Categories')
 @Controller('categories')
 export class Sport_Category_Controller {
-  constructor(private readonly categoryService: Sport_Category_Service) {}
 
-  @Post('create') 
+  constructor(private readonly categoryService: Sport_Category_Service) { }
+
+
+  @Post('create')
   @Roles(UserRole.ADMIN)
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
@@ -37,13 +39,11 @@ export class Sport_Category_Controller {
     description:
       'Crea una nueva categoria (solo el admin deberia poder hacer esto)',
   })
-  @ApiBody({
-    description: 'Datos necesarios para crear un nuevo deporte',
-    type: CreateSportCategoryDto,
-  })
+  @ApiBody({ description: 'Datos necesarios para crear un nuevo deporte', type: CreateSportCategoryDto })
   async create(@Body() data: CreateSportCategoryDto): Promise<Sport_Category> {
     return await this.categoryService.createSportCategory(data);
   }
+
 
   @Get('all')
   @ApiOperation({
@@ -55,9 +55,10 @@ export class Sport_Category_Controller {
     type: String,
     description: 'Palabra de busqueda',
   })
-  async filterSportCategories(@Query('search') search?: string) {
+  async filterSportCategories(@Query('search') search?: string): Promise<Sport_Category[]> {
     return await this.categoryService.filterSportCategories(search);
   }
+
 
   @Get(':id')
   @ApiOperation({
@@ -69,11 +70,12 @@ export class Sport_Category_Controller {
     description: 'ID del Sport_Category que se desea obtener',
     example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
   })
-  async findById(@Param('id', ParseUUIDPipe) id: string) {
+  async findById(@Param('id', ParseUUIDPipe) id: string): Promise<Sport_Category> {
     return await this.categoryService.findById(id);
   }
 
-  //NO SE VA A USAR
+
+  //! NO SE SI SE VAYA A USAR, ES COMPLICADO
   // @Delete(':id')
   // // @ApiBearerAuth()
   // // @Roles(UserRole.MANAGER, UserRole.CONSUMER)
