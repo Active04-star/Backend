@@ -41,9 +41,10 @@ export class Field_Block_Service {
     const opening = this.timeStringToMinutes(opening_time);
     const closing = this.timeStringToMinutes(closing_time);
 
-    if (closing <= opening || duration_minutes <= 0) {
-      throw new Error('Invalid schedule or duration.');
-
+    if (closing <= opening) {
+      throw new Error('Invalid schedule.');
+    } else if (duration_minutes <= 0) {
+      throw new Error('Invalid duration.');
     }
 
     const blocks: Field_Block[] = [];

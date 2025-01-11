@@ -10,34 +10,34 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class SportCenter_Schedule_Service {
+
   constructor(
-    private scheduleRepository:SportCenter_Schedule_Repository,
-    @InjectRepository(SportCenter)
-    private centerRepository: Repository<SportCenter>,  ) {}
+    private scheduleRepository: SportCenter_Schedule_Repository,
+    @InjectRepository(SportCenter) private centerRepository: Repository<SportCenter>,) { }
 
-  async createSchedule(data: CreateSportCenterScheduleDto[], id: string):Promise<SportCenter_Schedule[]> {
 
-    console.log('data',data);
-    
+  async createSchedule(data: CreateSportCenterScheduleDto[], id: string): Promise<SportCenter_Schedule[]> {
+
+    console.log('data', data);
+
     const sportcenter: SportCenter = await this.centerRepository.findOne({
-      where:{main_manager:{id:id}},
-      relations:['schedules']
+      where: { main_manager: { id: id } },
+      relations: ['schedules']
     })
 
     if (sportcenter.schedules.length > 0) {
-      throw new ApiError(
-        ApiStatusEnum.CENTER_ALREADY_HAS_SCHEDULES,
-        BadRequestException,
-      );
+      throw new ApiError(ApiStatusEnum.CENTER_ALREADY_HAS_SCHEDULES, BadRequestException);
+
     }
 
     const created_schedules: SportCenter_Schedule[] | undefined =
-      await this.scheduleRepository.createSchedules(data,sportcenter);
+      await this.scheduleRepository.createSchedules(data, sportcenter);
 
-        if (created_schedules === undefined) {
-            throw new ApiError(ApiStatusEnum.CENTER_SCHEDULES_CREATION_FAILED, BadRequestException);
-          }
+    if (created_schedules === undefined) {
+      throw new ApiError(ApiStatusEnum.CENTER_SCHEDULES_CREATION_FAILED, BadRequestException);
+      
+    }
 
-          return created_schedules
+    return created_schedules
   }
 }
