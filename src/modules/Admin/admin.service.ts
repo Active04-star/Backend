@@ -23,16 +23,16 @@ import { Auth0Service } from '../auth0/auth0.service';
 
 @Injectable()
 export class AdminService {
+
   constructor(
-    @InjectRepository(Reservation)
-    private reservationRepository: Repository<Reservation>,
+    @InjectRepository(Reservation) private reservationRepository: Repository<Reservation>,
     private readonly adminRepository: AdminRepository,
     private readonly centerService: SportCenterService,
     private readonly userService: UserService,
     private readonly auth0Service: Auth0Service,
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
-  ) {}
+    @InjectRepository(User) private userRepository: Repository<User>,
+  ) { }
+
 
   async getPremiumUsers(): Promise<User[]> {
     const usersQueryBuilder = this.userRepository.createQueryBuilder('user');
@@ -46,12 +46,8 @@ export class AdminService {
   }
 
 
-  
   async getUsers(page: number, limit: number): Promise<UserList> {
-    const found_users: UserList = await this.adminRepository.getUsers(
-      page,
-      limit,
-    );
+    const found_users: UserList = await this.adminRepository.getUsers(page, limit);
 
     if (found_users.users.length === 0) {
       throw new ApiError(ApiStatusEnum.USER_LIST_EMPTY, NotFoundException);
@@ -70,29 +66,25 @@ export class AdminService {
     const validendDate = new Date(endDate);
 
     if (isNaN(validstartDate.getTime()) || isNaN(validendDate.getTime())) {
-      throw new ApiError(
-        ApiStatusEnum.INVALID_DATE_FORMAT,
-        BadRequestException,
-      );
+      throw new ApiError(ApiStatusEnum.INVALID_DATE_FORMAT, BadRequestException);
+
     }
 
-    const foundReservation: ReservationList =
-      await this.adminRepository.getReservationByDate(
-        page,
-        limit,
-        validstartDate,
-        validendDate,
-      );
+    const foundReservation: ReservationList = await this.adminRepository.getReservationByDate(
+      page,
+      limit,
+      validstartDate,
+      validendDate,
+    );
 
     if (foundReservation.reservations.length === 0) {
-      throw new ApiError(
-        ApiStatusEnum.RESERVATION_NOT_FOUND,
-        NotFoundException,
-      );
+      throw new ApiError(ApiStatusEnum.RESERVATION_NOT_FOUND, NotFoundException);
+
     }
 
     return foundReservation;
   }
+
 
   async banOrUnbanUser(id: string): Promise<ApiResponse> {
     try {
@@ -100,6 +92,7 @@ export class AdminService {
 
       if (found_user.authtoken !== null) {
         await this.auth0Service.blockOrUnBlock(found_user);
+
       }
 
       const [updated_user, status]: [User, string] =
@@ -111,24 +104,16 @@ export class AdminService {
         return { message: ApiStatusEnum.USER_RESTORED };
       }
 
-      throw new ApiError(
-        ApiStatusEnum.USER_UNBAN_OR_BAN,
-        BadRequestException,
-        'Something went wrong trying to modify this',
-      );
+      throw new ApiError(ApiStatusEnum.USER_UNBAN_OR_BAN, BadRequestException, 'Something went wrong trying to modify this');
     } catch (error) {
       throw new ApiError(error?.message, BadRequestException, error);
+
     }
+
   }
 
-  async banOrUnbanCenter(
-    id: string,
-    estado: Sport_Center_Status,
-  ): Promise<ApiResponse> {
-    const found_center: SportCenter = await this.centerService.getById(
-      id,
-      true,
-    );
+  async banOrUnbanCenter(id: string, estado: Sport_Center_Status): Promise<ApiResponse> {
+    const found_center: SportCenter = await this.centerService.getById(id, true);
 
     try {
       if (
@@ -140,31 +125,25 @@ export class AdminService {
         )
       ) {
         return { message: ApiStatusEnum.CENTER_HAS_PENDING_RESERVATIONS };
+
       }
 
-      const changeCenter: SportCenter = await this.centerService.banOrUnban(
-        id,
-        estado,
-      );
+      const changeCenter: SportCenter = await this.centerService.banOrUnban(id, estado);
       if (changeCenter) {
         return { message: ApiStatusEnum.CENTER_UPDATE_STATUS };
+
       }
 
-      throw new ApiError(
-        ApiStatusEnum.CENTER_UPDATE_STATUS_FAILED,
-        InternalServerErrorException,
-      );
+      throw new ApiError(ApiStatusEnum.CENTER_UPDATE_STATUS_FAILED, InternalServerErrorException);
     } catch (error) {
       throw new ApiError(error?.message, InternalServerErrorException, error);
+
     }
   }
 
   async forceBan(id: string): Promise<ApiResponse> {
     try {
-      const found_center: SportCenter = await this.centerService.getById(
-        id,
-        true,
-      );
+      const found_center: SportCenter = await this.centerService.getById(id, true);
 
       const forceBanPromises: Promise<Reservation>[] = [];
 
@@ -180,22 +159,17 @@ export class AdminService {
 
       await Promise.all(forceBanPromises);
 
-      const changeCenter = await this.centerService.banOrUnban(
-        id,
-        Sport_Center_Status.BANNED,
-      );
+      const changeCenter = await this.centerService.banOrUnban(id, Sport_Center_Status.BANNED);
 
       if (changeCenter) {
         return { message: ApiStatusEnum.CENTER_UPDATE_STATUS };
+
       }
 
-      throw new ApiError(
-        ApiStatusEnum.CENTER_DELETION_FAILED,
-        InternalServerErrorException,
-        'nothing updated',
-      );
+      throw new ApiError(ApiStatusEnum.CENTER_DELETION_FAILED, InternalServerErrorException, 'nothing updated');
     } catch (error) {
       throw new ApiError(error?.message, InternalServerErrorException, error);
+      
     }
   }
 }
