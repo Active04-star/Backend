@@ -1,9 +1,4 @@
-import {
-  forwardRef,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Field_Block } from 'src/entities/field_blocks.entity';
 import { SportCenter_Schedule } from 'src/entities/sportcenter_schedules.entity';
@@ -15,36 +10,31 @@ import { ApiStatusEnum } from 'src/enums/HttpStatus.enum';
 
 @Injectable()
 export class Field_Block_Service {
+
   constructor(
-    @InjectRepository(Field_Block)
-    private fieldBlockRepository: Repository<Field_Block>,
-    @Inject(forwardRef(() => Field_Service))
-    private readonly fieldService: Field_Service,
-  ) {}
+    @InjectRepository(Field_Block) private fieldBlockRepository: Repository<Field_Block>,
+    @Inject(forwardRef(() => Field_Service)) private readonly fieldService: Field_Service,
+  ) { }
+
 
   async getFiedlBlocks(fieldId: string) {
     const field: Field = await this.fieldService.findById(fieldId);
     return field.blocks;
   }
 
+
   async getById(id: string): Promise<Field_Block> {
-    const fieldBlock: Field_Block | undefined =
-      await this.fieldBlockRepository.findOneBy({ id });
+    const fieldBlock: Field_Block | undefined = await this.fieldBlockRepository.findOneBy({ id });
 
     if (!fieldBlock) {
-      throw new ApiError(
-        ApiStatusEnum.FIELD_BLOCK_NOT_FOUND,
-        NotFoundException,
-      );
+      throw new ApiError(ApiStatusEnum.FIELD_BLOCK_NOT_FOUND, NotFoundException);
     }
 
     return fieldBlock;
   }
 
-  async createFieldBlocks(
-    field: Field,
-    sportCenterSchedule: SportCenter_Schedule,
-  ) {
+
+  async createFieldBlocks(field: Field, sportCenterSchedule: SportCenter_Schedule) {
     const { duration_minutes } = field;
     const { opening_time, closing_time } = sportCenterSchedule;
 
@@ -53,6 +43,7 @@ export class Field_Block_Service {
 
     if (closing <= opening || duration_minutes <= 0) {
       throw new Error('Invalid schedule or duration.');
+
     }
 
     const blocks: Field_Block[] = [];
@@ -68,20 +59,25 @@ export class Field_Block_Service {
       blocks.push(block);
     }
 
-    const saved_blocks: Field_Block[] =
-      await this.fieldBlockRepository.save(blocks);
+    const saved_blocks: Field_Block[] = await this.fieldBlockRepository.save(blocks);
 
     return saved_blocks === null ? undefined : saved_blocks;
+
   }
+
 
   private timeStringToMinutes(time: string): number {
     const [hours, minutes] = time.split(':').map(Number);
     return hours * 60 + minutes;
+
   }
+
 
   private minutesToTimeString(minutes: number): string {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+
   }
+
 }

@@ -31,6 +31,7 @@ import { User } from 'src/entities/user.entity';
 @ApiTags('Admin')
 @Controller('admin')
 export class AdminController {
+  
   constructor(
     private readonly sportCenterService: SportCenterService,
     private readonly adminService: AdminService,
