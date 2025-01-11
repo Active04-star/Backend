@@ -14,8 +14,7 @@ import { SportCenter_Schedule_Service } from './sportCenter_scheudle.service';
 import { Roles } from 'src/decorators/roles.decorator';
 import { UserRole } from 'src/enums/roles.enum';
 
-
-@ApiTags('horarios del centor')
+@ApiTags('horarios del centro')
 @Controller('schedules')
 export class SportCenter_Schedules_Controller {
 

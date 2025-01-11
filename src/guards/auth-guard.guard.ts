@@ -12,7 +12,7 @@ export class AuthGuard implements CanActivate {
     constructor(private readonly jwtService: JwtService, private readonly reflector: Reflector) { }
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
-        const request = context.switchToHttp().getRequest()
+        const request = context.switchToHttp().getRequest();
         const token = this.extractTokenFromHeader(request);
 
         if (!token) throw new ApiError(ApiStatusEnum.NO_TOKEN_PROVIDED, UnauthorizedException);

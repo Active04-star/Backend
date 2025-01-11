@@ -1,4 +1,4 @@
-import { Inject, Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -25,8 +25,8 @@ import { ManagerModule } from './modules/manager/manager.module';
 import { Field_Block_Module } from './modules/field_blocks/field_schedule.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ScheduleTaskModule } from './modules/task/task.module';
-import { ScheduleTaskService } from './modules/task/task.service';
 import { notificationGateway } from './modules/notification.gateway.ts/websocket.gateway';
+import { IllegalUserMiddleware } from './middlewares/IllegalUser.middleware';
 
 @Module({
   imports: [
@@ -76,7 +76,7 @@ import { notificationGateway } from './modules/notification.gateway.ts/websocket
         },
       }),
     }),
-    
+
     Auth0Module,
     ImagesModule,
     UploadModule,
@@ -100,4 +100,8 @@ import { notificationGateway } from './modules/notification.gateway.ts/websocket
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(IllegalUserMiddleware).forRoutes('*');
+  }
+}
