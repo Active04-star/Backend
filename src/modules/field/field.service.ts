@@ -47,6 +47,11 @@ export class Field_Service {
         ? await this.sportCategoryService.findById(fieldData.sportCategoryId)
         : null;
 
+        if(!sportCenter.schedules.length)
+        {
+          throw new ApiError(ApiStatusEnum.SPORTCENTER_NEEDS_SCHEDULES_BEFORE, InternalServerErrorException);
+        }
+
       const created_field: Field | undefined = await this.fieldRepository.createField(
         sportCenter,
         sportCategory,

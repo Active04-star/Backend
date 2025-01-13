@@ -72,6 +72,8 @@ export enum ApiStatusEnum {
   FIELD_BLOCK_CREATION_FAILED = 'Se produjo un error creando los bloques de las canchas',
   FIELD_BLOCK_NOT_FOUND = 'No se encontro el bloque de horario',
   FIELD_BLOCK_ALREADY_RESERVED = "Ya se reservo este horario",
+  SPORTCENTER_NEEDS_SCHEDULES_BEFORE = "Necesitas crear horarios para el centro antes de crear una cancha ",
+
 
   // Payments
   SUBSCRIPTION_PAYMENT_FAILED = 'No se pudo crear el pago de la subscripcion',
