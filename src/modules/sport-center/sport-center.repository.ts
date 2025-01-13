@@ -52,6 +52,8 @@ export class SportCenterRepository {
     const queryBuilder = this.sportCenterRepository
       .createQueryBuilder('sportcenter')
       .leftJoinAndSelect('sportcenter.photos', 'photos')
+      .leftJoinAndSelect('sportcenter.schedules', 'schedules')
+      .leftJoinAndSelect('sportcenter.fields','fields')
       .orderBy('sportcenter.averageRating', 'DESC', 'NULLS LAST');
 
     if (!show_hidden) {
