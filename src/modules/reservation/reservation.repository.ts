@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Reservation } from 'src/entities/reservation.entity';
-import { User } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
 import { notificationGateway } from '../notification.gateway.ts/websocket.gateway';
+import { ReservationStatus } from 'src/enums/reservationStatus.enum';
 
 @Injectable()
 export class Reservation_Repository {
@@ -14,12 +14,13 @@ export class Reservation_Repository {
   ) {}
 
   async cancelReservation(reservation: Reservation): Promise<Reservation> {
-    return await this.reservationRepository.remove(reservation);
+    reservation.status=ReservationStatus.CANCELLED
+    return await this.reservationRepository.save(reservation);
   }
 
   async findById(id: string): Promise<Reservation | undefined> {
     const found_reservation: Reservation | null =
-      await this.reservationRepository.findOne({ where: { id: id } });
+      await this.reservationRepository.findOne({ where: { id: id } ,relations:['fieldBlock','field']});
 
     return found_reservation === null ? undefined : found_reservation;
   }

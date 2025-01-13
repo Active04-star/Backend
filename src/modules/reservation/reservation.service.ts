@@ -1,4 +1,4 @@
-import { DataSource } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import {
   BadRequestException,
   forwardRef,
@@ -16,6 +16,7 @@ import { Field_Service } from '../field/field.service';
 import { UserService } from '../user/user.service';
 import { isEmpty } from 'class-validator';
 import { CreateReservationDto } from 'src/dtos/reservation/reservation-create.dto';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class Reservation_Service {
@@ -24,7 +25,9 @@ export class Reservation_Service {
     private readonly dataSource: DataSource,
     private readonly reservationRepository: Reservation_Repository,
     @Inject(forwardRef(() => Field_Service)) private readonly field_service: Field_Service,
-    private readonly userService: UserService
+    private readonly userService: UserService,
+    @InjectRepository(Field_Block)
+    private fieldBlockRepository:Repository<Field_Block>
   ) { }
 
 
@@ -78,7 +81,7 @@ export class Reservation_Service {
   }
 
 
-  async cancelReservation(id: string): Promise<boolean> {
+  async cancelReservation(id: string): Promise<Reservation> {
     const reservation: Reservation | undefined = await this.reservationRepository.findById(id);
 
     if (reservation === undefined) {
@@ -89,9 +92,17 @@ export class Reservation_Service {
       throw new ApiError(ApiStatusEnum.RESERVATION_ALREADY_CANCELED, BadRequestException);
     }
 
-    const deleted: Reservation = await this.reservationRepository.cancelReservation(reservation);
+     const cancelled_reservation:Reservation=await this.reservationRepository.cancelReservation(reservation);
 
-    return deleted !== undefined;
+     const block:Field_Block=await this.fieldBlockRepository.findOne({
+      where:{id:reservation.fieldBlock.id}
+
+     })
+
+     block.status=BlockStatus.AVAILABLE
+     await this.fieldBlockRepository.save(block)
+
+     return cancelled_reservation
 
   }
 
