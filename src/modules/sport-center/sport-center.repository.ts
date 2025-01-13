@@ -80,15 +80,14 @@ export class SportCenterRepository {
 
     const centers = await queryBuilder.getMany();
 
+   
+
     return {
       items: totalCount,
       page: Number(page),
       limit: Number(limit),
       total_pages: Math.ceil(totalCount / limit),
-      sport_centers: centers.map(center => ({
-        ...center,
-        photos: center.photos === undefined ? [] : center.photos.map(image => image.image_url)
-      }))
+      sport_centers: centers
     };
   }
 
