@@ -20,7 +20,7 @@ export class Field_Repository {
 
 
 async getFields(sportCenterId:string):Promise<Field[]>{
-return await this.fieldRepository.find({where:{sportcenter:{id:sportCenterId}},relations:['reservation','blocks','photos','reviews']})
+return await this.fieldRepository.find({where:{sportcenter:{id:sportCenterId},isDeleted:false},relations:['reservation','blocks','photos','reviews']})
 }
 
   async updateField(field: Field, data: UpdateFieldDto): Promise<Field> {
@@ -38,7 +38,8 @@ return await this.fieldRepository.find({where:{sportcenter:{id:sportCenterId}},r
         id
       },
       relations: {
-        blocks:{reservation:true}
+        reservation:true,
+        blocks:true
       },
     });
 
@@ -61,6 +62,8 @@ return await this.fieldRepository.find({where:{sportcenter:{id:sportCenterId}},r
 
 
   async deleteField(field: Field): Promise<Field | undefined> {
+    console.log('field',field);
+    
     const deletion_result: Field = await this.fieldRepository.remove(field);
 
     if (isEmpty(deletion_result)) {

@@ -59,12 +59,12 @@ export class Field_Controller {
   }
 
 
-  @Delete(':id')
+  @Put('delete/:id')
   @ApiBearerAuth()
-  // @Roles(UserRole.MANAGER)
-  // @UseGuards(AuthGuard)
+  @Roles(UserRole.MAIN_MANAGER)
+  @UseGuards(AuthGuard)
   @ApiOperation({
-    summary: 'Elimina un field',
+    summary: 'Elimina un field(soft remove)',
     description:
       'recibe el id del field por parametro y lo remueve, tambien cancela todas las reservas que tenga asociado ese field',
   })

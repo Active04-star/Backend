@@ -22,15 +22,15 @@ import { Field_Block_Service } from '../field_blocks/field_schedule.service';
 
 @Injectable()
 export class Field_Service {
-
   constructor(
     private readonly fieldRepository: Field_Repository,
     private sportCenterService: SportCenterService,
     private sportCategoryService: Sport_Category_Service,
-    @Inject(forwardRef(() => Reservation_Service)) private reservationService: Reservation_Service,
-    @Inject(forwardRef(() => Field_Block_Service)) private fieldblockService: Field_Block_Service
-  ) { }
-
+    @Inject(forwardRef(() => Reservation_Service))
+    private reservationService: Reservation_Service,
+    @Inject(forwardRef(() => Field_Block_Service))
+    private fieldblockService: Field_Block_Service,
+  ) {}
 
   async updateField(id: string, data: UpdateFieldDto): Promise<Field> {
     const field = await this.fieldRepository.findById(id);
@@ -38,50 +38,61 @@ export class Field_Service {
     return updatedField;
   }
 
-
   async createField(fieldData: FieldDto): Promise<Field> {
     try {
-      const sportCenter: SportCenter = await this.sportCenterService.getById(fieldData.sportCenterId, true);
+      const sportCenter: SportCenter = await this.sportCenterService.getById(
+        fieldData.sportCenterId,
+        true,
+      );
 
       const sportCategory: Sport_Category | null = fieldData.sportCategoryId
         ? await this.sportCategoryService.findById(fieldData.sportCategoryId)
         : null;
 
-        if(!sportCenter.schedules.length)
-        {
-          throw new ApiError(ApiStatusEnum.SPORTCENTER_NEEDS_SCHEDULES_BEFORE, InternalServerErrorException);
-        }
+      if (!sportCenter.schedules.length) {
+        throw new ApiError(
+          ApiStatusEnum.SPORTCENTER_NEEDS_SCHEDULES_BEFORE,
+          InternalServerErrorException,
+        );
+      }
 
-      const created_field: Field | undefined = await this.fieldRepository.createField(
-        sportCenter,
-        sportCategory,
-        fieldData,
-      );
+      const created_field: Field | undefined =
+        await this.fieldRepository.createField(
+          sportCenter,
+          sportCategory,
+          fieldData,
+        );
 
       if (created_field === undefined) {
-        throw new ApiError(ApiStatusEnum.FIELD_CREATION_FAILED, InternalServerErrorException);
-
+        throw new ApiError(
+          ApiStatusEnum.FIELD_CREATION_FAILED,
+          InternalServerErrorException,
+        );
       }
 
       for (const schedule of sportCenter.schedules) {
-        const blocks = await this.fieldblockService.createFieldBlocks(created_field, schedule);
+        const blocks = await this.fieldblockService.createFieldBlocks(
+          created_field,
+          schedule,
+        );
 
         if (!blocks || blocks.length === 0) {
-          throw new ApiError(ApiStatusEnum.FIELD_BLOCK_CREATION_FAILED, InternalServerErrorException);
-
+          throw new ApiError(
+            ApiStatusEnum.FIELD_BLOCK_CREATION_FAILED,
+            InternalServerErrorException,
+          );
         }
       }
 
       return await this.findById(created_field.id);
     } catch (error) {
       throw new ApiError(error?.message, BadRequestException, error);
-
     }
   }
 
-
   async findById(id: string): Promise<Field> {
-    const found_field: Field | undefined = await this.fieldRepository.findById(id);
+    const found_field: Field | undefined =
+      await this.fieldRepository.findById(id);
 
     if (found_field === undefined) {
       throw new ApiError(ApiStatusEnum.FIELD_NOT_FOUND, NotFoundException);
@@ -90,29 +101,39 @@ export class Field_Service {
     return found_field;
   }
 
-
   async getFields(centerId: string): Promise<Field[]> {
     try {
-      const found_center: SportCenter = await this.sportCenterService.getById(centerId, true);
+      const found_center: SportCenter = await this.sportCenterService.getById(
+        centerId,
+        true,
+      );
 
-      if (found_center.fields === undefined || found_center.fields.length === 0) {
-        throw new ApiError(ApiStatusEnum.CENTER_HAS_NO_FIELDS, NotFoundException);
-
+      if (
+        found_center.fields === undefined ||
+        found_center.fields.length === 0
+      ) {
+        throw new ApiError(
+          ApiStatusEnum.CENTER_HAS_NO_FIELDS,
+          NotFoundException,
+        );
       }
 
       return await this.fieldRepository.getFields(found_center.id);
     } catch (error) {
       throw new ApiError(error?.message, InternalServerErrorException, error);
-
     }
   }
 
-  async deleteField(id: string): Promise<ApiResponse> {
+  async deleteField(id: string): Promise<Field> {
     try {
       const field: Field = await this.findById(id);
 
+      console.log('holaaaaaaa', field);
+
       // Actualizar el estado de todas las reservas asociadas a 'CANCELED'
       if (field.reservation && field.reservation.length > 0) {
+        console.log('holaa');
+
         await Promise.all(
           field.reservation.map(async (reservation) => {
             return await this.reservationService.cancelReservation(
@@ -120,22 +141,33 @@ export class Field_Service {
             );
           }),
         );
-
-        //TODO Se tiene que enviar un mail aca avisando a los usuarios de la cancelacion
-        const deletion_result: Field | undefined = await this.fieldRepository.deleteField(field);
-
-        if (!deletion_result) {
-          throw new ApiError(ApiStatusEnum.FIELD_DELETION_FAILED, InternalServerErrorException);
-
-        }
-
-        return {
-          message: ApiStatusEnum.FIELD_DELETED_SUCCESSFULLY,
-        };
       }
-    } catch (error) {
-      throw new ApiError(error?.message, BadRequestException, error);
 
+      if (field.reservation.length > 0) {
+        throw new ApiError(
+          ApiStatusEnum.CANT_CANCEL_RESERVATIONS,
+          InternalServerErrorException,
+        );
+      }
+
+      console.log('se va a elimianr ');
+
+      //TODO Se tiene que enviar un mail aca avisando a los usuarios de la cancelacion
+      const deletion_result: Field | undefined =
+        await this.fieldRepository.deleteField(field);
+
+      if (!deletion_result) {
+        throw new ApiError(
+          ApiStatusEnum.FIELD_DELETION_FAILED,
+          InternalServerErrorException,
+        );
+      }
+
+      return deletion_result;
+    } catch (error) {
+      console.log('erro', error);
+
+      throw new ApiError(error?.message, BadRequestException, error);
     }
   }
 }
