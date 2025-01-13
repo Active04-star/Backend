@@ -40,9 +40,9 @@ export class Reservation_Repository {
 
     async getResevationCron(): Promise<Reservation[]> {
       const now = new Date()
-
       const oneHour = new Date(now)
       oneHour.setHours(now.getHours() + 1)
+
       const startRange = new Date(oneHour)
       startRange.setSeconds(0,0)
 
@@ -58,6 +58,24 @@ export class Reservation_Repository {
 
     async notifyUser(reservation: Reservation) {
       const message = `Tu reserva para ${reservation.id} comienza en 1 hora`;
+      this.notificationGateway.sendNotification(reservation.user.id, message)
+    }
+
+    async reservationnotify(): Promise<Reservation[]> {
+      const now = new Date()
+      
+      const startRange = new Date(now)
+      startRange.setMinutes(now.getMinutes() - 1)
+
+      return await this.reservationRepository
+      .createQueryBuilder('reservation')
+      .where('reservation.status = :status', {status: 'active'})
+      .andWhere('reservation.createdAt BETWEEN :startRange AND :now', {startRange, now})
+      .getMany()
+    }
+
+    async notifyreservationUser(reservation: Reservation) {
+      const message = `Tu reserva ah sido registrada correctamente`;
       this.notificationGateway.sendNotification(reservation.user.id, message)
     }
 }
