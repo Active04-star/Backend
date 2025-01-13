@@ -32,8 +32,7 @@ export class SportCenterRepository {
       ...new Set([...sportCenter.sport_categories, ...sportCategories]),
     ];
 
-    const saved_sportcenter: SportCenter =
-      await this.sportCenterRepository.save(sportCenter);
+    const saved_sportcenter: SportCenter =      await this.sportCenterRepository.save(sportCenter);
 
     return saved_sportcenter === null ? undefined : saved_sportcenter;
   }
@@ -68,9 +67,9 @@ export class SportCenterRepository {
         { keyword: `%${keyword}%` },
       );
     }
-
+ 
     if (rating !== undefined) {
-      queryBuilder.andWhere('sportcenter.averageRating <= :rating', { rating });
+      queryBuilder.andWhere('sportcenter.averageRating >= :rating', { rating });
     }
 
     // Get total count before pagination
@@ -110,7 +109,7 @@ export class SportCenterRepository {
 
   async findOne(id: string, relations: boolean): Promise<SportCenter | undefined> {
     const found_sportcenter: SportCenter = await this.sportCenterRepository.findOne({
-      where: { id: id }, relations: relations ? ['sport_categories', 'photos', "fields"] : []
+      where: { id: id }, relations: relations ? ['sport_categories', 'photos', "fields","schedules"] : []
     });
 
     return found_sportcenter === null ? undefined : found_sportcenter;
