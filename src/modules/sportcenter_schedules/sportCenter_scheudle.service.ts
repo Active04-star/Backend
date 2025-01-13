@@ -16,7 +16,7 @@ export class SportCenter_Schedule_Service {
     @InjectRepository(SportCenter) private centerRepository: Repository<SportCenter>,) { }
 
 
-  async createSchedule(data: CreateSportCenterScheduleDto[], id: string): Promise<SportCenter_Schedule[]> {
+  async createOrUpdateSchedule(data: CreateSportCenterScheduleDto[], id: string): Promise<SportCenter_Schedule[]> {
 
     console.log('data', data);
 
@@ -25,10 +25,18 @@ export class SportCenter_Schedule_Service {
       relations: ['schedules']
     })
 
-    if (sportcenter.schedules.length > 0) {
-      throw new ApiError(ApiStatusEnum.CENTER_ALREADY_HAS_SCHEDULES, BadRequestException);
-
+    if (!sportcenter) {
+      throw new ApiError(ApiStatusEnum.CENTER_NOT_FOUND, BadRequestException);
     }
+
+    if (sportcenter.schedules.length > 0) {
+      const updatedSchedules = await this.scheduleRepository.updateSchedules(
+        data,
+        sportcenter
+      );
+      return updatedSchedules;
+    }
+  
 
     const created_schedules: SportCenter_Schedule[] | undefined =
       await this.scheduleRepository.createSchedules(data, sportcenter);
