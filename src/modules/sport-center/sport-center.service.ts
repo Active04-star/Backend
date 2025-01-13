@@ -145,6 +145,9 @@ export class SportCenterService {
 
 
   async updateSportCenter(id: string, updateData: UpdateSportCenterDto): Promise<SportCenter> {
+
+    console.log('id',id);
+    
     const sportCenter: SportCenter = await this.getById(id);
 
     const updated: SportCenter = await this.sportcenterRepository.updateSportCenter(sportCenter, updateData);
