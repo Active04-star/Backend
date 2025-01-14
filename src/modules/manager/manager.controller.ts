@@ -12,7 +12,7 @@ import { ApiResponse } from 'src/dtos/api-response';
 import { Reservation_Service } from '../reservation/reservation.service';
 import { Reservation } from 'src/entities/reservation.entity';
 
-@Controller('manager')
+@Controller('manager') //
 export class ManagerController {
 
   constructor(
