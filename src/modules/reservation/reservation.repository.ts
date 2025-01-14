@@ -4,6 +4,7 @@ import { Reservation } from 'src/entities/reservation.entity';
 import { Repository } from 'typeorm';
 import { notificationGateway } from '../notification.gateway.ts/websocket.gateway';
 import { ReservationStatus } from 'src/enums/reservationStatus.enum';
+import { Field_Block_Service } from '../field_blocks/field_schedule.service';
 
 @Injectable()
 export class Reservation_Repository {
@@ -64,15 +65,17 @@ export class Reservation_Repository {
 
     async reservationnotify(): Promise<Reservation[]> {
       const now = new Date()
-      
       const startRange = new Date(now)
       startRange.setMinutes(now.getMinutes() - 1)
+
+      const nowUtc = new Date(now.toISOString())
+      const startRangeUtc = new Date(startRange.toISOString())
 
       return await this.reservationRepository
       .createQueryBuilder('reservation')
       .where('reservation.status = :status', {status: 'active'})
-      .andWhere('reservation.createdAt BETWEEN :startRange AND :now', {startRange, now})
-      .getMany()
+      .andWhere('reservation.createdAt BETWEEN :startRange AND :now', {startRange: startRangeUtc.toISOString(), now: nowUtc.toISOString()})
+      .getMany()       
     }
 
     async notifyreservationUser(reservation: Reservation) {

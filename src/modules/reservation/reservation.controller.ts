@@ -59,6 +59,8 @@ export class Reservation_Controller {
     return await this.reservationService.cancelReservation(id)
   }
 
+  
+
   // //en caso de modificar la fecha de la reserva, tener en cuenta el limite de tiempo necesario para esto
   // @Put('update')
   // @ApiOperation({
