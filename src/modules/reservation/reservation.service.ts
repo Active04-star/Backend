@@ -106,7 +106,7 @@ export class Reservation_Service {
 
   }
 
-  async activeReservation(id: string): Promise<Reservation> {
+  async completeReservation(id: string): Promise<Reservation> {
     const reservation: Reservation | undefined = await this.reservationRepository.findById(id);
 
     if (reservation === undefined) {
@@ -115,7 +115,7 @@ export class Reservation_Service {
     if (reservation.status === ReservationStatus.COMPLETED) {
       throw new ApiError(ApiStatusEnum.RESERVATION_ALREADY_COMPLETED, BadRequestException);
     }
-    const completedReservation: Reservation = await this.reservationRepository.activeReservation(reservation)
+    const completedReservation: Reservation = await this.reservationRepository.completeReservation(reservation)
 
     return completedReservation
   }
