@@ -4,7 +4,6 @@ import { Reservation } from 'src/entities/reservation.entity';
 import { Repository } from 'typeorm';
 import { notificationGateway } from '../notification.gateway.ts/websocket.gateway';
 import { ReservationStatus } from 'src/enums/reservationStatus.enum';
-import { Field_Block_Service } from '../field_blocks/field_schedule.service';
 
 @Injectable()
 export class Reservation_Repository {
@@ -88,7 +87,7 @@ export class Reservation_Repository {
       this.notificationGateway.sendNotification(reservation.user.id, message)
     }
 
-    async activeReservation(reservation: Reservation): Promise<Reservation> {
+    async completeReservation(reservation: Reservation): Promise<Reservation> {
       reservation.status = ReservationStatus.COMPLETED
       return await this.reservationRepository.save(reservation)
     }
