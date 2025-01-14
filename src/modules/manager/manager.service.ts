@@ -80,10 +80,11 @@ export class ManagerService {
     return await this.fieldService.getFields(centerId);
   }
 
-  async getManagerReservations(managerId: string):Promise<Reservation[]> {
+  async getManagerReservations(managerId: string): Promise<Reservation[]> {
     const user: User = await this.userService.getUserById(managerId);
-    const reservations:Reservation[] = await this.reservationRepository
+    const reservations: Reservation[] = await this.reservationRepository
       .createQueryBuilder('reservation')
+      .leftJoinAndSelect('reservation.user', 'user')
       .leftJoinAndSelect('reservation.field', 'field')
       .leftJoinAndSelect('field.sportcenter', 'sportcenter')
       .leftJoinAndSelect('sportcenter.main_manager', 'main_manager')
