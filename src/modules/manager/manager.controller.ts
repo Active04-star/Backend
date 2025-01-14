@@ -9,6 +9,7 @@ import { Roles } from 'src/decorators/roles.decorator';
 import { UserRole } from 'src/enums/roles.enum';
 import { AuthGuard } from 'src/guards/auth-guard.guard';
 import { ApiResponse } from 'src/dtos/api-response';
+import { Reservation } from 'src/entities/reservation.entity';
 
 @Controller('manager')
 export class ManagerController {
@@ -69,7 +70,7 @@ export class ManagerController {
     description: 'ID del usuario con rol manager',
     example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
   })
-  async getReservations(@Param('id', ParseUUIDPipe) id: string) {
+  async getReservations(@Param('id', ParseUUIDPipe) id: string):Promise<Reservation[]>{
     return await this.managerService.getManagerReservations(id);
   }
 
