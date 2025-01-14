@@ -40,9 +40,9 @@ export class Reservation_Repository {
     
 
     async getResevationCron(): Promise<Reservation[]> {
-      const now = new Date()
+      const now = new Date(Date.now())
       const oneHour = new Date(now)
-      oneHour.setHours(now.getHours() + 1)
+      oneHour.setHours(now.getHours() + 1);
 
       const startRange = new Date(oneHour)
       startRange.setSeconds(0,0)
@@ -52,8 +52,11 @@ export class Reservation_Repository {
 
       return await this.reservationRepository
       .createQueryBuilder('reservation')
+      .leftJoinAndSelect('reservation.user', 'user')
       .where('reservation.status = :status', {status: 'active'})
-      .andWhere('reservation.date BETWEEN :startRange AND :endRange', {startRange, endRange})
+      .andWhere('reservation.date BETWEEN :startRange AND :endRange', {
+        startRange, 
+        endRange})
       .getMany()
     }
 
@@ -67,8 +70,6 @@ export class Reservation_Repository {
       const nowUtc = new Date(Date.now())
 
       const startRangeUtc = new Date(Date.now() - 60 * 1000); // Hace un minuto en UTC
-      console.log(`nowUtc: ${nowUtc.toISOString()}, startRangeUtc: ${startRangeUtc.toISOString()}`)
-
       const reservations = await this.reservationRepository
       .createQueryBuilder('reservation')
       .leftJoinAndSelect('reservation.user', 'user')

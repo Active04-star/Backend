@@ -14,7 +14,7 @@ import { Reservation_Module } from '../reservation/reservation.module';
   imports: [
     UserModule,
     SportCenter_Module, 
-    Field_Module, 
+    Field_Module,
     Reservation_Module,
     TypeOrmModule.forFeature([SportCenter, Field, Reservation])],
   controllers: [ManagerController],

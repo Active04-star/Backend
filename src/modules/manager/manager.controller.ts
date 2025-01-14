@@ -25,7 +25,8 @@ import { Reservation_Service } from '../reservation/reservation.service';
 import { Reservation } from 'src/entities/reservation.entity';
 
 @Controller('manager')
-export class ManagerController {
+export class ManagerController{
+
   constructor(
     private readonly managerService: ManagerService,
     private sportCenterService: SportCenterService,
