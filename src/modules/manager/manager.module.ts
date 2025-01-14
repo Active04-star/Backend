@@ -8,8 +8,6 @@ import { Field_Module } from '../field/field.module';
 import { UserModule } from '../user/user.module';
 import { Field } from 'src/entities/field.entity';
 import { Reservation } from 'src/entities/reservation.entity';
-import { SportCenterRepository } from '../sport-center/sport-center.repository';
-import { Reservation_Service } from '../reservation/reservation.service';
 import { Reservation_Module } from '../reservation/reservation.module';
 
 @Module({
