@@ -27,6 +27,16 @@ export class SportCenterService {
   ) { }
 
 
+  async getTotalCenters(show_hidden: boolean): Promise<{ total: number }> {
+    const total: number | undefined = await this.sportcenterRepository.getTotalCenters(show_hidden);
+    if(total === undefined) {
+      throw new ApiError(ApiStatusEnum.CENTER_LIST_EMTPY, NotFoundException);
+    }
+
+    return { total: total };
+  }
+
+
   async updateAverageRating(sportCenter: SportCenter): Promise<void> {
     // Recuperar todas las reseñas activas asociadas a las canchas del centro
     const reviews: Review[] = await this.reviewRepository.find({
@@ -146,8 +156,8 @@ export class SportCenterService {
 
   async updateSportCenter(id: string, updateData: UpdateSportCenterDto): Promise<SportCenter> {
 
-    console.log('id',id);
-    
+    console.log('id', id);
+
     const sportCenter: SportCenter = await this.getById(id);
 
     const updated: SportCenter = await this.sportcenterRepository.updateSportCenter(sportCenter, updateData);
