@@ -146,9 +146,9 @@ export class ManagerController {
   //   return await this.sportCenterService.banOrUnBanCenter(id);
   // }
 
-  @Put('publish/:id')
-  // @Roles(UserRole.MAIN_MANAGER)
-  // @UseGuards(AuthGuard)
+  @Put('sportcenter/publish/:sportCenterId')
+  @Roles(UserRole.MAIN_MANAGER)
+  @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOperation({
     summary:
@@ -156,14 +156,13 @@ export class ManagerController {
     description: 'Activa un centro deportivo asociado a un usuario.',
   })
   @ApiParam({
-    name: 'id',
-    description: 'ID de la reserva',
+    name: 'sportCenterId',
+    description: 'ID del centro deportivo',
     example: 'a1b2c3d4-5678-9101-1121-abcdef654321',
   })
   async publishSportCenter(
-    @Param('userId', ParseUUIDPipe) userId: string,
     @Param('sportCenterId', ParseUUIDPipe) sportCenterId: string,
   ) {
-    return await this.managerService.publishSportCenter(userId, sportCenterId);
+    return await this.managerService.publishSportCenter( sportCenterId);
   }
 }

@@ -29,12 +29,11 @@ export class ManagerService {
   }
 
   async publishSportCenter(
-    userId: string,
     sportCenterId: string,
   ): Promise<SportCenter> {
     const found_sportcenter = await this.sportCenterRepository.findOne({
-      where: { id: sportCenterId, main_manager: { id: userId } },
-      relations: ['schedules', 'fields'],
+      where: { id: sportCenterId },
+      relations: ['schedules', 'fields','main_manager'],
     });
 
     if (!found_sportcenter) {
@@ -51,8 +50,10 @@ export class ManagerService {
       );
     }
 
+
+
     return await this.sportCenterService.updateStatus(
-      userId,
+      found_sportcenter.main_manager.id,
       found_sportcenter.id,
       Sport_Center_Status.PUBLISHED,
     );
