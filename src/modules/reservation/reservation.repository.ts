@@ -65,21 +65,31 @@ export class Reservation_Repository {
 
     async reservationnotify(): Promise<Reservation[]> {
       const now = new Date()
-      const startRange = new Date(now)
-      startRange.setMinutes(now.getMinutes() - 1)
+      const nowUtc = new Date(Date.now())
 
-      const nowUtc = new Date(now.toISOString())
-      const startRangeUtc = new Date(startRange.toISOString())
+      const startRangeUtc = new Date(Date.now() - 60 * 1000); // Hace un minuto en UTC
+      console.log(`nowUtc: ${nowUtc.toISOString()}, startRangeUtc: ${startRangeUtc.toISOString()}`)
 
-      return await this.reservationRepository
+      const reservations = await this.reservationRepository
       .createQueryBuilder('reservation')
+      .leftJoinAndSelect('reservation.user', 'user')
       .where('reservation.status = :status', {status: 'active'})
-      .andWhere('reservation.createdAt BETWEEN :startRange AND :now', {startRange: startRangeUtc.toISOString(), now: nowUtc.toISOString()})
-      .getMany()       
+      .andWhere('reservation.createdAt BETWEEN :startRangeUtc AND :now', {startRangeUtc: startRangeUtc.toISOString(), now: nowUtc.toISOString()})
+      .getMany()
+      
+      if (!reservations || reservations.length === 0) {
+        console.log("No se encontraron reservas dentro del rango especificado.");
+      }
+      return reservations
     }
 
     async notifyreservationUser(reservation: Reservation) {
       const message = `Tu reserva ah sido registrada correctamente`;
       this.notificationGateway.sendNotification(reservation.user.id, message)
+    }
+
+    async activeReservation(reservation: Reservation): Promise<Reservation> {
+      reservation.status = ReservationStatus.COMPLETED
+      return await this.reservationRepository.save(reservation)
     }
 }
