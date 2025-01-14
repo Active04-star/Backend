@@ -106,6 +106,20 @@ export class Reservation_Service {
 
   }
 
+  async activeReservation(id: string): Promise<Reservation> {
+    const reservation: Reservation | undefined = await this.reservationRepository.findById(id);
+
+    if (reservation === undefined) {
+      throw new ApiError(ApiStatusEnum.RESERVATION_NOT_FOUND, NotFoundException);
+    }
+    if (reservation.status === ReservationStatus.COMPLETED) {
+      throw new ApiError(ApiStatusEnum.RESERVATION_ALREADY_COMPLETED, BadRequestException);
+    }
+    const completedReservation: Reservation = await this.reservationRepository.activeReservation(reservation)
+
+    return completedReservation
+  }
+
 
   async getReservationUser(id: string): Promise<Reservation[]> {
     const getReservation = await this.reservationRepository.getReservationByUser(id)

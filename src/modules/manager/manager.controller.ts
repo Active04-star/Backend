@@ -9,6 +9,7 @@ import { Roles } from 'src/decorators/roles.decorator';
 import { UserRole } from 'src/enums/roles.enum';
 import { AuthGuard } from 'src/guards/auth-guard.guard';
 import { ApiResponse } from 'src/dtos/api-response';
+import { Reservation_Service } from '../reservation/reservation.service';
 
 @Controller('manager')
 export class ManagerController {
@@ -16,6 +17,7 @@ export class ManagerController {
   constructor(
     private readonly managerService: ManagerService,
     private sportCenterService: SportCenterService,
+    private reservationService: Reservation_Service,
   ) { }
 
 
@@ -69,7 +71,7 @@ export class ManagerController {
     description: 'ID del usuario con rol manager',
     example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
   })
-  async getReservations(@Param('id', ParseUUIDPipe) id: string) {
+  async getReservations(@Param('id', ParseUUIDPipe) id: string):Promise<Reservation[]>{
     return await this.managerService.getManagerReservations(id);
   }
 
@@ -95,7 +97,22 @@ export class ManagerController {
     return await this.sportCenterService.updateSportCenter(id, data);
   }
 
-
+  @Put('complete/:id')
+  // @Roles(UserRole.MAIN_MANAGER)
+  // @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'completa una reserva por su ID',
+    description: 'Permite cambiar el estado de la resreva a completed',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID de la reserva',
+    example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
+  })
+  async activeReservation(@Param('id', ParseUUIDPipe) id: string): Promise<Reservation> {
+    return await this.reservationService.activeReservation(id)
+  }
 
   //ESTA RUTA VA A QUEDAR COMO EXTRA, EL USUARIO VA A TENER SOLAMENTE UN CENTRO , VERFICAR SI EL CENTRO TIENE CANCHAS CON RESERVAS, NO PUEDE CANCELARSLAS , SINO ESPERAR QUE NO TENGA MAS O UN PERIDOD DE TIEMPO(CRONS,EXTRA) PARA QUE EL CENTRO SE ELIMINE Y EL USUARIO PIERDA SU ROL DE MAIN_MANAGER  
   // @Delete('ban-unban/:id')
@@ -113,9 +130,9 @@ export class ManagerController {
   //   return await this.sportCenterService.banOrUnBanCenter(id);
   // }
 
-  @Put('publish/:sportCenterId/:userId')
-  @Roles(UserRole.MAIN_MANAGER)
-  @UseGuards(AuthGuard)
+  @Put('publish/:id')
+  // @Roles(UserRole.MAIN_MANAGER)
+  // @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOperation({
     summary:
@@ -123,13 +140,8 @@ export class ManagerController {
     description: 'Activa un centro deportivo asociado a un usuario.',
   })
   @ApiParam({
-    name: 'sportCenterId',
-    description: 'ID del SportCenter a activar',
-    example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
-  })
-  @ApiParam({
-    name: 'userId',
-    description: 'ID del usuario asociado al SportCenter',
+    name: 'id',
+    description: 'ID de la reserva',
     example: 'a1b2c3d4-5678-9101-1121-abcdef654321',
   })
   async publishSportCenter(
