@@ -8,6 +8,7 @@ import { UserModule } from '../user/user.module';
 import { Field_Module } from '../field/field.module';
 import { notificationGateway } from '../notification.gateway.ts/websocket.gateway';
 import { Field_Block } from 'src/entities/field_blocks.entity';
+import { Field_Block_Service } from '../field_blocks/field_schedule.service';
 
 @Module({
   imports: [

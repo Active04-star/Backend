@@ -61,6 +61,7 @@ export enum ApiStatusEnum {
   RESERVATION_CREATED = "Reservacion agendada exitosamente",
   RESERVATION_NOT_FOUND = 'No se encontró ninguna reserva',
   RESERVATION_ALREADY_CANCELED = 'Esta reserva ya fue cancelada',
+  RESERVATION_ALREADY_COMPLETED = 'Esta reserva ya esta activada',
   INVALID_RESERVATION_STATUS = 'Estado de la reserva invalido',
   RESERVATION_NOT_COMPLETED = "Se va a poder crear una reseña luego de la reserva haya sido completada",
 
