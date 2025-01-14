@@ -10,6 +10,7 @@ import { UserRole } from 'src/enums/roles.enum';
 import { AuthGuard } from 'src/guards/auth-guard.guard';
 import { ApiResponse } from 'src/dtos/api-response';
 import { Reservation_Service } from '../reservation/reservation.service';
+import { Reservation } from 'src/entities/reservation.entity';
 
 @Controller('manager')
 export class ManagerController {
