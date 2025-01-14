@@ -24,18 +24,23 @@ export class IllegalUserMiddleware implements NestMiddleware {
                 const payload = await this.jwtService.verifyAsync(token, {
                     secret: process.env.JWT_SECRET,
                 });
-                
+
                 const user: User = await this.userService.getUserById(payload.id);
 
                 if (user.was_banned) {
                     throw new ApiError(ApiStatusEnum.USER_DELETED, UnauthorizedException);
-                    
+
                 }
 
                 next();
             } catch (error) {
-                throw new ApiError(error?.message, (error as ApiError).exception || InternalServerErrorException, error);
+                if (error.message === "jwt expired") {
+                    next();
 
+                } else {
+                    throw new ApiError(error?.message, (error as ApiError).exception || InternalServerErrorException, error);
+
+                }
             }
         }
     }

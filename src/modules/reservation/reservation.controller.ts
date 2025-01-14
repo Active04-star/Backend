@@ -27,8 +27,8 @@ export class Reservation_Controller {
   constructor(private readonly reservationService: Reservation_Service) { }
 
   @Post('create')
-  // @ApiBearerAuth()
-  // @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   @ApiOperation({
     summary: 'Registra una nueva reserva',
     description: 'Crea una nueva reserva en el sistema',

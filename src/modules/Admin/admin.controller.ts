@@ -31,11 +31,11 @@ import { User } from 'src/entities/user.entity';
 @ApiTags('Admin')
 @Controller('admin')
 export class AdminController {
-  
+
   constructor(
     private readonly sportCenterService: SportCenterService,
     private readonly adminService: AdminService,
-  ) {}
+  ) { }
 
   @Get('list/user')
   @ApiBearerAuth()
@@ -113,19 +113,8 @@ export class AdminController {
     summary:
       'Obtiene lista de sportcenter publicados o no publicados ordenados por rating de mayor a menor',
   })
-  async getSportCenters(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
-    @Query('rating') rating?: number,
-    @Query('search') search?: string,
-  ): Promise<SportCenterList> {
-    return await this.sportCenterService.getSportCenters(
-      page,
-      limit,
-      true,
-      rating,
-      search,
-    );
+  async getSportCenters(@Query('page') page: number = 1, @Query('limit') limit: number = 10, @Query('rating') rating?: number, @Query('search') search?: string,): Promise<SportCenterList> {
+    return await this.sportCenterService.getSportCenters(page, limit, true, rating, search,);
   }
 
   @Put('ban-unban/user/:id')
