@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, UseGuards, UsePipes } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiTags, PickType } from '@nestjs/swagger';
 import { LocalRegister } from 'src/dtos/user/local-register.dto';
@@ -17,6 +17,7 @@ export class AuthController {
 
 
   @Post('register')
+  // @UsePipes(TrimPipe)
   @ApiBody({ type: LocalRegister })
   @ApiOperation({ summary: 'Registro de usuario' })
   async userRegistration(@Body() userObject: LocalRegister): Promise<ApiResponse> {
