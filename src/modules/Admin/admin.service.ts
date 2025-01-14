@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { User } from 'src/entities/user.entity';
 import { ApiStatusEnum } from 'src/enums/HttpStatus.enum';
 import { ApiError } from 'src/helpers/api-error-class';
@@ -25,14 +30,24 @@ export class AdminService {
     private readonly centerService: SportCenterService,
     private readonly userService: UserService,
     private readonly auth0Service: Auth0Service,
+    @InjectRepository(User) private userRepository: Repository<User>,
   ) { }
 
 
+  async getPremiumUsers(): Promise<User[]> {
+    const usersQueryBuilder = this.userRepository.createQueryBuilder('user');
+
+    // Filter users that have a non-null stripeCustomerId
+    usersQueryBuilder.where('user.stripeCustomerId IS NOT NULL');
+
+    // Execute the query and get the result
+    const users = await usersQueryBuilder.getMany();
+    return users;
+  }
+
+
   async getUsers(page: number, limit: number): Promise<UserList> {
-    const found_users: UserList = await this.adminRepository.getUsers(
-      page,
-      limit,
-    );
+    const found_users: UserList = await this.adminRepository.getUsers(page, limit);
 
     if (found_users.users.length === 0) {
       throw new ApiError(ApiStatusEnum.USER_LIST_EMPTY, NotFoundException);
@@ -40,9 +55,13 @@ export class AdminService {
     return found_users;
   }
 
-
   // agregar error a enum
-  async getReservationByDate(page: number, limit: number, startDate: string, endDate: string): Promise<ReservationList> {
+  async getReservationByDate(
+    page: number,
+    limit: number,
+    startDate: string,
+    endDate: string,
+  ): Promise<ReservationList> {
     const validstartDate = new Date(startDate);
     const validendDate = new Date(endDate);
 
@@ -51,7 +70,12 @@ export class AdminService {
 
     }
 
-    const foundReservation: ReservationList = await this.adminRepository.getReservationByDate(page, limit, validstartDate, validendDate)
+    const foundReservation: ReservationList = await this.adminRepository.getReservationByDate(
+      page,
+      limit,
+      validstartDate,
+      validendDate,
+    );
 
     if (foundReservation.reservations.length === 0) {
       throw new ApiError(ApiStatusEnum.RESERVATION_NOT_FOUND, NotFoundException);
@@ -66,19 +90,18 @@ export class AdminService {
     try {
       const found_user: User = await this.userService.getUserById(id);
 
-      if(found_user.authtoken !== null) {
+      if (found_user.authtoken !== null) {
         await this.auth0Service.blockOrUnBlock(found_user);
 
       }
 
-      const [updated_user, status]: [User, string] = await this.adminRepository.banOrUnbanUser(found_user);
+      const [updated_user, status]: [User, string] =
+        await this.adminRepository.banOrUnbanUser(found_user);
 
       if (updated_user && status === 'deleted') {
         return { message: ApiStatusEnum.USER_DELETED };
-
       } else if (updated_user && status === 'restored') {
         return { message: ApiStatusEnum.USER_RESTORED };
-
       }
 
       throw new ApiError(ApiStatusEnum.USER_UNBAN_OR_BAN, BadRequestException, 'Something went wrong trying to modify this');
@@ -86,17 +109,20 @@ export class AdminService {
       throw new ApiError(error?.message, BadRequestException, error);
 
     }
-  }
 
+  }
 
   async banOrUnbanCenter(id: string, estado: Sport_Center_Status): Promise<ApiResponse> {
     const found_center: SportCenter = await this.centerService.getById(id, true);
 
     try {
-
-      if (estado === Sport_Center_Status.BANNED && found_center.fields.some((field) =>
-        field.reservation.some((reserva) => reserva.status === ReservationStatus.ACTIVE)
-      )
+      if (
+        estado === Sport_Center_Status.BANNED &&
+        found_center.fields.some((field) =>
+          field.reservation.some(
+            (reserva) => reserva.status === ReservationStatus.ACTIVE,
+          ),
+        )
       ) {
         return { message: ApiStatusEnum.CENTER_HAS_PENDING_RESERVATIONS };
 
@@ -105,21 +131,18 @@ export class AdminService {
       const changeCenter: SportCenter = await this.centerService.banOrUnban(id, estado);
       if (changeCenter) {
         return { message: ApiStatusEnum.CENTER_UPDATE_STATUS };
+
       }
 
       throw new ApiError(ApiStatusEnum.CENTER_UPDATE_STATUS_FAILED, InternalServerErrorException);
-
     } catch (error) {
       throw new ApiError(error?.message, InternalServerErrorException, error);
 
     }
-
   }
-
 
   async forceBan(id: string): Promise<ApiResponse> {
     try {
-
       const found_center: SportCenter = await this.centerService.getById(id, true);
 
       const forceBanPromises: Promise<Reservation>[] = [];
@@ -140,16 +163,13 @@ export class AdminService {
 
       if (changeCenter) {
         return { message: ApiStatusEnum.CENTER_UPDATE_STATUS };
+
       }
 
-      throw new ApiError(ApiStatusEnum.CENTER_DELETION_FAILED, InternalServerErrorException, "nothing updated");
-
+      throw new ApiError(ApiStatusEnum.CENTER_DELETION_FAILED, InternalServerErrorException, 'nothing updated');
     } catch (error) {
       throw new ApiError(error?.message, InternalServerErrorException, error);
-
+      
     }
-
   }
-
-
 }

@@ -45,6 +45,16 @@ export class UserController {
     }
 
 
+    @Get("verify")
+    @ApiBearerAuth()
+    @ApiOperation({
+        summary: "Peticion rapida para verificar el estado baneado de un usuario",
+        description: "La peticion no retorna informacion importante, solo es para pasar por el middleware de verificacion, y devolver un error en caso de que el usuario esté baneado"
+    })
+    async verifyUser(): Promise<any> {
+        return { verified: true };
+    }
+
 
     @Get("solo-para-testing/:id")
     @ApiParam({

@@ -19,6 +19,7 @@ import { CreateReservationDto } from 'src/dtos/reservation/reservation-create.dt
 import { AuthGuard } from 'src/guards/auth-guard.guard';
 import { Roles } from 'src/decorators/roles.decorator';
 import { UserRole } from 'src/enums/roles.enum';
+import { Reservation } from 'src/entities/reservation.entity';
 
 @ApiTags('Reservation')
 @Controller('reservation')
@@ -54,18 +55,13 @@ export class Reservation_Controller {
     description: 'ID de la reserva a cancelar',
     example: 'a3e3b2d0-4321-7856-0191-adecef103556',
   })
-  // @ApiBody({
-  //   description: 'Datos necesario para Cancelar la reserva',
-  //   schema: {
-  //     example: {
-  //       userId: 'e3d5c8f0-1234-5678-9101-abcdef123456',
-  //       cancelReason: 'no puedo asistir',
-  //     }
-  //   }
-  // })
-  async cancelReservation(@Param('id', ParseUUIDPipe) id: string): Promise<boolean> {
+  async cancelReservation(@Param('id', ParseUUIDPipe) id: string): Promise<Reservation> {
     return await this.reservationService.cancelReservation(id)
   }
+
+
+
+  
 
   // //en caso de modificar la fecha de la reserva, tener en cuenta el limite de tiempo necesario para esto
   // @Put('update')

@@ -19,6 +19,14 @@ export class SportCenterRepository {
   ) { }
 
 
+  async getTotalCenters(show_hidden: boolean): Promise<number | undefined> {
+    const total: [SportCenter[], number] = await this.sportCenterRepository.findAndCount();
+    const centers: SportCenterList = await this.getSportCenters(1, total[1], show_hidden);
+
+    return centers.items === 0 ? undefined : centers.items;
+  }
+
+
   async getManagerCenters(user: User): Promise<SportCenter[]> {
     return await this.sportCenterRepository.find({ where: { main_manager: user } });
   }
@@ -32,8 +40,7 @@ export class SportCenterRepository {
       ...new Set([...sportCenter.sport_categories, ...sportCategories]),
     ];
 
-    const saved_sportcenter: SportCenter =
-      await this.sportCenterRepository.save(sportCenter);
+    const saved_sportcenter: SportCenter = await this.sportCenterRepository.save(sportCenter);
 
     return saved_sportcenter === null ? undefined : saved_sportcenter;
   }
@@ -53,6 +60,8 @@ export class SportCenterRepository {
     const queryBuilder = this.sportCenterRepository
       .createQueryBuilder('sportcenter')
       .leftJoinAndSelect('sportcenter.photos', 'photos')
+      .leftJoinAndSelect('sportcenter.schedules', 'schedules')
+      .leftJoinAndSelect('sportcenter.fields', 'fields')
       .orderBy('sportcenter.averageRating', 'DESC', 'NULLS LAST');
 
     if (!show_hidden) {
@@ -70,7 +79,7 @@ export class SportCenterRepository {
     }
 
     if (rating !== undefined) {
-      queryBuilder.andWhere('sportcenter.averageRating <= :rating', { rating });
+      queryBuilder.andWhere('sportcenter.averageRating >= :rating', { rating });
     }
 
     // Get total count before pagination
@@ -81,15 +90,14 @@ export class SportCenterRepository {
 
     const centers = await queryBuilder.getMany();
 
+
+
     return {
       items: totalCount,
       page: Number(page),
       limit: Number(limit),
       total_pages: Math.ceil(totalCount / limit),
-      sport_centers: centers.map(center => ({
-        ...center,
-        photos: center.photos === undefined ? [] : center.photos.map(image => image.image_url)
-      }))
+      sport_centers: centers
     };
   }
 
@@ -110,7 +118,7 @@ export class SportCenterRepository {
 
   async findOne(id: string, relations: boolean): Promise<SportCenter | undefined> {
     const found_sportcenter: SportCenter = await this.sportCenterRepository.findOne({
-      where: { id: id }, relations: relations ? ['sport_categories', 'photos', "fields"] : []
+      where: { id: id }, relations: relations ? ['sport_categories', 'photos', "fields", "schedules"] : []
     });
 
     return found_sportcenter === null ? undefined : found_sportcenter;

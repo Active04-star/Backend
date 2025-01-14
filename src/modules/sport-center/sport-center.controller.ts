@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query, UseGuards, } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseBoolPipe, ParseUUIDPipe, Post, Query, UseGuards, } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiQuery, ApiTags, } from '@nestjs/swagger';
 import { SportCenterService } from './sport-center.service';
 import { CreateSportCenterDto } from 'src/dtos/sportcenter/createSportCenter.dto';
@@ -9,7 +9,7 @@ import { AuthGuard } from 'src/guards/auth-guard.guard';
 @ApiTags('Sport Center')
 @Controller('sportcenter')
 export class SportCenterController {
-  
+
   constructor(private readonly sportcenterService: SportCenterService) { }
 
   @Get('search')
@@ -46,6 +46,21 @@ export class SportCenterController {
   })
   async getSportCenters(@Query('page') page: number = 1, @Query('limit') limit: number = 10, @Query('rating') rating?: number, @Query('search') search?: string,): Promise<SportCenterList> {
     return await this.sportcenterService.getSportCenters(page, limit, false, rating, search,);
+  }
+
+
+  @Get("total/:hidden")
+  @ApiParam({
+    name: "hidden",
+    description: "Marcar true para conseguir el total incluyendo centros baneados",
+    type: Boolean
+  })
+  @ApiOperation({
+    summary: 'Consigue el total de canchas registradas hasta el momento',
+    description: "Util para verificacion de paginado"
+  })
+  async getTotalCenters(@Param("hidden", ParseBoolPipe) hidden: boolean): Promise<{ total: number }> {
+    return await this.sportcenterService.getTotalCenters(hidden);
   }
 
 

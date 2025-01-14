@@ -4,17 +4,16 @@ import { Reservation } from 'src/entities/reservation.entity';
 import { Reservation_Controller } from './reservation.controller';
 import { Reservation_Service } from './reservation.service';
 import { Reservation_Repository } from './reservation.repository';
-import { Field_Block_Module } from '../field_blocks/field_schedule.module';
 import { UserModule } from '../user/user.module';
 import { Field_Module } from '../field/field.module';
 import { notificationGateway } from '../notification.gateway.ts/websocket.gateway';
+import { Field_Block } from 'src/entities/field_blocks.entity';
 
 @Module({
   imports: [
     forwardRef(() => Field_Module),
-    Field_Block_Module,
     UserModule,
-    TypeOrmModule.forFeature([Reservation]),
+    TypeOrmModule.forFeature([Reservation,Field_Block]),
   ],
   controllers: [Reservation_Controller],
   providers: [Reservation_Service, Reservation_Repository, notificationGateway],

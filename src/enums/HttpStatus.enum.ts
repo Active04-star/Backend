@@ -61,6 +61,7 @@ export enum ApiStatusEnum {
   RESERVATION_CREATED = "Reservacion agendada exitosamente",
   RESERVATION_NOT_FOUND = 'No se encontró ninguna reserva',
   RESERVATION_ALREADY_CANCELED = 'Esta reserva ya fue cancelada',
+  RESERVATION_ALREADY_COMPLETED = 'Esta reserva ya esta activada',
   INVALID_RESERVATION_STATUS = 'Estado de la reserva invalido',
   RESERVATION_NOT_COMPLETED = "Se va a poder crear una reseña luego de la reserva haya sido completada",
 
@@ -72,6 +73,9 @@ export enum ApiStatusEnum {
   FIELD_BLOCK_CREATION_FAILED = 'Se produjo un error creando los bloques de las canchas',
   FIELD_BLOCK_NOT_FOUND = 'No se encontro el bloque de horario',
   FIELD_BLOCK_ALREADY_RESERVED = "Ya se reservo este horario",
+  SPORTCENTER_NEEDS_SCHEDULES_BEFORE = "Necesitas crear horarios para el centro antes de crear una cancha ",
+  CANT_CANCEL_RESERVATIONS = "No se pudo cancelar las reservas al eliminar una cancha",
+
 
   // Payments
   SUBSCRIPTION_PAYMENT_FAILED = 'No se pudo crear el pago de la subscripcion',
@@ -111,4 +115,5 @@ export enum ApiStatusEnum {
   TEST_ERROR = 'Error de prueba, debe ser eliminado en modo produccion!',
   RATING_OUT_OF_BOUNDS = "La calificacion debe estar entre 1 y 5",
   INVALID_DATE_FORMAT = "El formato de la fecha es invalido!",
+ 
 }
