@@ -27,7 +27,7 @@ export class Reservation_Service {
     @Inject(forwardRef(() => Field_Service)) private readonly field_service: Field_Service,
     private readonly userService: UserService,
     @InjectRepository(Field_Block)
-    private fieldBlockRepository:Repository<Field_Block>
+    private fieldBlockRepository: Repository<Field_Block>
   ) { }
 
 
@@ -92,17 +92,17 @@ export class Reservation_Service {
       throw new ApiError(ApiStatusEnum.RESERVATION_ALREADY_CANCELED, BadRequestException);
     }
 
-     const cancelled_reservation:Reservation=await this.reservationRepository.cancelReservation(reservation);
+    const cancelled_reservation: Reservation = await this.reservationRepository.cancelReservation(reservation);
 
-     const block:Field_Block=await this.fieldBlockRepository.findOne({
-      where:{id:reservation.fieldBlock.id}
+    const block: Field_Block = await this.fieldBlockRepository.findOne({
+      where: { id: reservation.fieldBlock.id }
 
-     })
+    })
 
-     block.status=BlockStatus.AVAILABLE
-     await this.fieldBlockRepository.save(block)
+    block.status = BlockStatus.AVAILABLE
+    await this.fieldBlockRepository.save(block)
 
-     return cancelled_reservation
+    return cancelled_reservation
 
   }
 
@@ -122,10 +122,10 @@ export class Reservation_Service {
 
 
   async getReservationUser(id: string): Promise<Reservation[]> {
-    const getReservation = await this.reservationRepository.getReservationByUser(id)
+    const getReservation: Reservation[] = await this.reservationRepository.getReservationByUser(id)
 
-    if (isEmpty(getReservation)) {
-      throw new ApiError(ApiStatusEnum.USER_NOT_FOUND);
+    if (getReservation.length === 0) {
+      throw new ApiError(ApiStatusEnum.RESERVATION_NOT_FOUND, NotFoundException);
     }
 
     return getReservation;
