@@ -46,8 +46,8 @@ export class AdminService {
   }
 
 
-  async getUsers(page: number, limit: number): Promise<UserList> {
-    const found_users: UserList = await this.adminRepository.getUsers(page, limit);
+  async getUsers(page: number, limit: number, search?: string): Promise<UserList> {
+    const found_users: UserList = await this.adminRepository.getUsers(page, limit, search);
 
     if (found_users.users.length === 0) {
       throw new ApiError(ApiStatusEnum.USER_LIST_EMPTY, NotFoundException);

@@ -12,67 +12,66 @@ export class Reservation_Repository {
     @InjectRepository(Reservation)
     private readonly reservationRepository: Repository<Reservation>,
     private readonly notificationGateway: notificationGateway,
-    private readonly mailService: MailerService
-  ) {}
+    // private readonly mailService: MailerService
+
+  ) { }
+
 
   async cancelReservation(reservation: Reservation): Promise<Reservation> {
-    reservation.status=ReservationStatus.CANCELLED
+    reservation.status = ReservationStatus.CANCELLED
     return await this.reservationRepository.save(reservation);
   }
 
   async findById(id: string): Promise<Reservation | undefined> {
     const found_reservation: Reservation | null =
-      await this.reservationRepository.findOne({ where: { id: id } ,relations:['fieldBlock','field']});
+      await this.reservationRepository.findOne({ where: { id: id }, relations: ['fieldBlock', 'field'] });
 
     return found_reservation === null ? undefined : found_reservation;
   }
 
-    async getReservationByUser(id: string): Promise<Reservation[]> {
-      return await this.reservationRepository
+  async getReservationByUser(id: string): Promise<Reservation[]> {
+    return await this.reservationRepository.find({ where: { user: { id: id } }, relations: { user: false } });
+  }
+
+  async getReservationById(id: string): Promise<Reservation> {
+    const reservation: Reservation | null = await this.reservationRepository.findOne({ where: { id: id } })
+    return reservation
+  }
+
+
+  async getResevationCron(): Promise<Reservation[]> {
+    const now = new Date(Date.now())
+    const oneHour = new Date(now)
+    oneHour.setHours(now.getHours() + 1);
+
+    const startRange = new Date(oneHour)
+    startRange.setSeconds(0, 0)
+
+    const endRange = new Date(oneHour)
+    endRange.setSeconds(59, 999)
+
+    return await this.reservationRepository
       .createQueryBuilder('reservation')
       .leftJoinAndSelect('reservation.user', 'user')
-      .where('user.id = :id', { id })
-      .getMany()
-    }
-
-    async getReservationById(id: string): Promise<Reservation> {
-      const reservation: Reservation | null = await this.reservationRepository.findOne( {where: {id: id}})
-      return reservation
-    }
-    
-
-    async getResevationCron(): Promise<Reservation[]> {
-      const now = new Date(Date.now())
-      const oneHour = new Date(now)
-      oneHour.setHours(now.getHours() + 1);
-
-      const startRange = new Date(oneHour)
-      startRange.setSeconds(0,0)
-
-      const endRange = new Date(oneHour)
-      endRange.setSeconds(59, 999)
-
-      return await this.reservationRepository
-      .createQueryBuilder('reservation')
-      .leftJoinAndSelect('reservation.user', 'user')
-      .where('reservation.status = :status', {status: 'active'})
+      .where('reservation.status = :status', { status: 'active' })
       .andWhere('reservation.date BETWEEN :startRange AND :endRange', {
-        startRange, 
-        endRange})
+        startRange,
+        endRange
+      })
       .getMany()
-    }
+  }
 
-    async notifyUser(reservation: Reservation) {
-      const message = `Tu reserva para ${reservation.id} comienza en 1 hora`;
-      this.notificationGateway.sendNotification(reservation.user.id, message)
-    }
+  async notifyUser(reservation: Reservation) {
+    const message = `Tu reserva para ${reservation.id} comienza en 1 hora`;
+    this.notificationGateway.sendNotification(reservation.user.id, message)
+  }
 
-    async reservationnotify(): Promise<Reservation[]> {
-      const now = new Date()
-      const nowUtc = new Date(Date.now())
+  async reservationnotify(): Promise<Reservation[]> {
+    const now = new Date()
+    const nowUtc = new Date(Date.now())
 
-      const startRangeUtc = new Date(Date.now() - 60 * 1000); // Hace un minuto en UTC
-      const reservations = await this.reservationRepository
+    const startRangeUtc = new Date(Date.now() - 60 * 1000); // Hace un minuto en UTC
+    const reservations = await this.reservationRepository
       .createQueryBuilder('reservation')
       .leftJoinAndSelect('reservation.field', 'field')
       .leftJoinAndSelect('field.sportcenter', 'sportcenter') 
@@ -88,12 +87,10 @@ export class Reservation_Repository {
 
     }
     
-
     async notifyreservationUser(reservation: Reservation) {
       const message = `Tines una nueva Reserva en tu cancha`;
       this.notificationGateway.sendNotification(reservation.field.sportcenter.main_manager.id, message)
     }
-
 
     // async sendWelcomeMail(user: { name: string, email: string }): Promise<void> {
     //   await this.mailService.sendMail({
@@ -109,8 +106,9 @@ export class Reservation_Repository {
     //   });
     // }
 
-    async completeReservation(reservation: Reservation): Promise<Reservation> {
-      reservation.status = ReservationStatus.COMPLETED
-      return await this.reservationRepository.save(reservation)
-    }
+  async completeReservation(reservation: Reservation): Promise<Reservation> {
+    reservation.status = ReservationStatus.COMPLETED
+    return await this.reservationRepository.save(reservation)
+  }
+
 }

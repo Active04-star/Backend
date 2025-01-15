@@ -42,6 +42,12 @@ export class AdminController {
   @UseGuards(AuthGuard)
   @Roles(UserRole.ADMIN)
   @ApiQuery({
+    name: 'search',
+    required: false,
+    type: String,
+    description: 'Palabra de busqueda',
+  })
+  @ApiQuery({
     name: 'page',
     required: true,
     type: Number,
@@ -59,11 +65,8 @@ export class AdminController {
     summary: 'Obtiene una lista de usuarios',
     description: 'debe ser ejecutado por un usuario con rol admin',
   })
-  async getUsers(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
-  ): Promise<UserList> {
-    return await this.adminService.getUsers(page, limit);
+  async getUsers(@Query('page') page: number = 1, @Query('limit') limit: number = 10, @Query("search") search?: string): Promise<UserList> {
+    return await this.adminService.getUsers(page, limit, search);
   }
 
   @Get('premiumUsers')
