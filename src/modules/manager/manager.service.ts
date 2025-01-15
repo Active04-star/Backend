@@ -28,12 +28,12 @@ export class ManagerService {
     //asigna deportes a un centro
   }
 
-  async publishSportCenter(
-    sportCenterId: string,
-  ): Promise<SportCenter> {
+  async publishSportCenter(id: string): Promise<SportCenter> {
+    console.log('iddd', id);
+
     const found_sportcenter = await this.sportCenterRepository.findOne({
-      where: { id: sportCenterId },
-      relations: ['schedules', 'fields','main_manager'],
+      where: { id: id },
+      relations: ['schedules', 'fields', 'main_manager'],
     });
 
     if (!found_sportcenter) {
@@ -49,14 +49,10 @@ export class ManagerService {
         BadRequestException,
       );
     }
+    console.log('amanger id?:', found_sportcenter.main_manager.id);
 
-
-
-    return await this.sportCenterService.updateStatus(
-      found_sportcenter.main_manager.id,
-      found_sportcenter.id,
-      Sport_Center_Status.PUBLISHED,
-    );
+  found_sportcenter.status=Sport_Center_Status.PUBLISHED
+  return await this.sportCenterRepository.save(found_sportcenter)
   }
 
   async getManagerSportCenter(id: string): Promise<SportCenter> {
