@@ -63,7 +63,7 @@ export class SportCenterController {
     return await this.sportcenterService.getTotalCenters(hidden);
   }
   
- 
+
   @Post('create')
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
