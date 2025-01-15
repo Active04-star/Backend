@@ -62,7 +62,7 @@ export class SportCenterController {
   async getTotalCenters(@Param("hidden", ParseBoolPipe) hidden: boolean): Promise<{ total: number }> {
     return await this.sportcenterService.getTotalCenters(hidden);
   }
-
+  
 
   @Post('create')
   @ApiBearerAuth()
@@ -91,7 +91,7 @@ export class SportCenterController {
     example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
   })
   async getById(@Param('id', ParseUUIDPipe) id: string): Promise<SportCenter> {
-    return await this.sportcenterService.getById(id);
+    return await this.sportcenterService.getById(id, true);
   }
 
 }
