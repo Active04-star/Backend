@@ -20,34 +20,42 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class Reservation_Service {
-
   constructor(
     private readonly dataSource: DataSource,
     private readonly reservationRepository: Reservation_Repository,
-    @Inject(forwardRef(() => Field_Service)) private readonly field_service: Field_Service,
+    @Inject(forwardRef(() => Field_Service))
+    private readonly field_service: Field_Service,
     private readonly userService: UserService,
     @InjectRepository(Field_Block)
-    private fieldBlockRepository: Repository<Field_Block>
-  ) { }
+    private fieldBlockRepository: Repository<Field_Block>,
+    @InjectRepository(Reservation)
+    private reservationRepo: Repository<Reservation>,
+  ) {}
 
-
-  async createReservation(data: CreateReservationDto): Promise<{ message: string, reservation: Reservation }> {
+  async createReservation(
+    data: CreateReservationDto,
+  ): Promise<{ message: string; reservation: Reservation }> {
     const { fieldBlockId, fieldId, userId, ...reservationData } = data;
 
     return await this.dataSource.transaction(async (manager) => {
       // Obtener el bloque con bloqueo pesimista
       const field_block = await manager.findOne(Field_Block, {
         where: { id: fieldBlockId },
-        lock: { mode: 'pessimistic_write' }
+        lock: { mode: 'pessimistic_write' },
       });
 
       if (!field_block) {
-        throw new ApiError(ApiStatusEnum.FIELD_BLOCK_NOT_FOUND, BadRequestException);
-
+        throw new ApiError(
+          ApiStatusEnum.FIELD_BLOCK_NOT_FOUND,
+          BadRequestException,
+        );
       }
 
       if (field_block.status === BlockStatus.RESERVED) {
-        throw new ApiError(ApiStatusEnum.FIELD_BLOCK_ALREADY_RESERVED, BadRequestException);
+        throw new ApiError(
+          ApiStatusEnum.FIELD_BLOCK_ALREADY_RESERVED,
+          BadRequestException,
+        );
       }
 
       // Obtener las demás entidades necesarias
@@ -60,7 +68,7 @@ export class Reservation_Service {
         fieldBlock: field_block,
         user,
         status: ReservationStatus.ACTIVE,
-        ...reservationData
+        ...reservationData,
       });
 
       field_block.status = BlockStatus.RESERVED;
@@ -70,75 +78,107 @@ export class Reservation_Service {
       const created_reservation = await manager.save(reservation);
 
       if (!created_reservation) {
-        throw new ApiError(ApiStatusEnum.CENTER_CREATION_FAILED, BadRequestException);
+        throw new ApiError(
+          ApiStatusEnum.CENTER_CREATION_FAILED,
+          BadRequestException,
+        );
       }
 
       return {
-        message: "Reservación creada exitosamente",
-        reservation: created_reservation
+        message: 'Reservación creada exitosamente',
+        reservation: created_reservation,
       };
     });
   }
 
-
   async cancelReservation(id: string): Promise<Reservation> {
-    const reservation: Reservation | undefined = await this.reservationRepository.findById(id);
+    const reservation: Reservation | undefined =
+      await this.reservationRepository.findById(id);
 
     if (reservation === undefined) {
-      throw new ApiError(ApiStatusEnum.RESERVATION_NOT_FOUND, NotFoundException);
+      throw new ApiError(
+        ApiStatusEnum.RESERVATION_NOT_FOUND,
+        NotFoundException,
+      );
     }
 
     if (reservation.status === ReservationStatus.CANCELLED) {
-      throw new ApiError(ApiStatusEnum.RESERVATION_ALREADY_CANCELED, BadRequestException);
+      throw new ApiError(
+        ApiStatusEnum.RESERVATION_ALREADY_CANCELED,
+        BadRequestException,
+      );
     }
 
-    const cancelled_reservation: Reservation = await this.reservationRepository.cancelReservation(reservation);
+    reservation.status = ReservationStatus.CANCELLED;
 
-    const block: Field_Block = await this.fieldBlockRepository.findOne({
-      where: { id: reservation.fieldBlock.id }
+    if (reservation.fieldBlock) {
+      const block: Field_Block | undefined =
+        await this.fieldBlockRepository.findOne({
+          where: { id: reservation.fieldBlock.id },
+          relations: ['reservation'], // Asegurarse de cargar la relación
+        });
 
-    })
+      if (block) {
+        // Cambiar el estado del bloque a AVAILABLE
+        block.status = BlockStatus.AVAILABLE;
 
-    block.status = BlockStatus.AVAILABLE
-    await this.fieldBlockRepository.save(block)
+        // Eliminar la relación entre el bloque y la reserva
+        block.reservation = null;
 
-    return cancelled_reservation
+        // Guardar los cambios en el bloque
+        await this.fieldBlockRepository.save(block);
+      }
 
+      // También eliminar la relación desde el lado de la reserva
+      reservation.fieldBlock = null;
+    }
+
+    return await this.reservationRepo.save(reservation);
   }
 
   async completeReservation(id: string): Promise<Reservation> {
-    const reservation: Reservation | undefined = await this.reservationRepository.findById(id);
+    const reservation: Reservation | undefined =
+      await this.reservationRepository.findById(id);
 
     if (reservation === undefined) {
-      throw new ApiError(ApiStatusEnum.RESERVATION_NOT_FOUND, NotFoundException);
+      throw new ApiError(
+        ApiStatusEnum.RESERVATION_NOT_FOUND,
+        NotFoundException,
+      );
     }
     if (reservation.status === ReservationStatus.COMPLETED) {
-      throw new ApiError(ApiStatusEnum.RESERVATION_ALREADY_COMPLETED, BadRequestException);
+      throw new ApiError(
+        ApiStatusEnum.RESERVATION_ALREADY_COMPLETED,
+        BadRequestException,
+      );
     }
-    const completedReservation: Reservation = await this.reservationRepository.completeReservation(reservation)
+    const completedReservation: Reservation =
+      await this.reservationRepository.completeReservation(reservation);
 
-    return completedReservation
+    return completedReservation;
   }
 
-
   async getReservationUser(id: string): Promise<Reservation[]> {
-    const getReservation: Reservation[] = await this.reservationRepository.getReservationByUser(id)
+    const getReservation: Reservation[] =
+      await this.reservationRepository.getReservationByUser(id);
 
     if (getReservation.length === 0) {
-      throw new ApiError(ApiStatusEnum.RESERVATION_NOT_FOUND, NotFoundException);
+      throw new ApiError(
+        ApiStatusEnum.RESERVATION_NOT_FOUND,
+        NotFoundException,
+      );
     }
 
     return getReservation;
   }
 
-
   async getReservationById(id: string): Promise<Reservation> {
-    const foundReservation = await this.reservationRepository.getReservationById(id)
+    const foundReservation =
+      await this.reservationRepository.getReservationById(id);
 
     if (isEmpty(foundReservation)) {
       throw new ApiError(ApiStatusEnum.RESERVATION_NOT_FOUND);
     }
-    return foundReservation
+    return foundReservation;
   }
-
 }
