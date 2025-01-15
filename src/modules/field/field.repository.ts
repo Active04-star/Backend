@@ -37,10 +37,7 @@ return await this.fieldRepository.find({where:{sportcenter:{id:sportCenterId},is
       where: {
         id
       },
-      relations: {
-        reservation:true,
-        blocks:true
-      },
+      relations:['reservation','blocks']
     });
 
     return field === null ? undefined : field;
