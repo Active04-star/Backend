@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Param,
   ParseUUIDPipe,
   Post,
@@ -60,8 +61,17 @@ export class Reservation_Controller {
   }
 
 
-
-  
+  @Get(":id")
+  @ApiOperation({
+    summary: "obtiene todas las reservas de un usuario"
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID de usuario',
+  })
+  async getReservations(@Param("id", ParseUUIDPipe) id: string): Promise<Reservation[]> {
+    return await this.reservationService.getReservationUser(id);
+  }
 
   // //en caso de modificar la fecha de la reserva, tener en cuenta el limite de tiempo necesario para esto
   // @Put('update')

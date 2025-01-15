@@ -1,15 +1,24 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, Length, IsString, IsEmail, Matches, Validate } from "class-validator";
-import { MatchPassword } from "src/validator/matchPassword";
+import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsNotEmpty,
+  Length,
+  IsString,
+  IsEmail,
+  Matches,
+  Validate,
+} from 'class-validator';
+import { MatchPassword } from 'src/validator/matchPassword';
 
 export class LocalRegister {
-
   @ApiProperty({
-    example: "Tom Howard",
+    example: 'Tom Howard',
   })
   @IsNotEmpty()
   @Length(3, 50)
   @IsString()
+  @Matches(/^[a-zA-Z\s]+$/, {
+    message: 'El nombre solo puede contener letras y espacios',
+  })
   name: string;
 
   @ApiProperty({
@@ -34,7 +43,7 @@ export class LocalRegister {
     },
   )
   password: string;
-  
+
   @ApiProperty({
     example: 'Password!1',
   })

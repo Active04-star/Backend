@@ -19,9 +19,15 @@ import { ApiStatusEnum } from 'src/enums/HttpStatus.enum';
 import { ApiError } from 'src/helpers/api-error-class';
 import { Sport_Category } from 'src/entities/sport_category.entity';
 import { Field_Block_Service } from '../field_blocks/field_schedule.service';
+import { BlockStatus, Field_Block } from 'src/entities/field_blocks.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Reservation } from 'src/entities/reservation.entity';
+import { Between, Repository } from 'typeorm';
+import { startOfDay, endOfDay } from 'date-fns';
 
 @Injectable()
 export class Field_Service {
+
   constructor(
     private readonly fieldRepository: Field_Repository,
     private sportCenterService: SportCenterService,
@@ -30,8 +36,36 @@ export class Field_Service {
     private reservationService: Reservation_Service,
     @Inject(forwardRef(() => Field_Block_Service))
     private fieldblockService: Field_Block_Service,
+    @InjectRepository(Reservation)
+    private reservationRepository:Repository<Reservation>
   ) {}
 
+
+  async getAvailableBlocks(fieldId: string, date: Date): Promise<Field_Block[]> {
+    const field = await this.fieldRepository.findById(fieldId);
+
+    if (!field) {
+      throw new NotFoundException('Field not found');
+    }
+
+    const reservations = await this.reservationRepository.find({
+      where: {
+        field: { id: fieldId },
+        date: Between(
+          startOfDay(date),
+          endOfDay(date)
+        ),
+      },
+      relations: ['fieldBlock'],
+    });
+
+    const reservedBlockIds = reservations.map(res => res.fieldBlock.id);
+
+    return field.blocks.map(block => ({
+      ...block,
+      status: reservedBlockIds.includes(block.id) ? BlockStatus.RESERVED : BlockStatus.AVAILABLE
+    }));
+  }
   async updateField(id: string, data: UpdateFieldDto): Promise<Field> {
     const field = await this.fieldRepository.findById(id);
     const updatedField = await this.fieldRepository.updateField(field, data);

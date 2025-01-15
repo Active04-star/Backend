@@ -1,5 +1,5 @@
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Put, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Field_Service } from './field.service';
 import { FieldDto } from 'src/dtos/field/createField.dto';
 import { UpdateFieldDto } from 'src/dtos/field/updateField.dto';
@@ -12,6 +12,18 @@ import { Roles } from 'src/decorators/roles.decorator';
 @Controller('field')
 export class Field_Controller {
   constructor(private readonly fieldService: Field_Service) { }
+
+
+  @Get(':fieldId/blocks')
+  @ApiOperation({ summary: 'Get available blocks for a field on a specific date' })
+  @ApiParam({ name: 'fieldId', type: 'string' })
+  @ApiQuery({ name: 'date', type: 'string', required: true })
+  async getAvailableBlocks(
+    @Param('fieldId') fieldId: string,
+    @Query('date') date: string
+  ) {
+    return this.fieldService.getAvailableBlocks(fieldId, new Date(date));
+  }
 
   @Post()
   @Roles(UserRole.MANAGER, UserRole.MAIN_MANAGER)

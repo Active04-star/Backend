@@ -15,19 +15,29 @@ export class AdminRepository {
   ) { }
 
 
-  async getUsers(page: number, limit: number): Promise<UserList> {
-    const [users, total] = await this.userRepository.findAndCount({
-      skip: (page - 1) * limit,
-      take: limit,
-    });
+  async getUsers(page: number, limit: number, keyword?: string): Promise<UserList> {
+    const queryBuilder = this.userRepository
+      .createQueryBuilder('users');
+
+    if (keyword) {
+      queryBuilder.andWhere(
+        '(LOWER(users.name) LIKE LOWER(:keyword) OR LOWER(users.email) LIKE LOWER(:keyword))',
+        { keyword: `%${keyword}%` },
+      );
+    }
+
+    const totalCount = await queryBuilder.getCount();
+
+    queryBuilder.skip((page - 1) * limit).take(limit);
+
+    const users = await queryBuilder.getMany();
+
     return {
-      items: total,
+      items: totalCount,
       page: Number(page),
       limit: Number(limit),
-      total_pages: Math.ceil(total / limit),
-      users: users.map(
-        ({ password, ...userWithoutPassword }) => userWithoutPassword,
-      ),
+      total_pages: Math.ceil(totalCount / limit),
+      users: users,
     };
   }
 
@@ -48,7 +58,7 @@ export class AdminRepository {
     };
   }
 
-  
+
   async banOrUnbanUser(
     userToModify: User,
   ): Promise<[User, 'deleted' | 'restored']> {

@@ -131,40 +131,18 @@ export class ManagerController{
     return await this.reservationService.completeReservation(id);
   }
 
-  //ESTA RUTA VA A QUEDAR COMO EXTRA, EL USUARIO VA A TENER SOLAMENTE UN CENTRO , VERFICAR SI EL CENTRO TIENE CANCHAS CON RESERVAS, NO PUEDE CANCELARSLAS , SINO ESPERAR QUE NO TENGA MAS O UN PERIDOD DE TIEMPO(CRONS,EXTRA) PARA QUE EL CENTRO SE ELIMINE Y EL USUARIO PIERDA SU ROL DE MAIN_MANAGER
-  // @Delete('ban-unban/:id')
-  // @ApiOperation({
-  //   summary: 'Elimina un Centro deportivo',
-  //   description:
-  //     'Esta ruta permite eliminar un centro deportivo (SportCenter) de la base de datos. Si el usuario que lo gestiona (manager) tiene el rol de MANAGER, su rol se va a ver afectado y el usuario va a dejar de ser main_manager',
-  // })
-  // @ApiParam({
-  //   name: 'id',
-  //   description: 'ID del Centro deportivo a eliminar',
-  //   example: 'e3d5c8f0-1234-5678-9101-abcdef123456',
-  // })
-  // async banOrUnBanCenter(@Param('id', ParseUUIDPipe) id: string): Promise<ApiResponse> {
-  //   return await this.sportCenterService.banOrUnBanCenter(id);
-  // }
-
-  @Put('publish/:id')
-  // @Roles(UserRole.MAIN_MANAGER)
-  // @UseGuards(AuthGuard)
+  @Put('sportcenter/publish/:id')
+  @Roles(UserRole.MAIN_MANAGER)
+  @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOperation({
     summary:
       'Activa un SportCenter (todavia no esta implementado, se va a usar para que se asegure que el centro ya tenga un horario asignado y canchas mas deportes y no se vea en el feed vacio',
     description: 'Activa un centro deportivo asociado a un usuario.',
   })
-  @ApiParam({
-    name: 'id',
-    description: 'ID de la reserva',
-    example: 'a1b2c3d4-5678-9101-1121-abcdef654321',
-  })
-  async publishSportCenter(
-    @Param('userId', ParseUUIDPipe) userId: string,
-    @Param('sportCenterId', ParseUUIDPipe) sportCenterId: string,
-  ) {
-    return await this.managerService.publishSportCenter(userId, sportCenterId);
+  async publishSportCenter(@Param('id', ParseUUIDPipe) id: string) {
+    console.log(id);
+    
+    return await this.managerService.publishSportCenter(id);
   }
 }
