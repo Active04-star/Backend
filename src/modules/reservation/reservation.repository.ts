@@ -4,6 +4,7 @@ import { Reservation } from 'src/entities/reservation.entity';
 import { Repository } from 'typeorm';
 import { notificationGateway } from '../notification.gateway.ts/websocket.gateway';
 import { ReservationStatus } from 'src/enums/reservationStatus.enum';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class Reservation_Repository {
@@ -11,7 +12,10 @@ export class Reservation_Repository {
     @InjectRepository(Reservation)
     private readonly reservationRepository: Repository<Reservation>,
     private readonly notificationGateway: notificationGateway,
+    // private readonly mailService: MailerService
+
   ) { }
+
 
   async cancelReservation(reservation: Reservation): Promise<Reservation> {
     reservation.status = ReservationStatus.CANCELLED
@@ -69,24 +73,42 @@ export class Reservation_Repository {
     const startRangeUtc = new Date(Date.now() - 60 * 1000); // Hace un minuto en UTC
     const reservations = await this.reservationRepository
       .createQueryBuilder('reservation')
-      .leftJoinAndSelect('reservation.user', 'user')
-      .where('reservation.status = :status', { status: 'active' })
-      .andWhere('reservation.createdAt BETWEEN :startRangeUtc AND :now', { startRangeUtc: startRangeUtc.toISOString(), now: nowUtc.toISOString() })
+      .leftJoinAndSelect('reservation.field', 'field')
+      .leftJoinAndSelect('field.sportcenter', 'sportcenter') 
+      .leftJoinAndSelect('sportcenter.main_manager', 'main_manager')  
+      .where('reservation.status = :status', {status: 'active'})
+      .andWhere('reservation.createdAt BETWEEN :startRangeUtc AND :now', {startRangeUtc: startRangeUtc.toISOString(), now: nowUtc.toISOString()})
       .getMany()
+      
+      if (!reservations || reservations.length === 0) {
+        console.log("No se encontraron reservas dentro del rango especificado.");
+      }
+      return reservations
 
-    if (!reservations || reservations.length === 0) {
-      console.log("No se encontraron reservas dentro del rango especificado.");
     }
-    return reservations
-  }
+    
+    async notifyreservationUser(reservation: Reservation) {
+      const message = `Tines una nueva Reserva en tu cancha`;
+      this.notificationGateway.sendNotification(reservation.field.sportcenter.main_manager.id, message)
+    }
 
-  async notifyreservationUser(reservation: Reservation) {
-    const message = `Tu reserva ah sido registrada correctamente`;
-    this.notificationGateway.sendNotification(reservation.user.id, message)
-  }
+    // async sendWelcomeMail(user: { name: string, email: string }): Promise<void> {
+    //   await this.mailService.sendMail({
+    //     from: 'ActiveProject <activeproject04@gmail.com>',
+    //     to: user.email,
+    //     subject: 'Welcome to our app',
+    //     template: 'registration',
+    //     context: {
+    //       name: user.name,
+    //       contactEmail: 'activeproject04@gmail.com',
+    //     }
+  
+    //   });
+    // }
 
   async completeReservation(reservation: Reservation): Promise<Reservation> {
     reservation.status = ReservationStatus.COMPLETED
     return await this.reservationRepository.save(reservation)
   }
+
 }
