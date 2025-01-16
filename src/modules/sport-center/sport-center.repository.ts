@@ -118,7 +118,7 @@ export class SportCenterRepository {
 
   async findOne(id: string, relations: boolean): Promise<SportCenter | undefined> {
     const found_sportcenter: SportCenter = await this.sportCenterRepository.findOne({
-      where: { id: id }, relations: relations ? ['sport_categories', 'photos', "fields", "schedules"] : []
+      where: { id: id }, relations: relations ? ['sport_categories', 'photos', "fields", "schedules","main_manager"] : []
     });
 
     return found_sportcenter === null ? undefined : found_sportcenter;
