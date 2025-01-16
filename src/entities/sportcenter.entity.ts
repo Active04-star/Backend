@@ -28,6 +28,12 @@ export class SportCenter {
   @Column({ length: 120 })
   address: string;
 
+  @Column('float', { nullable: true })
+  latitude: number;
+
+  @Column('float', { nullable: true })
+  longitude: number;
+  
   @Column({
     type: 'float',
     default: 0,
@@ -59,13 +65,13 @@ export class SportCenter {
 
   @OneToMany(() => SportCenter_Schedule, (schedule) => schedule.sportcenter, {
     cascade: true,
-    onDelete:'CASCADE'
+    onDelete: 'CASCADE',
   })
   schedules: SportCenter_Schedule[];
 
   @OneToMany(() => Field, (field) => field.sportcenter, {
     cascade: true,
-    onDelete:'CASCADE'
+    onDelete: 'CASCADE',
   })
   fields: Field[];
 
@@ -75,7 +81,8 @@ export class SportCenter {
   managers_list: Sport_Center_Managers[];
 
   @ManyToOne(() => User, (user) => user.managed_centers, {
-    nullable: false, cascade: ["update", "remove"]
+    nullable: false,
+    cascade: ['update', 'remove'],
   })
   main_manager: User;
 

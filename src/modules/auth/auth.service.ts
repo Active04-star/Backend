@@ -5,7 +5,15 @@ import { User } from 'src/entities/user.entity';
 import { isNotEmpty } from 'class-validator';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { BadRequestException, ConflictException, ForbiddenException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UserClean } from 'src/dtos/user/user-clean.dto';
 import { ApiStatusEnum } from 'src/enums/HttpStatus.enum';
 import { LoginResponse } from 'src/dtos/user/login-response.dto';
@@ -17,41 +25,45 @@ import { Auth0Service } from '../auth0/auth0.service';
 
 @Injectable()
 export class AuthService {
-
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly mailService: MailerService,
-    private readonly auth0Service: Auth0Service
-  ) { }
+    private readonly auth0Service: Auth0Service,
+  ) {}
 
-
-  async updatePassword(id: string, credentials: Pick<LocalRegister, "password" | "confirm_password">): Promise<ApiResponse> {
+  async updatePassword(
+    id: string,
+    credentials: Pick<LocalRegister, 'password' | 'confirm_password'>,
+  ): Promise<ApiResponse> {
     const { password, confirm_password } = credentials;
 
     if (password !== confirm_password) {
-      throw new ApiError(ApiStatusEnum.PASSWORDS_DONT_MATCH, BadRequestException);
+      throw new ApiError(
+        ApiStatusEnum.PASSWORDS_DONT_MATCH,
+        BadRequestException,
+      );
     }
 
     const user: User | undefined = await this.userService.getUserById(id);
-    let is_same_password
+    let is_same_password;
 
-    if(user === undefined) {
+    if (user === undefined) {
       throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, NotFoundException);
     }
 
-    if(user.password !== null) {
+    if (user.password !== null) {
       is_same_password = await bcrypt.compare(password, user.password);
     } else {
       is_same_password = false;
     }
 
-
     if (isNotEmpty(user)) {
-
       if (is_same_password) {
-        throw new ApiError(ApiStatusEnum.PASSWORD_SAME_AS_OLD, BadRequestException);
-
+        throw new ApiError(
+          ApiStatusEnum.PASSWORD_SAME_AS_OLD,
+          BadRequestException,
+        );
       }
 
       const hashed_password = await bcrypt.hash(password, 10);
@@ -67,17 +79,15 @@ export class AuthService {
       await this.userService.updateUser(user.id, { password: hashed_password });
 
       return { message: ApiStatusEnum.PASSWORD_UPDATE_SUCCESS };
- 
     }
 
     throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, NotFoundException);
-
   }
-
 
   async getAuthType(email: string): Promise<ApiResponse> {
     const lower_mail = email.toLowerCase();
-    const user: User | undefined = await this.userService.getUserByMail(lower_mail);
+    const user: User | undefined =
+      await this.userService.getUserByMail(lower_mail);
 
     if (isNotEmpty(user) && user.was_banned) {
       throw new ApiError(ApiStatusEnum.USER_DELETED, ForbiddenException);
@@ -85,20 +95,17 @@ export class AuthService {
 
     if (isNotEmpty(user) && user.password !== null) {
       return { message: ApiStatusEnum.USER_IS_LOCAL };
-
     }
 
     if (isNotEmpty(user) && user.authtoken !== null && user.password === null) {
       return { message: ApiStatusEnum.USER_IS_THIRD_PARTY };
-
     }
 
     throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, BadRequestException);
   }
 
-
   async userRegistration(userObject: LocalRegister): Promise<ApiResponse> {
-    let id: string = "";
+    let id: string = '';
 
     try {
       const { email, password, confirm_password, ...rest_user } = userObject;
@@ -106,8 +113,10 @@ export class AuthService {
       const lower_mail = email.toLowerCase();
 
       if (password !== confirm_password) {
-        throw new ApiError(ApiStatusEnum.PASSWORDS_DONT_MATCH, BadRequestException);
-
+        throw new ApiError(
+          ApiStatusEnum.PASSWORDS_DONT_MATCH,
+          BadRequestException,
+        );
       }
 
       const is_existent: User | undefined =
@@ -131,14 +140,16 @@ export class AuthService {
 
       id = created.id;
 
-      await this.auth0Service.syncUser({ name: rest_user.name, email: lower_mail, password, id: created.id });
+      await this.auth0Service.syncUser({
+        name: rest_user.name,
+        email: lower_mail,
+        password,
+        id: created.id,
+      });
 
-
-
-      await this.sendWelcomeMail({ name: rest_user.name, email: lower_mail });
+      // await this.sendWelcomeMail({ name: rest_user.name, email: lower_mail });
 
       return { message: ApiStatusEnum.REGISTRATION_SUCCESS };
-
     } catch (error) {
       if (isNotEmpty(id)) {
         await this.userService.deleteUser(id);
@@ -148,9 +159,8 @@ export class AuthService {
     }
   }
 
-
   async adminRegistration(userObject: LocalRegister): Promise<ApiResponse> {
-    let id: string = "";
+    let id: string = '';
     console.log(userObject);
 
     try {
@@ -159,11 +169,14 @@ export class AuthService {
       const lower_mail = email.toLowerCase();
 
       if (password !== confirm_password) {
-        throw new ApiError(ApiStatusEnum.PASSWORDS_DONT_MATCH, BadRequestException);
-
+        throw new ApiError(
+          ApiStatusEnum.PASSWORDS_DONT_MATCH,
+          BadRequestException,
+        );
       }
 
-      const is_existent: User | undefined = await this.userService.getUserByMail(lower_mail);
+      const is_existent: User | undefined =
+        await this.userService.getUserByMail(lower_mail);
 
       if (isNotEmpty(is_existent)) {
         throw new ApiError(ApiStatusEnum.MAIL_IN_USE, ConflictException);
@@ -173,7 +186,6 @@ export class AuthService {
 
       if (!hashed_password) {
         throw new ApiError(ApiStatusEnum.HASHING_FAILED, BadRequestException);
-
       }
 
       const created: UserClean = await this.userService.createAdmin({
@@ -184,12 +196,16 @@ export class AuthService {
 
       id = created.id;
 
-      await this.auth0Service.syncUser({ name: rest_user.name, email: lower_mail, password, id: created.id });
+      await this.auth0Service.syncUser({
+        name: rest_user.name,
+        email: lower_mail,
+        password,
+        id: created.id,
+      });
 
       await this.sendWelcomeMail({ name: rest_user.name, email: lower_mail });
 
       return { message: ApiStatusEnum.REGISTRATION_SUCCESS };
-
     } catch (error) {
       if (isNotEmpty(id)) {
         await this.userService.deleteUser(id);
@@ -199,14 +215,13 @@ export class AuthService {
     }
   }
 
-
   async loginOrRegister(userObject: AuthRegister): Promise<LoginResponse> {
     const { email, sub, ...rest } = userObject;
     const lower_mail = email.toLowerCase();
 
     try {
-
-      const found_user: User | undefined = await this.userService.getUserByMail(lower_mail);
+      const found_user: User | undefined =
+        await this.userService.getUserByMail(lower_mail);
 
       let created: UserClean;
 
@@ -214,33 +229,26 @@ export class AuthService {
         created = await this.userService.createUser(userObject);
         this.sendWelcomeMail({ name: rest.name, email: lower_mail });
         return this.signToken(created);
-
       } else {
-
         if (sub === found_user.authtoken) {
           return this.signToken(found_user);
-
         } else if (found_user.authtoken === null) {
           await this.userService.putAuthToken(found_user, sub);
           return this.signToken(found_user);
-
         } else {
           throw new ApiError(ApiStatusEnum.UNKNOWN_ERROR, BadRequestException);
-
         }
-
       }
-
     } catch (error) {
       throw new ApiError(error?.message, InternalServerErrorException, error);
-
     }
-
   }
 
-
-  private async sendWelcomeMail(user: { name: string, email: string }): Promise<void> {
-    console.log(this.mailService['transporter'].options);   //BORRAR SOLO ES PARA PRUEBA
+  private async sendWelcomeMail(user: {
+    name: string;
+    email: string;
+  }): Promise<void> {
+    console.log(this.mailService['transporter'].options); //BORRAR SOLO ES PARA PRUEBA
     await this.mailService.sendMail({
       from: 'ActiveProject <activeproject04@gmail.com>',
       to: user.email,
@@ -249,11 +257,9 @@ export class AuthService {
       context: {
         name: user.name,
         contactEmail: 'activeproject04@gmail.com',
-      }
-
+      },
     });
   }
-
 
   private signToken(user: UserClean): LoginResponse {
     const token = this.jwtService.sign({
@@ -279,22 +285,23 @@ export class AuthService {
     };
   }
 
-
   async userLogin(userCredentials: UserLogin): Promise<LoginResponse> {
     const { email, password } = userCredentials;
     const lower_mail = email.toLowerCase();
 
-    const user: User | undefined = await this.userService.getUserByMail(lower_mail);
+    const user: User | undefined =
+      await this.userService.getUserByMail(lower_mail);
 
     if (isNotEmpty(user) && user.was_banned) {
       throw new ApiError(ApiStatusEnum.USER_DELETED, ForbiddenException);
     }
 
     if (isNotEmpty(user)) {
-
       if (user.password === null && user.authtoken !== null) {
-        throw new ApiError(ApiStatusEnum.USER_IS_THIRD_PARTY, BadRequestException);
-
+        throw new ApiError(
+          ApiStatusEnum.USER_IS_THIRD_PARTY,
+          BadRequestException,
+        );
       }
 
       const is_valid_password = await bcrypt.compare(password, user.password);
@@ -304,7 +311,9 @@ export class AuthService {
       }
     }
 
-    throw new ApiError(ApiStatusEnum.INVALID_CREDENTIALS, UnauthorizedException);
+    throw new ApiError(
+      ApiStatusEnum.INVALID_CREDENTIALS,
+      UnauthorizedException,
+    );
   }
-
 }
