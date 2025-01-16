@@ -1,10 +1,11 @@
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Put } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Put, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { reviewCreate } from 'src/dtos/review/review-create.dto';
 import { reviewUpdate } from 'src/dtos/review/review-update.dto';
 import { Review } from 'src/entities/review.entity';
 import { ReviewService } from './review.service';
 import { ApiResponse } from 'src/dtos/api-response';
+import { AuthGuard } from 'src/guards/auth-guard.guard';
 
 // endpoint para ordenar reseñas por puntuacion
 // endpoint para contar la cantidad de reseñas
@@ -38,6 +39,8 @@ export class ReviewController {
 
   
   @Post('create')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Registra una nueva Reseña', description: 'Crea una nueva reseña en el sistema', })
   @ApiBody({
     description: 'Datos para la creacion de la reseña', schema: {

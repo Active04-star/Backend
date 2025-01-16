@@ -7,8 +7,9 @@ export enum ApiStatusEnum {
   TOKEN_NOT_FOUND = 'No se encontró ningún token en esta solicitud',
   NO_TOKEN_PROVIDED = "No se proporcionó ningún token",
   INVALID_TOKEN = "el token es invalido o ha expirado",
+  TOKEN_SIGN_SUCCESSFUL="firma de token exitosa",
 
-  // Registration
+  // Registration 
   REGISTRATION_FAIL = 'Error al registrar el usuario',
   REGISTRATION_SUCCESS = 'Registrado correctamente',
   MAIL_IN_USE = 'Este correo ya esta registrado!',

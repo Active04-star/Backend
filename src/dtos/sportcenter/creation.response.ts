@@ -4,10 +4,10 @@ import { Type } from "@nestjs/class-transformer";
 import { User } from "src/entities/user.entity";
 import { ApiStatusEnum } from "src/enums/HttpStatus.enum";
 
-export class LoginResponse {
+export class CenterCreationResponse {
     @IsNotEmpty()
     @IsString()
-    message: ApiStatusEnum.LOGIN_SUCCESS | ApiStatusEnum.REGISTRATION_SUCCESS| ApiStatusEnum.TOKEN_SIGN_SUCCESSFUL
+    message:  ApiStatusEnum.TOKEN_SIGN_SUCCESSFUL
 
     @IsNotEmpty()
     @IsString()
