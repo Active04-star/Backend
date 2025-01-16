@@ -5,6 +5,7 @@ import { CreateSportCenterDto } from 'src/dtos/sportcenter/createSportCenter.dto
 import { SportCenter } from 'src/entities/sportcenter.entity';
 import { SportCenterList } from 'src/dtos/sportcenter/sport-center-list.dto';
 import { AuthGuard } from 'src/guards/auth-guard.guard';
+import { CenterCreationResponse } from 'src/dtos/sportcenter/creation.response';
 
 @ApiTags('Sport Center')
 @Controller('sportcenter')
@@ -75,7 +76,7 @@ export class SportCenterController {
     description: 'Datos necesarios para crear un nuevo SportCenter',
     type: CreateSportCenterDto,
   })
-  async createSportCenter(@Body() data: CreateSportCenterDto,): Promise<SportCenter> {
+  async createSportCenter(@Body() data: CreateSportCenterDto): Promise<CenterCreationResponse> {
     return await this.sportcenterService.createSportCenter(data);
   }
 
