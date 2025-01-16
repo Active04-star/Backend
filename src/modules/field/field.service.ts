@@ -59,8 +59,10 @@ export class Field_Service {
       relations: ['fieldBlock'],
     });
 
-    const reservedBlockIds = reservations.map(res => res.fieldBlock.id);
-
+    const reservedBlockIds = reservations
+    .filter(res => res.fieldBlock !== null)
+    .map(res => res.fieldBlock.id);
+    
     return field.blocks.map(block => ({
       ...block,
       status: reservedBlockIds.includes(block.id) ? BlockStatus.RESERVED : BlockStatus.AVAILABLE
