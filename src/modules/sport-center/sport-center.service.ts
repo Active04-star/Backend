@@ -163,7 +163,8 @@ export class SportCenterService {
         );
       }
 
-      await this.userService.rankUpTo(future_manager, UserRole.MAIN_MANAGER);
+     future_manager.role=UserRole.MAIN_MANAGER
+     await this.userRepository.save(future_manager)
 
       id = created_sportcenter.id;
       await this.getById(id);
