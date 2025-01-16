@@ -23,14 +23,11 @@ export class Reservation_Service {
   constructor(
     private readonly dataSource: DataSource,
     private readonly reservationRepository: Reservation_Repository,
-    @Inject(forwardRef(() => Field_Service))
-    private readonly field_service: Field_Service,
+    @Inject(forwardRef(() => Field_Service)) private readonly field_service: Field_Service,
     private readonly userService: UserService,
-    @InjectRepository(Field_Block)
-    private fieldBlockRepository: Repository<Field_Block>,
-    @InjectRepository(Reservation)
-    private reservationRepo: Repository<Reservation>,
-  ) {}
+    @InjectRepository(Field_Block) private fieldBlockRepository: Repository<Field_Block>,
+    @InjectRepository(Reservation) private reservationRepo: Repository<Reservation>,
+  ) { }
 
   async createReservation(
     data: CreateReservationDto,
@@ -58,6 +55,9 @@ export class Reservation_Service {
         );
       }
 
+      field_block.status = BlockStatus.RESERVED;
+      await manager.save(Field_Block, field_block);
+
       // Obtener las demás entidades necesarias
       const user = await this.userService.getUserById(userId);
       const field = await this.field_service.findById(fieldId);
@@ -71,12 +71,13 @@ export class Reservation_Service {
         ...reservationData,
       });
 
-      field_block.status = BlockStatus.RESERVED;
-      await manager.save(Field_Block, field_block);
-
+    
       // Guardar la reservación
       const created_reservation = await manager.save(reservation);
 
+
+      console.log('created reservation',created_reservation);
+      
       if (!created_reservation) {
         throw new ApiError(
           ApiStatusEnum.CENTER_CREATION_FAILED,
@@ -111,6 +112,9 @@ export class Reservation_Service {
 
     reservation.status = ReservationStatus.CANCELLED;
 
+    console.log('reservation',reservation);
+    
+
     if (reservation.fieldBlock && reservation.field) {
       const block: Field_Block | undefined =
         await this.fieldBlockRepository.findOne({
@@ -131,7 +135,6 @@ export class Reservation_Service {
 
       // También eliminar la relación desde el lado de la reserva
       reservation.fieldBlock = null;
-      reservation.field = null;
     } else {
       throw new ApiError(
         ApiStatusEnum.
@@ -175,7 +178,12 @@ export class Reservation_Service {
       );
     }
 
-    return getReservation;
+    return getReservation.map((x) => {
+      const reservation = x;
+      reservation.date = new Date(x.fieldBlock.start_time);
+      return reservation;
+    });
+
   }
 
   async getReservationById(id: string): Promise<Reservation> {

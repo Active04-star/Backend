@@ -8,6 +8,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class Reservation_Repository {
+
   constructor(
     @InjectRepository(Reservation)
     private readonly reservationRepository: Repository<Reservation>,
@@ -21,6 +22,7 @@ export class Reservation_Repository {
     return await this.reservationRepository.save(reservation);
   }
 
+
   async findById(id: string): Promise<Reservation | undefined> {
     const found_reservation: Reservation | null =
       await this.reservationRepository.findOne({ where: { id: id }, relations: ['fieldBlock', 'field'] });
@@ -28,9 +30,11 @@ export class Reservation_Repository {
     return found_reservation === null ? undefined : found_reservation;
   }
 
+
   async getReservationByUser(id: string): Promise<Reservation[]> {
-    return await this.reservationRepository.find({ where: { user: { id: id } }, relations: { user: false } });
+    return await this.reservationRepository.find({ where: { user: { id: id } }, relations: { user: false, fieldBlock: true } });
   }
+
 
   async getReservationById(id: string): Promise<Reservation> {
     const reservation: Reservation | null = await this.reservationRepository.findOne({ where: { id: id } })
@@ -60,13 +64,15 @@ export class Reservation_Repository {
       .getMany()
   }
 
+
   async notifyUser(reservation: Reservation) {
     const message = `Tu reserva para ${reservation.id} comienza en 1 hora`;
     this.notificationGateway.sendNotification(reservation.user.id, message)
   }
 
+
   async reservationnotify(): Promise<Reservation[]> {
-    const now = new Date()
+    // const now = new Date()
     const nowUtc = new Date(Date.now())
 
     const startRangeUtc = new Date(Date.now() - 3600 * 1000); // Hace un minuto en UTC
@@ -109,6 +115,7 @@ export class Reservation_Repository {
   
       });
     }
+
 
   async completeReservation(reservation: Reservation): Promise<Reservation> {
     reservation.status = ReservationStatus.COMPLETED

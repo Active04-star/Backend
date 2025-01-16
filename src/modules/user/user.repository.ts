@@ -80,9 +80,8 @@ export class UserRepository {
     return found_user === null ? undefined : found_user;
   }
 
-  async createUser(
-    userObject: Omit<LocalRegister, 'confirm_password'> | AuthRegister,
-  ): Promise<User> {
+
+  async createUser(userObject: Omit<LocalRegister, 'confirm_password'> | AuthRegister): Promise<User> {
     let created_user: User;
 
     if (this.isLocalRegister(userObject)) {
@@ -98,6 +97,27 @@ export class UserRepository {
 
     return await this.userRepository.save(created_user);
   }
+
+
+  async createAdmin(userObject: Omit<LocalRegister, 'confirm_password'> | AuthRegister): Promise<User> {
+    let created_user: User;
+
+    if (this.isLocalRegister(userObject)) {
+      if (isNotEmpty(userObject.password)) {
+        created_user = this.userRepository.create({...userObject, role: UserRole.ADMIN});
+      }
+
+    } else if (this.isAuthRegister(userObject)) {
+      if (isNotEmpty(userObject.sub)) {
+        const { sub, ...rest } = userObject;
+        created_user = this.userRepository.create({ authtoken: sub, ...rest, role: UserRole.ADMIN });
+      }
+    }
+
+    return await this.userRepository.save(created_user);
+    
+  }
+
 
   async getUserByMail(email: string): Promise<User | undefined> {
     const found: User | null = await this.userRepository.findOne({
