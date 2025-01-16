@@ -2,7 +2,6 @@ import { Inject, Injectable } from '@nestjs/common';
 import Stripe from 'stripe';
 import { ConfigService } from '@nestjs/config';
 
-
 @Injectable()
 export class StripeService {
   private stripe: Stripe;
@@ -15,7 +14,8 @@ export class StripeService {
     this.stripe = new Stripe(this.apiKey, {
       apiVersion: '2024-11-20.acacia',
     });
-    this.frontendUrl = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
+    this.frontendUrl =
+      this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
   }
 
   async createCustomer(
@@ -35,9 +35,8 @@ export class StripeService {
     priceId: string,
     customerId: string,
   ): Promise<Stripe.Checkout.Session> {
+    console.log('varibale', this.frontendUrl);
 
-    console.log('varibale',this.frontendUrl);
-    
     try {
       const session = await this.stripe.checkout.sessions.create({
         customer: customerId,
@@ -69,5 +68,4 @@ export class StripeService {
       throw new Error('Webhook signature verification failed');
     }
   }
-
 }

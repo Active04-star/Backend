@@ -5,7 +5,8 @@ import {
   HttpException,
   HttpStatus,
   Post,
-  Req,} from '@nestjs/common';
+  Req,
+} from '@nestjs/common';
 import { StripeService } from './stripe.service';
 import { ApiTags } from '@nestjs/swagger';
 import { UserService } from '../user/user.service';
@@ -98,7 +99,6 @@ export class StripeController {
               'No se encontró el usuario con el customerId en la base de datos.',
             );
           }
-
         } else {
           throw new Error(
             'customerId no es un string, es de tipo: ' + typeof customerId,

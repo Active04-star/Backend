@@ -3,8 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { StripeService } from './stripe.service';
 import { StripeController } from './stripe.controller';
 import { UserModule } from '../user/user.module';
-import { Payment_Module } from '../payment/payment.module';
-import { Subscription_Module } from '../subscription/subscription.module';
+
 
 @Module({})
 export class StripeModule {
