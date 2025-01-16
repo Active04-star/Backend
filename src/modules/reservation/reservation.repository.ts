@@ -12,8 +12,7 @@ export class Reservation_Repository {
     @InjectRepository(Reservation)
     private readonly reservationRepository: Repository<Reservation>,
     private readonly notificationGateway: notificationGateway,
-    // private readonly mailService: MailerService
-
+    private readonly mailService: MailerService,
   ) { }
 
 
@@ -70,7 +69,7 @@ export class Reservation_Repository {
     const now = new Date()
     const nowUtc = new Date(Date.now())
 
-    const startRangeUtc = new Date(Date.now() - 60 * 1000); // Hace un minuto en UTC
+    const startRangeUtc = new Date(Date.now() - 3600 * 1000); // Hace un minuto en UTC
     const reservations = await this.reservationRepository
       .createQueryBuilder('reservation')
       .leftJoinAndSelect('reservation.field', 'field')
@@ -89,22 +88,25 @@ export class Reservation_Repository {
     
     async notifyreservationUser(reservation: Reservation) {
       const message = `Tines una nueva Reserva en tu cancha`;
+      // console.log(this.mailService['transporter'].options);   //BORRAR SOLO ES PARA PRUEBA
+      await this.sendWelcomeMail({name: reservation.field.sportcenter.main_manager.name, email: reservation.field.sportcenter.main_manager.email})
       this.notificationGateway.sendNotification(reservation.field.sportcenter.main_manager.id, message)
     }
 
-    // async sendWelcomeMail(user: { name: string, email: string }): Promise<void> {
-    //   await this.mailService.sendMail({
-    //     from: 'ActiveProject <activeproject04@gmail.com>',
-    //     to: user.email,
-    //     subject: 'Welcome to our app',
-    //     template: 'registration',
-    //     context: {
-    //       name: user.name,
-    //       contactEmail: 'activeproject04@gmail.com',
-    //     }
+    private async sendWelcomeMail(user: { name: string, email: string }): Promise<void> {
+      console.log(user.email)
+      await this.mailService.sendMail({
+        from: 'ActiveProject <activeproject04@gmail.com>',
+        to: user.email,
+        subject: 'Welcome to our app',
+        template: 'registration',
+        context: {
+          name: user.name,
+          contactEmail: 'activeproject04@gmail.com',
+        }
   
-    //   });
-    // }
+      });
+    }
 
   async completeReservation(reservation: Reservation): Promise<Reservation> {
     reservation.status = ReservationStatus.COMPLETED

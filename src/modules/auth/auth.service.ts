@@ -124,6 +124,8 @@ export class AuthService {
 
       await this.auth0Service.syncUser({ name: rest_user.name, email: lower_mail, password, id: created.id });
 
+
+
       await this.sendWelcomeMail({ name: rest_user.name, email: lower_mail });
 
       return { message: ApiStatusEnum.REGISTRATION_SUCCESS };
@@ -149,8 +151,6 @@ export class AuthService {
       let created: UserClean;
 
       if (found_user === undefined) {
-        console.log("Usuario no encontrado. Creando un nuevo registro de usuario");
-
         created = await this.userService.createUser(userObject);
         this.sendWelcomeMail({ name: rest.name, email: lower_mail });
         return this.signToken(created);
@@ -179,7 +179,8 @@ export class AuthService {
   }
 
 
-  private async sendWelcomeMail(user: { name: string, email: string }): Promise<void> {
+  async sendWelcomeMail(user: { name: string, email: string }): Promise<void> {
+    console.log(this.mailService['transporter'].options);   //BORRAR SOLO ES PARA PRUEBA
     await this.mailService.sendMail({
       from: 'ActiveProject <activeproject04@gmail.com>',
       to: user.email,
