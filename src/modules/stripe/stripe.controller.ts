@@ -5,11 +5,9 @@ import {
   HttpException,
   HttpStatus,
   Post,
-  Req,
-  Res,
-} from '@nestjs/common';
+  Req,} from '@nestjs/common';
 import { StripeService } from './stripe.service';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { UserService } from '../user/user.service';
 

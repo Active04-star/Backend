@@ -5,7 +5,7 @@ import { User } from 'src/entities/user.entity';
 import { isNotEmpty } from 'class-validator';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { BadRequestException, ConflictException, ForbiddenException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { UserClean } from 'src/dtos/user/user-clean.dto';
 import { ApiStatusEnum } from 'src/enums/HttpStatus.enum';
 import { LoginResponse } from 'src/dtos/user/login-response.dto';
@@ -34,8 +34,17 @@ export class AuthService {
     }
 
     const user: User | undefined = await this.userService.getUserById(id);
+    let is_same_password
 
-    const is_same_password = await bcrypt.compare(password, user.password);
+    if(user === undefined) {
+      throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, NotFoundException);
+    }
+
+    if(user.password !== null) {
+      is_same_password = await bcrypt.compare(password, user.password);
+    } else {
+      is_same_password = false;
+    }
 
 
     if (isNotEmpty(user)) {
@@ -51,17 +60,17 @@ export class AuthService {
         throw new ApiError(ApiStatusEnum.HASHING_FAILED, BadRequestException);
       }
 
-      if (isNotEmpty(user.authtoken)) {
+      if (user.authtoken !== null) {
         await this.auth0Service.updateUserPassword(user, password);
       }
 
       await this.userService.updateUser(user.id, { password: hashed_password });
 
       return { message: ApiStatusEnum.PASSWORD_UPDATE_SUCCESS };
-
+ 
     }
 
-    throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, BadRequestException);
+    throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, NotFoundException);
 
   }
 
@@ -78,12 +87,12 @@ export class AuthService {
       return { message: ApiStatusEnum.USER_IS_LOCAL };
 
     }
- 
+
     if (isNotEmpty(user) && user.authtoken !== null && user.password === null) {
       return { message: ApiStatusEnum.USER_IS_THIRD_PARTY };
 
     }
- 
+
     throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, BadRequestException);
   }
 
@@ -124,6 +133,59 @@ export class AuthService {
 
       await this.auth0Service.syncUser({ name: rest_user.name, email: lower_mail, password, id: created.id });
 
+
+
+      await this.sendWelcomeMail({ name: rest_user.name, email: lower_mail });
+
+      return { message: ApiStatusEnum.REGISTRATION_SUCCESS };
+
+    } catch (error) {
+      if (isNotEmpty(id)) {
+        await this.userService.deleteUser(id);
+      }
+
+      throw new ApiError(error?.message, InternalServerErrorException, error);
+    }
+  }
+
+
+  async adminRegistration(userObject: LocalRegister): Promise<ApiResponse> {
+    let id: string = "";
+    console.log(userObject);
+
+    try {
+      const { email, password, confirm_password, ...rest_user } = userObject;
+
+      const lower_mail = email.toLowerCase();
+
+      if (password !== confirm_password) {
+        throw new ApiError(ApiStatusEnum.PASSWORDS_DONT_MATCH, BadRequestException);
+
+      }
+
+      const is_existent: User | undefined = await this.userService.getUserByMail(lower_mail);
+
+      if (isNotEmpty(is_existent)) {
+        throw new ApiError(ApiStatusEnum.MAIL_IN_USE, ConflictException);
+      }
+
+      const hashed_password = await bcrypt.hash(password, 10);
+
+      if (!hashed_password) {
+        throw new ApiError(ApiStatusEnum.HASHING_FAILED, BadRequestException);
+
+      }
+
+      const created: UserClean = await this.userService.createAdmin({
+        ...rest_user,
+        email: lower_mail,
+        password: hashed_password,
+      });
+
+      id = created.id;
+
+      await this.auth0Service.syncUser({ name: rest_user.name, email: lower_mail, password, id: created.id });
+
       await this.sendWelcomeMail({ name: rest_user.name, email: lower_mail });
 
       return { message: ApiStatusEnum.REGISTRATION_SUCCESS };
@@ -149,8 +211,6 @@ export class AuthService {
       let created: UserClean;
 
       if (found_user === undefined) {
-        console.log("Usuario no encontrado. Creando un nuevo registro de usuario");
-
         created = await this.userService.createUser(userObject);
         this.sendWelcomeMail({ name: rest.name, email: lower_mail });
         return this.signToken(created);
@@ -180,6 +240,7 @@ export class AuthService {
 
 
   private async sendWelcomeMail(user: { name: string, email: string }): Promise<void> {
+    console.log(this.mailService['transporter'].options);   //BORRAR SOLO ES PARA PRUEBA
     await this.mailService.sendMail({
       from: 'ActiveProject <activeproject04@gmail.com>',
       to: user.email,

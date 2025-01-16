@@ -60,16 +60,16 @@ export class UserRepository {
     return user;
   }
 
-  async updateUser(actual_user: User, modified_user: Partial<User>): Promise<User> {
-    this.userRepository.merge(actual_user, modified_user);
+  async updateUser(actual_user: User, modified_user: Partial<Pick<User, "name" | "profile_image" | "authtoken" | "password">>): Promise<User> {
+    const merged_user: User = this.userRepository.merge(actual_user, modified_user);
 
-    return await this.userRepository.save(actual_user);
+    return await this.userRepository.save(merged_user);
   }
 
   async rankUpTo(user: User, role: UserRole): Promise<User> {
-    const {managed_centers, ...user_} = user;
-    user_.role = role;
-    return await this.userRepository.save(user_);
+    const {managed_centers, ...usernew} = user;
+    usernew.role = role;
+    return await this.userRepository.save(usernew);
   }
 
   async getUserById(id: string): Promise<User | undefined> {
@@ -80,9 +80,8 @@ export class UserRepository {
     return found_user === null ? undefined : found_user;
   }
 
-  async createUser(
-    userObject: Omit<LocalRegister, 'confirm_password'> | AuthRegister,
-  ): Promise<User> {
+
+  async createUser(userObject: Omit<LocalRegister, 'confirm_password'> | AuthRegister): Promise<User> {
     let created_user: User;
 
     if (this.isLocalRegister(userObject)) {
@@ -98,6 +97,27 @@ export class UserRepository {
 
     return await this.userRepository.save(created_user);
   }
+
+
+  async createAdmin(userObject: Omit<LocalRegister, 'confirm_password'> | AuthRegister): Promise<User> {
+    let created_user: User;
+
+    if (this.isLocalRegister(userObject)) {
+      if (isNotEmpty(userObject.password)) {
+        created_user = this.userRepository.create({...userObject, role: UserRole.ADMIN});
+      }
+
+    } else if (this.isAuthRegister(userObject)) {
+      if (isNotEmpty(userObject.sub)) {
+        const { sub, ...rest } = userObject;
+        created_user = this.userRepository.create({ authtoken: sub, ...rest, role: UserRole.ADMIN });
+      }
+    }
+
+    return await this.userRepository.save(created_user);
+    
+  }
+
 
   async getUserByMail(email: string): Promise<User | undefined> {
     const found: User | null = await this.userRepository.findOne({

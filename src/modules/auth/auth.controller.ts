@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, UseGuards, UsePipes } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiTags, PickType } from '@nestjs/swagger';
 import { LocalRegister } from 'src/dtos/user/local-register.dto';
@@ -13,11 +13,11 @@ import { AuthGuard } from 'src/guards/auth-guard.guard';
 @ApiTags('Autentication')
 @Controller('auth')
 export class AuthController {
+
   constructor(private readonly authService: AuthService) { }
 
 
   @Post('register')
-  // @UsePipes(TrimPipe)
   @ApiBody({ type: LocalRegister })
   @ApiOperation({ summary: 'Registro de usuario' })
   async userRegistration(@Body() userObject: LocalRegister): Promise<ApiResponse> {
@@ -38,6 +38,17 @@ export class AuthController {
   @ApiOperation({ summary: 'Login de usuario' })
   async userLogin(@Body() userCredentials: UserLogin): Promise<LoginResponse> {
     return await this.authService.userLogin(userCredentials);
+  }
+
+
+  @Post("admin/register")
+  @Roles(UserRole.SUPER_ADMIN)
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiBody({ type: LocalRegister })
+  @ApiOperation({ summary: 'Registro de administrador, debe ser ejecutado por el super admin.' })
+  async adminRegistration(@Body() userObject: LocalRegister): Promise<ApiResponse> {
+    return await this.authService.adminRegistration(userObject);
   }
 
 

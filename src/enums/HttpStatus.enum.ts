@@ -7,8 +7,9 @@ export enum ApiStatusEnum {
   TOKEN_NOT_FOUND = 'No se encontró ningún token en esta solicitud',
   NO_TOKEN_PROVIDED = "No se proporcionó ningún token",
   INVALID_TOKEN = "el token es invalido o ha expirado",
+  TOKEN_SIGN_SUCCESSFUL = "firma de token exitosa",
 
-  // Registration
+  // Registration 
   REGISTRATION_FAIL = 'Error al registrar el usuario',
   REGISTRATION_SUCCESS = 'Registrado correctamente',
   MAIL_IN_USE = 'Este correo ya esta registrado!',
@@ -48,7 +49,7 @@ export enum ApiStatusEnum {
   CENTER_ALREADY_HAS_SCHEDULES = "El centro ya tiene horarios asignados",
   CENTER_SCHEDULES_CREATION_FAILED = "Fallo la creacion de horarios para el centro",
   CENTER_HAS_PENDING_RESERVATIONS = 'El centro aun tiene reservaciones pendientes',
-  CENTER_IS_NOT_COMPLETED='El centro no se puede publicar porque no tiene asignado horarios o no tiene canchas',
+  CENTER_IS_NOT_COMPLETED = 'El centro no se puede publicar porque no tiene asignado horarios o no tiene canchas',
 
   // Reviews
   REVIEW_CREATION_FAILED = 'No se pudo crear una nueva reseña',
@@ -64,6 +65,7 @@ export enum ApiStatusEnum {
   RESERVATION_ALREADY_COMPLETED = 'Esta reserva ya esta activada',
   INVALID_RESERVATION_STATUS = 'Estado de la reserva invalido',
   RESERVATION_NOT_COMPLETED = "Se va a poder crear una reseña luego de la reserva haya sido completada",
+  RESERVATION_DOES_NOT_HAVE_BLOCKS_AND_FIELD = "No se encontro la cancha o el bloque asociado a la reserva",
 
   // Field
   FIELD_DELETED_SUCCESSFULLY = 'Cancha eliminada correctamente',
@@ -75,7 +77,9 @@ export enum ApiStatusEnum {
   FIELD_BLOCK_ALREADY_RESERVED = "Ya se reservo este horario",
   SPORTCENTER_NEEDS_SCHEDULES_BEFORE = "Necesitas crear horarios para el centro antes de crear una cancha ",
   CANT_CANCEL_RESERVATIONS = "No se pudo cancelar las reservas al eliminar una cancha",
-
+  FIELD_NUMBER_ALREADY_EXISTS="Ya existe una cancha con este numero",
+  USER_HAS_NOT_PAID_YET="Necesitas pasar a premium para poder crear mas de 2 canchas",
+  CANT_DELETE_FIELD_WITH_ACTIVE_RESERVATIONS="No se puede eliminar la cancha con reservas activas",
 
   // Payments
   SUBSCRIPTION_PAYMENT_FAILED = 'No se pudo crear el pago de la subscripcion',
@@ -115,5 +119,6 @@ export enum ApiStatusEnum {
   TEST_ERROR = 'Error de prueba, debe ser eliminado en modo produccion!',
   RATING_OUT_OF_BOUNDS = "La calificacion debe estar entre 1 y 5",
   INVALID_DATE_FORMAT = "El formato de la fecha es invalido!",
- 
+  THIRD_PARTY_NOT_ALLOWED = "Usuarios externos no pueden cambiar su contraseña!",
+  
 }

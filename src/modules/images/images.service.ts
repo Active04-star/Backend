@@ -114,15 +114,16 @@ export class ImagesService {
 
 
     async uploadToUser(id: string, file: Express.Multer.File): Promise<{ message: ApiStatusEnum, url: string }> {
+        let url: string;
         try {
 
-            const url: string = await this.uploadService.uploadToCloudinary(file);
+            url = await this.uploadService.uploadToCloudinary(file);
 
             const found_user: User = await this.userService.getUserById(id);
 
             await this.userService.updateUser(id, { profile_image: url });
 
-            if (found_user.profile_image !== 'https://res.cloudinary.com/dvgvcleky/image/upload/f_auto,q_auto/v1/RestO/ffgx6ywlaix0mb3jghux') {
+            if (found_user.profile_image.includes("https://res.cloudinary.com/") && found_user.profile_image !== 'https://res.cloudinary.com/dvgvcleky/image/upload/f_auto,q_auto/v1/RestO/ffgx6ywlaix0mb3jghux') {
                 await this.uploadService.removeFromCloudinary(found_user.profile_image);
 
             }
@@ -130,6 +131,10 @@ export class ImagesService {
             return { message: ApiStatusEnum.IMAGE_PROFILE_UPLOAD_SUCCESS, url: url };
 
         } catch (error) {
+            if(error.status === 'Missing required parameter - public_id' && url !== undefined) {
+                return { message: ApiStatusEnum.IMAGE_PROFILE_UPLOAD_SUCCESS, url: url };
+            }
+
             throw new HttpException(error?.message, error?.status || 500);
 
         }

@@ -9,6 +9,6 @@ import { Auth0Module } from "../auth0/auth0.module";
     imports: [MailerModule, UserModule, Auth0Module],
     controllers: [AuthController],
     providers: [AuthService],
-    exports: []
+    exports: [AuthService]
 })
 export class AuthModule { }

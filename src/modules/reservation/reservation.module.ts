@@ -8,9 +8,12 @@ import { UserModule } from '../user/user.module';
 import { Field_Module } from '../field/field.module';
 import { notificationGateway } from '../notification.gateway.ts/websocket.gateway';
 import { Field_Block } from 'src/entities/field_blocks.entity';
+import { AuthModule } from '../auth/auth.module';
+import { MailerModule } from '@nestjs-modules/mailer';
 
 @Module({
   imports: [
+    MailerModule,
     forwardRef(() => Field_Module),
     UserModule,
     TypeOrmModule.forFeature([Reservation,Field_Block]),

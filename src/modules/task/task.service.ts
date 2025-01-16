@@ -35,7 +35,6 @@ export class ScheduleTaskService {
             console.log('ejecutando cron de nuevas reservas...')       //console.log() para test
             const newReservation = await this.reservationRepository.reservationnotify();
             for(const reservation of newReservation) {
-                // await this.reservationRepository.sendWelcomeMail({name: reservation.field.sportcenter.main_manager.name, email: reservation.field.sportcenter.main_manager.email})
                 await this.reservationRepository.notifyreservationUser(reservation)
                 console.log(`Notificando al usuario que su reserva fue confirmada`) //console.log() para test
             }

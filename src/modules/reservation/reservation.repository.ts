@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Reservation } from 'src/entities/reservation.entity';
+import { Reservation } from 'src/entities/reservation.entity';//
 import { Repository } from 'typeorm';
 import { notificationGateway } from '../notification.gateway.ts/websocket.gateway';
 import { ReservationStatus } from 'src/enums/reservationStatus.enum';
@@ -8,12 +8,12 @@ import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class Reservation_Repository {
+
   constructor(
     @InjectRepository(Reservation)
     private readonly reservationRepository: Repository<Reservation>,
     private readonly notificationGateway: notificationGateway,
-    // private readonly mailService: MailerService
-
+    private readonly mailService: MailerService,
   ) { }
 
 
@@ -22,6 +22,7 @@ export class Reservation_Repository {
     return await this.reservationRepository.save(reservation);
   }
 
+
   async findById(id: string): Promise<Reservation | undefined> {
     const found_reservation: Reservation | null =
       await this.reservationRepository.findOne({ where: { id: id }, relations: ['fieldBlock', 'field'] });
@@ -29,9 +30,11 @@ export class Reservation_Repository {
     return found_reservation === null ? undefined : found_reservation;
   }
 
+
   async getReservationByUser(id: string): Promise<Reservation[]> {
-    return await this.reservationRepository.find({ where: { user: { id: id } }, relations: { user: false } });
+    return await this.reservationRepository.find({ where: { user: { id: id } }, relations: { user: false, fieldBlock: true } });
   }
+
 
   async getReservationById(id: string): Promise<Reservation> {
     const reservation: Reservation | null = await this.reservationRepository.findOne({ where: { id: id } })
@@ -61,16 +64,18 @@ export class Reservation_Repository {
       .getMany()
   }
 
+
   async notifyUser(reservation: Reservation) {
     const message = `Tu reserva para ${reservation.id} comienza en 1 hora`;
     this.notificationGateway.sendNotification(reservation.user.id, message)
   }
 
+
   async reservationnotify(): Promise<Reservation[]> {
-    const now = new Date()
+    // const now = new Date()
     const nowUtc = new Date(Date.now())
 
-    const startRangeUtc = new Date(Date.now() - 60 * 1000); // Hace un minuto en UTC
+    const startRangeUtc = new Date(Date.now() - 3600 * 1000); // Hace un minuto en UTC
     const reservations = await this.reservationRepository
       .createQueryBuilder('reservation')
       .leftJoinAndSelect('reservation.field', 'field')
@@ -89,22 +94,28 @@ export class Reservation_Repository {
     
     async notifyreservationUser(reservation: Reservation) {
       const message = `Tines una nueva Reserva en tu cancha`;
+      // console.log(this.mailService['transporter'].options);   //BORRAR SOLO ES PARA PRUEBA
+      // console.log('Transporte de MailerService:', this.mailService['transporter'].options);
+      await this.sendWelcomeMail({
+        name: reservation.field.sportcenter.main_manager.name, 
+        email: reservation.field.sportcenter.main_manager.email})
       this.notificationGateway.sendNotification(reservation.field.sportcenter.main_manager.id, message)
     }
 
-    // async sendWelcomeMail(user: { name: string, email: string }): Promise<void> {
-    //   await this.mailService.sendMail({
-    //     from: 'ActiveProject <activeproject04@gmail.com>',
-    //     to: user.email,
-    //     subject: 'Welcome to our app',
-    //     template: 'registration',
-    //     context: {
-    //       name: user.name,
-    //       contactEmail: 'activeproject04@gmail.com',
-    //     }
+    private async sendWelcomeMail(user: { name: string, email: string }): Promise<void> {
+      await this.mailService.sendMail({
+        from: 'ActiveProject <activeproject04@gmail.com>',
+        to: user.email,
+        subject: 'Welcome to our app',
+        template: 'registration',
+        context: {
+          name: user.name,
+          contactEmail: 'activeproject04@gmail.com',
+        }
   
-    //   });
-    // }
+      });
+    }
+
 
   async completeReservation(reservation: Reservation): Promise<Reservation> {
     reservation.status = ReservationStatus.COMPLETED
