@@ -13,7 +13,7 @@ export class StripeModule {
     return {
       module: StripeModule,
       controllers: [StripeController],
-      imports: [UserModule,ConfigModule.forRoot(),Payment_Module,Subscription_Module],
+      imports: [UserModule,ConfigModule.forRoot()],
       providers: [
         StripeService,
         {
