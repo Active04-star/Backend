@@ -27,7 +27,6 @@ import { startOfDay, endOfDay } from 'date-fns';
 
 @Injectable()
 export class Field_Service {
-
   constructor(
     private readonly fieldRepository: Field_Repository,
     private sportCenterService: SportCenterService,
@@ -37,11 +36,13 @@ export class Field_Service {
     @Inject(forwardRef(() => Field_Block_Service))
     private fieldblockService: Field_Block_Service,
     @InjectRepository(Reservation)
-    private reservationRepository:Repository<Reservation>
+    private reservationRepository: Repository<Reservation>,
   ) {}
 
-
-  async getAvailableBlocks(fieldId: string, date: Date): Promise<Field_Block[]> {
+  async getAvailableBlocks(
+    fieldId: string,
+    date: Date,
+  ): Promise<Field_Block[]> {
     const field = await this.fieldRepository.findById(fieldId);
 
     if (!field) {
@@ -51,21 +52,20 @@ export class Field_Service {
     const reservations = await this.reservationRepository.find({
       where: {
         field: { id: fieldId },
-        date: Between(
-          startOfDay(date),
-          endOfDay(date)
-        ),
+        date: Between(startOfDay(date), endOfDay(date)),
       },
       relations: ['fieldBlock'],
     });
 
     const reservedBlockIds = reservations
-    .filter(res => res.fieldBlock !== null)
-    .map(res => res.fieldBlock.id);
-    
-    return field.blocks.map(block => ({
+      .filter((res) => res.fieldBlock !== null)
+      .map((res) => res.fieldBlock.id);
+
+    return field.blocks.map((block) => ({
       ...block,
-      status: reservedBlockIds.includes(block.id) ? BlockStatus.RESERVED : BlockStatus.AVAILABLE
+      status: reservedBlockIds.includes(block.id)
+        ? BlockStatus.RESERVED
+        : BlockStatus.AVAILABLE,
     }));
   }
   async updateField(id: string, data: UpdateFieldDto): Promise<Field> {
@@ -81,6 +81,17 @@ export class Field_Service {
         true,
       );
 
+      // Verificar si ya existe un campo con el mismo número
+      const existingField = sportCenter.fields.find(
+        (field) => field.number === fieldData.number && !field.isDeleted,
+      );
+
+      if (existingField) {
+        throw new ApiError(
+          ApiStatusEnum.FIELD_NUMBER_ALREADY_EXISTS,
+          BadRequestException,
+        );
+      }
       const sportCategory: Sport_Category | null = fieldData.sportCategoryId
         ? await this.sportCategoryService.findById(fieldData.sportCategoryId)
         : null;
@@ -91,7 +102,6 @@ export class Field_Service {
           InternalServerErrorException,
         );
       }
-
       const created_field: Field | undefined =
         await this.fieldRepository.createField(
           sportCenter,

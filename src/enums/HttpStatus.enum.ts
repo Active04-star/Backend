@@ -77,7 +77,7 @@ export enum ApiStatusEnum {
   FIELD_BLOCK_ALREADY_RESERVED = "Ya se reservo este horario",
   SPORTCENTER_NEEDS_SCHEDULES_BEFORE = "Necesitas crear horarios para el centro antes de crear una cancha ",
   CANT_CANCEL_RESERVATIONS = "No se pudo cancelar las reservas al eliminar una cancha",
-
+  FIELD_NUMBER_ALREADY_EXISTS="Ya existe una cancha con este numero",
 
   // Payments
   SUBSCRIPTION_PAYMENT_FAILED = 'No se pudo crear el pago de la subscripcion',
