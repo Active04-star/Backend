@@ -23,14 +23,11 @@ export class Reservation_Service {
   constructor(
     private readonly dataSource: DataSource,
     private readonly reservationRepository: Reservation_Repository,
-    @Inject(forwardRef(() => Field_Service))
-    private readonly field_service: Field_Service,
+    @Inject(forwardRef(() => Field_Service)) private readonly field_service: Field_Service,
     private readonly userService: UserService,
-    @InjectRepository(Field_Block)
-    private fieldBlockRepository: Repository<Field_Block>,
-    @InjectRepository(Reservation)
-    private reservationRepo: Repository<Reservation>,
-  ) {}
+    @InjectRepository(Field_Block) private fieldBlockRepository: Repository<Field_Block>,
+    @InjectRepository(Reservation) private reservationRepo: Repository<Reservation>,
+  ) { }
 
   async createReservation(
     data: CreateReservationDto,
@@ -175,7 +172,12 @@ export class Reservation_Service {
       );
     }
 
-    return getReservation;
+    return getReservation.map((x) => {
+      const reservation = x;
+      reservation.date = new Date(x.fieldBlock.start_time);
+      return reservation;
+    });
+
   }
 
   async getReservationById(id: string): Promise<Reservation> {

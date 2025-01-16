@@ -31,7 +31,7 @@ export class Sport_Category_Controller {
 
 
   @Post('create')
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOperation({

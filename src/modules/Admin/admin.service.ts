@@ -34,6 +34,16 @@ export class AdminService {
   ) { }
 
 
+  async getTotalUsers(): Promise<{ total: number }> {
+    const total: number | undefined = await this.adminRepository.getTotalUsers();
+    if (total === undefined) {
+      throw new ApiError(ApiStatusEnum.CENTER_LIST_EMTPY, NotFoundException);
+    }
+
+    return { total: total };
+  }
+
+
   async getPremiumUsers(): Promise<User[]> {
     const usersQueryBuilder = this.userRepository.createQueryBuilder('user');
 
@@ -169,7 +179,7 @@ export class AdminService {
       throw new ApiError(ApiStatusEnum.CENTER_DELETION_FAILED, InternalServerErrorException, 'nothing updated');
     } catch (error) {
       throw new ApiError(error?.message, InternalServerErrorException, error);
-      
+
     }
   }
 }

@@ -78,12 +78,12 @@ export class AuthService {
       return { message: ApiStatusEnum.USER_IS_LOCAL };
 
     }
- 
+
     if (isNotEmpty(user) && user.authtoken !== null && user.password === null) {
       return { message: ApiStatusEnum.USER_IS_THIRD_PARTY };
 
     }
- 
+
     throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, BadRequestException);
   }
 
@@ -125,6 +125,57 @@ export class AuthService {
       await this.auth0Service.syncUser({ name: rest_user.name, email: lower_mail, password, id: created.id });
 
 
+
+      await this.sendWelcomeMail({ name: rest_user.name, email: lower_mail });
+
+      return { message: ApiStatusEnum.REGISTRATION_SUCCESS };
+
+    } catch (error) {
+      if (isNotEmpty(id)) {
+        await this.userService.deleteUser(id);
+      }
+
+      throw new ApiError(error?.message, InternalServerErrorException, error);
+    }
+  }
+
+
+  async adminRegistration(userObject: LocalRegister): Promise<ApiResponse> {
+    let id: string = "";
+    console.log(userObject);
+
+    try {
+      const { email, password, confirm_password, ...rest_user } = userObject;
+
+      const lower_mail = email.toLowerCase();
+
+      if (password !== confirm_password) {
+        throw new ApiError(ApiStatusEnum.PASSWORDS_DONT_MATCH, BadRequestException);
+
+      }
+
+      const is_existent: User | undefined = await this.userService.getUserByMail(lower_mail);
+
+      if (isNotEmpty(is_existent)) {
+        throw new ApiError(ApiStatusEnum.MAIL_IN_USE, ConflictException);
+      }
+
+      const hashed_password = await bcrypt.hash(password, 10);
+
+      if (!hashed_password) {
+        throw new ApiError(ApiStatusEnum.HASHING_FAILED, BadRequestException);
+
+      }
+
+      const created: UserClean = await this.userService.createAdmin({
+        ...rest_user,
+        email: lower_mail,
+        password: hashed_password,
+      });
+
+      id = created.id;
+
+      await this.auth0Service.syncUser({ name: rest_user.name, email: lower_mail, password, id: created.id });
 
       await this.sendWelcomeMail({ name: rest_user.name, email: lower_mail });
 
