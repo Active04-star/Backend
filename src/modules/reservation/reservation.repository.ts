@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Reservation } from 'src/entities/reservation.entity';
+import { Reservation } from 'src/entities/reservation.entity';//
 import { Repository } from 'typeorm';
 import { notificationGateway } from '../notification.gateway.ts/websocket.gateway';
 import { ReservationStatus } from 'src/enums/reservationStatus.enum';
@@ -95,12 +95,14 @@ export class Reservation_Repository {
     async notifyreservationUser(reservation: Reservation) {
       const message = `Tines una nueva Reserva en tu cancha`;
       // console.log(this.mailService['transporter'].options);   //BORRAR SOLO ES PARA PRUEBA
-      await this.sendWelcomeMail({name: reservation.field.sportcenter.main_manager.name, email: reservation.field.sportcenter.main_manager.email})
+      // console.log('Transporte de MailerService:', this.mailService['transporter'].options);
+      await this.sendWelcomeMail({
+        name: reservation.field.sportcenter.main_manager.name, 
+        email: reservation.field.sportcenter.main_manager.email})
       this.notificationGateway.sendNotification(reservation.field.sportcenter.main_manager.id, message)
     }
 
     private async sendWelcomeMail(user: { name: string, email: string }): Promise<void> {
-      console.log(user.email)
       await this.mailService.sendMail({
         from: 'ActiveProject <activeproject04@gmail.com>',
         to: user.email,

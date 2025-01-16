@@ -55,6 +55,9 @@ export class Reservation_Service {
         );
       }
 
+      field_block.status = BlockStatus.RESERVED;
+      await manager.save(Field_Block, field_block);
+
       // Obtener las demás entidades necesarias
       const user = await this.userService.getUserById(userId);
       const field = await this.field_service.findById(fieldId);
@@ -68,12 +71,13 @@ export class Reservation_Service {
         ...reservationData,
       });
 
-      field_block.status = BlockStatus.RESERVED;
-      await manager.save(Field_Block, field_block);
-
+    
       // Guardar la reservación
       const created_reservation = await manager.save(reservation);
 
+
+      console.log('created reservation',created_reservation);
+      
       if (!created_reservation) {
         throw new ApiError(
           ApiStatusEnum.CENTER_CREATION_FAILED,
@@ -108,6 +112,9 @@ export class Reservation_Service {
 
     reservation.status = ReservationStatus.CANCELLED;
 
+    console.log('reservation',reservation);
+    
+
     if (reservation.fieldBlock && reservation.field) {
       const block: Field_Block | undefined =
         await this.fieldBlockRepository.findOne({
@@ -128,7 +135,6 @@ export class Reservation_Service {
 
       // También eliminar la relación desde el lado de la reserva
       reservation.fieldBlock = null;
-      reservation.field = null;
     } else {
       throw new ApiError(
         ApiStatusEnum.
