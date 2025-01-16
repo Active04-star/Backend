@@ -1,9 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import Stripe from 'stripe';
 import { ConfigService } from '@nestjs/config';
-import { User } from 'src/entities/user.entity';
-import { Payment_Service } from '../payment/payment.service';
-import { Subscription_Service } from '../subscription/subscription.service';
 
 @Injectable()
 export class StripeService {
@@ -13,13 +10,12 @@ export class StripeService {
   constructor(
     @Inject('STRIPE_API_KEY') private readonly apiKey: string,
     private configService: ConfigService,
-    private paymentService: Payment_Service,
-    private subscriptionService: Subscription_Service,
   ) {
     this.stripe = new Stripe(this.apiKey, {
       apiVersion: '2024-11-20.acacia',
     });
-    this.frontendUrl = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
+    this.frontendUrl =
+      this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
   }
 
   async createCustomer(
@@ -39,9 +35,8 @@ export class StripeService {
     priceId: string,
     customerId: string,
   ): Promise<Stripe.Checkout.Session> {
+    console.log('varibale', this.frontendUrl);
 
-    console.log('varibale',this.frontendUrl);
-    
     try {
       const session = await this.stripe.checkout.sessions.create({
         customer: customerId,
@@ -72,18 +67,5 @@ export class StripeService {
     } catch (err) {
       throw new Error('Webhook signature verification failed');
     }
-  }
-
-  // Manejar el evento de sesión completada
-  async handleCheckoutSessionCompleted(session: any, user: User) {
-    const payment = await this.paymentService.createSubscriptionPayment(
-      session,
-      user,
-    );
-    console.log('Pago completado:', payment);
-    const subscription = await this.subscriptionService.createSubscription(
-      payment,
-      user,
-    );
   }
 }

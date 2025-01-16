@@ -5,10 +5,10 @@ import {
   HttpException,
   HttpStatus,
   Post,
-  Req,} from '@nestjs/common';
+  Req,
+} from '@nestjs/common';
 import { StripeService } from './stripe.service';
 import { ApiTags } from '@nestjs/swagger';
-import { ConfigService } from '@nestjs/config';
 import { UserService } from '../user/user.service';
 
 @ApiTags('Stripe')
@@ -16,7 +16,6 @@ import { UserService } from '../user/user.service';
 export class StripeController {
   constructor(
     private stripeService: StripeService,
-    private configService: ConfigService,
     private readonly userService: UserService,
   ) {}
 
@@ -100,12 +99,6 @@ export class StripeController {
               'No se encontró el usuario con el customerId en la base de datos.',
             );
           }
-
-          // Aquí puedes continuar con la lógica de procesamiento del pago
-          await this.stripeService.handleCheckoutSessionCompleted(
-            session,
-            user,
-          );
         } else {
           throw new Error(
             'customerId no es un string, es de tipo: ' + typeof customerId,
