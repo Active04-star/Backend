@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import axios from 'axios';
 import { Auth0TokenRequestDto } from 'src/dtos/auth-token-response';
 import { User } from 'src/entities/user.entity';
@@ -48,6 +48,10 @@ export class Auth0Service {
 
         try {
             const token_request: Auth0TokenRequestDto = await this.getAuthToken();
+
+            if(!user.authtoken.includes("auth0")) {
+                throw new ApiError(ApiStatusEnum.THIRD_PARTY_NOT_ALLOWED, BadRequestException);
+            }
 
             const data = JSON.stringify({
                 "password": password,

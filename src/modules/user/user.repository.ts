@@ -60,10 +60,10 @@ export class UserRepository {
     return user;
   }
 
-  async updateUser(actual_user: User, modified_user: Partial<User>): Promise<User> {
-    this.userRepository.merge(actual_user, modified_user);
+  async updateUser(actual_user: User, modified_user: Partial<Pick<User, "name" | "profile_image" | "authtoken" | "password">>): Promise<User> {
+    const merged_user: User = this.userRepository.merge(actual_user, modified_user);
 
-    return await this.userRepository.save(actual_user);
+    return await this.userRepository.save(merged_user);
   }
 
   async rankUpTo(user: User, role: UserRole): Promise<User> {
