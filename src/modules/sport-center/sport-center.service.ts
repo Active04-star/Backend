@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { SportCenterRepository } from './sport-center.repository';
 import { CreateSportCenterDto } from 'src/dtos/sportcenter/createSportCenter.dto';
 import { User } from 'src/entities/user.entity';
@@ -15,27 +20,56 @@ import { UserRole } from 'src/enums/roles.enum';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Review } from 'src/entities/review.entity';
 import { Repository } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
+import { LoginResponse } from 'src/dtos/user/login-response.dto';
+import { UserClean } from 'src/dtos/user/user-clean.dto';
+import { CenterCreationResponse } from 'src/dtos/sportcenter/creation.response';
 
 @Injectable()
 export class SportCenterService {
-
   constructor(
     private readonly sportcenterRepository: SportCenterRepository,
     private readonly userService: UserService,
     @InjectRepository(Review) private reviewRepository: Repository<Review>,
-    @InjectRepository(SportCenter) private sportCenterRepository: Repository<SportCenter>
-  ) { }
+    @InjectRepository(SportCenter)
+    private sportCenterRepository: Repository<SportCenter>,
+    private readonly jwtService: JwtService,
+    @InjectRepository(User) private userRepository: Repository<User>,
+  ) {}
 
+  private signToken(user: UserClean): CenterCreationResponse {
+    const token = this.jwtService.sign({
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    });
+
+    return {
+      message: ApiStatusEnum.TOKEN_SIGN_SUCCESSFUL,
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        profile_image: user.profile_image,
+        role: user.role,
+        was_banned: user.was_banned,
+        subscription_status: user.subscription_status,
+        subscription: null,
+        stripeCustomerId: user.stripeCustomerId,
+      },
+    };
+  }
 
   async getTotalCenters(show_hidden: boolean): Promise<{ total: number }> {
-    const total: number | undefined = await this.sportcenterRepository.getTotalCenters(show_hidden);
-    if(total === undefined) {
+    const total: number | undefined =
+      await this.sportcenterRepository.getTotalCenters(show_hidden);
+    if (total === undefined) {
       throw new ApiError(ApiStatusEnum.CENTER_LIST_EMTPY, NotFoundException);
     }
 
     return { total: total };
   }
-
 
   async updateAverageRating(sportCenter: SportCenter): Promise<void> {
     // Recuperar todas las reseñas activas asociadas a las canchas del centro
@@ -46,16 +80,16 @@ export class SportCenterService {
     });
 
     // Calcular el promedio de ratings
-    const averageRating = reviews.length > 0
-      ? reviews.reduce((sum, review) => sum + review.rating, 0) /
-      reviews.length
-      : 0;
+    const averageRating =
+      reviews.length > 0
+        ? reviews.reduce((sum, review) => sum + review.rating, 0) /
+          reviews.length
+        : 0;
 
     // Actualizar el promedio en el SportCenter
     sportCenter.averageRating = averageRating;
     await this.sportCenterRepository.save(sportCenter);
   }
-
 
   async getSportCenters(
     page: number,
@@ -64,19 +98,21 @@ export class SportCenterService {
     rating?: number,
     keyword?: string,
   ): Promise<SportCenterList> {
-
     if (rating < 0 || rating > 5) {
-      throw new ApiError(ApiStatusEnum.RATING_OUT_OF_BOUNDS, BadRequestException);
-
+      throw new ApiError(
+        ApiStatusEnum.RATING_OUT_OF_BOUNDS,
+        BadRequestException,
+      );
     }
 
-    const found_centers: SportCenterList = await this.sportcenterRepository.getSportCenters(
-      page,
-      limit,
-      show_hidden,
-      rating,
-      keyword,
-    );
+    const found_centers: SportCenterList =
+      await this.sportcenterRepository.getSportCenters(
+        page,
+        limit,
+        show_hidden,
+        rating,
+        keyword,
+      );
 
     console.log('centers', found_centers);
 
@@ -90,34 +126,50 @@ export class SportCenterService {
     return found_centers;
   }
 
-
-  async createSportCenter(createSportCenter: CreateSportCenterDto): Promise<SportCenter> {
+  async createSportCenter(
+    createSportCenter: CreateSportCenterDto,
+  ): Promise<CenterCreationResponse> {
     const { manager, ...sportCenterData } = createSportCenter;
     let id = '';
 
     try {
-      const future_manager: User = await this.userService.getUserById(manager);
+      const future_manager: User = await this.userRepository.findOne({
+        where: { id: createSportCenter.manager },
+      });
+
+      if (!future_manager) {
+        throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, BadRequestException);
+      }
 
       if ((await this.getManagerCenters(future_manager)).length > 0) {
-        throw new ApiError(ApiStatusEnum.USER_ALREADY_HAS_A_CENTER, BadRequestException);
-
+        throw new ApiError(
+          ApiStatusEnum.USER_ALREADY_HAS_A_CENTER,
+          BadRequestException,
+        );
       }
 
       await this.userService.hasActiveReservations(future_manager.id);
 
       const created_sportcenter: SportCenter | undefined =
-        await this.sportcenterRepository.createSportCenter(future_manager, sportCenterData);
+        await this.sportcenterRepository.createSportCenter(
+          future_manager,
+          sportCenterData,
+        );
 
       if (created_sportcenter === undefined) {
-        throw new ApiError(ApiStatusEnum.CENTER_CREATION_FAILED, BadRequestException);
-
+        throw new ApiError(
+          ApiStatusEnum.CENTER_CREATION_FAILED,
+          BadRequestException,
+        );
       }
 
-      await this.userService.rankUpTo(future_manager, UserRole.MAIN_MANAGER);
+     future_manager.role=UserRole.MAIN_MANAGER
+     await this.userRepository.save(future_manager)
 
       id = created_sportcenter.id;
+      await this.getById(id);
 
-      return await this.getById(id);
+      return this.signToken(future_manager);
     } catch (error) {
       let deletion_error: any;
 
@@ -139,12 +191,12 @@ export class SportCenterService {
     }
   }
 
-
   /**
    * @param id Id del centro deportivo
    * @param relations Declara esto como true si deseas traer las relaciones de la entidad*/
   async getById(id: string, relations = false): Promise<SportCenter> {
-    const found_sportcenter: SportCenter | undefined = await this.sportcenterRepository.findOne(id, relations);
+    const found_sportcenter: SportCenter | undefined =
+      await this.sportcenterRepository.findOne(id, relations);
 
     if (found_sportcenter === undefined) {
       throw new ApiError(ApiStatusEnum.CENTER_NOT_FOUND, NotFoundException);
@@ -153,19 +205,22 @@ export class SportCenterService {
     return found_sportcenter;
   }
 
-
-  async updateSportCenter(id: string, updateData: UpdateSportCenterDto): Promise<SportCenter> {
-
+  async updateSportCenter(
+    id: string,
+    updateData: UpdateSportCenterDto,
+  ): Promise<SportCenter> {
     console.log('id', id);
 
     const sportCenter: SportCenter = await this.getById(id);
 
-    const updated: SportCenter = await this.sportcenterRepository.updateSportCenter(sportCenter, updateData);
+    const updated: SportCenter =
+      await this.sportcenterRepository.updateSportCenter(
+        sportCenter,
+        updateData,
+      );
 
     return updated;
-
   }
-
 
   private async deleteSportCenter(id: string): Promise<ApiResponse> {
     try {
@@ -175,19 +230,23 @@ export class SportCenterService {
         await this.sportcenterRepository.deleteSportCenter(sport_center);
 
       if (!was_deleted) {
-        throw new ApiError(ApiStatusEnum.CENTER_DELETION_FAILED, InternalServerErrorException);
+        throw new ApiError(
+          ApiStatusEnum.CENTER_DELETION_FAILED,
+          InternalServerErrorException,
+        );
       }
 
       return { message: ApiStatusEnum.CENTER_DELETION_SUCCESS };
-
     } catch (error) {
       throw new ApiError(error?.message, InternalServerErrorException, error);
-
     }
   }
 
-
-  async updateStatus(userId: string, sportCenterId: string, status: Sport_Center_Status): Promise<SportCenter> {
+  async updateStatus(
+    userId: string,
+    sportCenterId: string,
+    status: Sport_Center_Status,
+  ): Promise<SportCenter> {
     const user: User = await this.userService.getUserById(userId);
 
     const found_sportcenter = await this.getById(sportCenterId);
@@ -197,29 +256,40 @@ export class SportCenterService {
     }
 
     if (found_sportcenter.status === status) {
-      throw new ApiError(ApiStatusEnum.CENTER_ALREADY_HAS_STATE, BadRequestException, status);
+      throw new ApiError(
+        ApiStatusEnum.CENTER_ALREADY_HAS_STATE,
+        BadRequestException,
+        status,
+      );
     }
 
-    return await this.sportcenterRepository.updateStatus(found_sportcenter, status);
-
+    return await this.sportcenterRepository.updateStatus(
+      found_sportcenter,
+      status,
+    );
   }
 
-
-  async banOrUnban(sportCenterId: string, status: Sport_Center_Status): Promise<SportCenter> {
+  async banOrUnban(
+    sportCenterId: string,
+    status: Sport_Center_Status,
+  ): Promise<SportCenter> {
     const found_sportcenter = await this.getById(sportCenterId);
 
     if (found_sportcenter.status === status) {
-      throw new ApiError(ApiStatusEnum.CENTER_ALREADY_HAS_STATE, BadRequestException, status);
+      throw new ApiError(
+        ApiStatusEnum.CENTER_ALREADY_HAS_STATE,
+        BadRequestException,
+        status,
+      );
     }
 
-    return await this.sportcenterRepository.updateStatus(found_sportcenter, status);
-
+    return await this.sportcenterRepository.updateStatus(
+      found_sportcenter,
+      status,
+    );
   }
-
 
   private async getManagerCenters(user: User): Promise<SportCenter[]> {
     return await this.sportcenterRepository.getManagerCenters(user);
-
   }
-
 }

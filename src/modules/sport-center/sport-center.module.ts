@@ -8,9 +8,10 @@ import { UserModule } from '../user/user.module';
 import { ImagesModule } from '../images/images.module';
 import { UploadModule } from 'src/modules/uploads/upload.module';
 import { Review } from 'src/entities/review.entity';
+import { User } from 'src/entities/user.entity';
 
 @Module({
-  imports: [forwardRef(() => ImagesModule), UploadModule, UserModule, TypeOrmModule.forFeature([SportCenter, Review])],
+  imports: [forwardRef(() => ImagesModule), UploadModule, UserModule, TypeOrmModule.forFeature([SportCenter, Review,User])],
   controllers: [SportCenterController],
   providers: [SportCenterService, SportCenterRepository],
   exports: [SportCenterService],
