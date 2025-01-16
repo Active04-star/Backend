@@ -111,7 +111,7 @@ export class Reservation_Service {
 
     reservation.status = ReservationStatus.CANCELLED;
 
-    if (reservation.fieldBlock) {
+    if (reservation.fieldBlock && reservation.field) {
       const block: Field_Block | undefined =
         await this.fieldBlockRepository.findOne({
           where: { id: reservation.fieldBlock.id },
@@ -131,8 +131,14 @@ export class Reservation_Service {
 
       // También eliminar la relación desde el lado de la reserva
       reservation.fieldBlock = null;
+      reservation.field = null;
+    } else {
+      throw new ApiError(
+        ApiStatusEnum.
+        RESERVATION_DOES_NOT_HAVE_BLOCKS_AND_FIELD,
+        NotFoundException,
+      );
     }
-
     return await this.reservationRepo.save(reservation);
   }
 

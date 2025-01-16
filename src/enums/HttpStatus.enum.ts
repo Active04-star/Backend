@@ -65,6 +65,7 @@ export enum ApiStatusEnum {
   RESERVATION_ALREADY_COMPLETED = 'Esta reserva ya esta activada',
   INVALID_RESERVATION_STATUS = 'Estado de la reserva invalido',
   RESERVATION_NOT_COMPLETED = "Se va a poder crear una reseña luego de la reserva haya sido completada",
+  RESERVATION_DOES_NOT_HAVE_BLOCKS_AND_FIELD="No se encontro la cancha o el bloque asociado a la reserva",
 
   // Field
   FIELD_DELETED_SUCCESSFULLY = 'Cancha eliminada correctamente',
