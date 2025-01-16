@@ -62,9 +62,10 @@ export class Reservation_Controller {
 
 
   @Get(":id")
-  @ApiOperation({
-    summary: "obtiene todas las reservas de un usuario"
-  })
+  @Roles(UserRole.USER, UserRole.MAIN_MANAGER, UserRole.MANAGER, UserRole.ADMIN, UserRole.SUPER_ADMIN)
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: "obtiene todas las reservas de un usuario" })
   @ApiParam({
     name: 'id',
     description: 'ID de usuario',

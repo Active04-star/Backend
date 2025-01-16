@@ -5,7 +5,7 @@ import { User } from 'src/entities/user.entity';
 import { isNotEmpty } from 'class-validator';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { BadRequestException, ConflictException, ForbiddenException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { UserClean } from 'src/dtos/user/user-clean.dto';
 import { ApiStatusEnum } from 'src/enums/HttpStatus.enum';
 import { LoginResponse } from 'src/dtos/user/login-response.dto';
@@ -34,8 +34,17 @@ export class AuthService {
     }
 
     const user: User | undefined = await this.userService.getUserById(id);
+    let is_same_password
 
-    const is_same_password = await bcrypt.compare(password, user.password);
+    if(user === undefined) {
+      throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, NotFoundException);
+    }
+
+    if(user.password !== null) {
+      is_same_password = await bcrypt.compare(password, user.password);
+    } else {
+      is_same_password = false;
+    }
 
 
     if (isNotEmpty(user)) {
@@ -51,17 +60,17 @@ export class AuthService {
         throw new ApiError(ApiStatusEnum.HASHING_FAILED, BadRequestException);
       }
 
-      if (isNotEmpty(user.authtoken)) {
+      if (user.authtoken !== null) {
         await this.auth0Service.updateUserPassword(user, password);
       }
 
       await this.userService.updateUser(user.id, { password: hashed_password });
 
       return { message: ApiStatusEnum.PASSWORD_UPDATE_SUCCESS };
-
+ 
     }
 
-    throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, BadRequestException);
+    throw new ApiError(ApiStatusEnum.USER_NOT_FOUND, NotFoundException);
 
   }
 

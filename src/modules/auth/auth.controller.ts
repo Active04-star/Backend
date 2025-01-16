@@ -13,6 +13,7 @@ import { AuthGuard } from 'src/guards/auth-guard.guard';
 @ApiTags('Autentication')
 @Controller('auth')
 export class AuthController {
+
   constructor(private readonly authService: AuthService) { }
 
 

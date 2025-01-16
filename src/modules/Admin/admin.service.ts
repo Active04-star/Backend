@@ -126,60 +126,59 @@ export class AdminService {
     const found_center: SportCenter = await this.centerService.getById(id, true);
 
     try {
-      if (
-        estado === Sport_Center_Status.BANNED &&
-        found_center.fields.some((field) =>
-          field.reservation.some(
-            (reserva) => reserva.status === ReservationStatus.ACTIVE,
-          ),
+      if (estado === Sport_Center_Status.BANNED && found_center.fields.some((field) => 
+        field === undefined || field?.reservation === undefined ? false :
+        field.reservation.some(
+          (reserva) => reserva.status === ReservationStatus.ACTIVE,
+        ),
         )
       ) {
-        return { message: ApiStatusEnum.CENTER_HAS_PENDING_RESERVATIONS };
+      return { message: ApiStatusEnum.CENTER_HAS_PENDING_RESERVATIONS };
 
-      }
+    }
 
-      const changeCenter: SportCenter = await this.centerService.banOrUnban(id, estado);
-      if (changeCenter) {
-        return { message: ApiStatusEnum.CENTER_UPDATE_STATUS };
+    const changeCenter: SportCenter = await this.centerService.banOrUnban(id, estado);
+    if (changeCenter) {
+      return { message: ApiStatusEnum.CENTER_UPDATE_STATUS };
 
-      }
+    }
 
-      throw new ApiError(ApiStatusEnum.CENTER_UPDATE_STATUS_FAILED, InternalServerErrorException);
-    } catch (error) {
-      throw new ApiError(error?.message, InternalServerErrorException, error);
+    throw new ApiError(ApiStatusEnum.CENTER_UPDATE_STATUS_FAILED, InternalServerErrorException);
+  } catch(error) {
+    throw new ApiError(error?.message, InternalServerErrorException, error);
 
+  }
+}
+
+  async forceBan(id: string): Promise < ApiResponse > {
+  try {
+    const found_center: SportCenter = await this.centerService.getById(id, true);
+
+    const forceBanPromises: Promise<Reservation>[] = [];
+
+    for(const field of found_center.fields) {
+  for (const reserva of field.reservation) {
+    if (reserva.status === 'pending') {
+      reserva.status = ReservationStatus.CANCELLED;
+      forceBanPromises.push(this.reservationRepository.save(reserva));
     }
   }
+}
+//TODO POR AQUI DEBERIAMOS HACER QUE SE ENVIE UNA NOTIFICACION AVISANDO DE LA CANCELACION DE LAS RESERVAS (Y CANCELARLAS TODAS)
 
-  async forceBan(id: string): Promise<ApiResponse> {
-    try {
-      const found_center: SportCenter = await this.centerService.getById(id, true);
+await Promise.all(forceBanPromises);
 
-      const forceBanPromises: Promise<Reservation>[] = [];
+const changeCenter = await this.centerService.banOrUnban(id, Sport_Center_Status.BANNED);
 
-      for (const field of found_center.fields) {
-        for (const reserva of field.reservation) {
-          if (reserva.status === 'pending') {
-            reserva.status = ReservationStatus.CANCELLED;
-            forceBanPromises.push(this.reservationRepository.save(reserva));
-          }
-        }
-      }
-      //TODO POR AQUI DEBERIAMOS HACER QUE SE ENVIE UNA NOTIFICACION AVISANDO DE LA CANCELACION DE LAS RESERVAS (Y CANCELARLAS TODAS)
+if (changeCenter) {
+  return { message: ApiStatusEnum.CENTER_UPDATE_STATUS };
 
-      await Promise.all(forceBanPromises);
+}
 
-      const changeCenter = await this.centerService.banOrUnban(id, Sport_Center_Status.BANNED);
-
-      if (changeCenter) {
-        return { message: ApiStatusEnum.CENTER_UPDATE_STATUS };
-
-      }
-
-      throw new ApiError(ApiStatusEnum.CENTER_DELETION_FAILED, InternalServerErrorException, 'nothing updated');
+throw new ApiError(ApiStatusEnum.CENTER_DELETION_FAILED, InternalServerErrorException, 'nothing updated');
     } catch (error) {
-      throw new ApiError(error?.message, InternalServerErrorException, error);
+  throw new ApiError(error?.message, InternalServerErrorException, error);
 
-    }
+}
   }
 }
