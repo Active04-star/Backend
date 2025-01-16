@@ -22,8 +22,10 @@ import { Field_Block_Service } from '../field_blocks/field_schedule.service';
 import { BlockStatus, Field_Block } from 'src/entities/field_blocks.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Reservation } from 'src/entities/reservation.entity';
-import { Between, Repository } from 'typeorm';
+import { Between, In, Repository } from 'typeorm';
 import { startOfDay, endOfDay } from 'date-fns';
+import { User } from 'src/entities/user.entity';
+import { ReservationStatus } from 'src/enums/reservationStatus.enum';
 
 @Injectable()
 export class Field_Service {
@@ -37,6 +39,8 @@ export class Field_Service {
     private fieldblockService: Field_Block_Service,
     @InjectRepository(Reservation)
     private reservationRepository: Repository<Reservation>,
+    @InjectRepository(User)
+    private userRepo: Repository<User>,
   ) {}
 
   async getAvailableBlocks(
@@ -81,6 +85,18 @@ export class Field_Service {
         true,
       );
 
+      const user: User = await this.userRepo.findOne({
+        where: {
+          id: sportCenter.main_manager.id,
+        },
+      });
+
+      if (sportCenter.fields.length >= 2 && user.stripeCustomerId === null) {
+        throw new ApiError(
+          ApiStatusEnum.USER_HAS_NOT_PAID_YET,
+          BadRequestException,
+        );
+      }
       // Verificar si ya existe un campo con el mismo número
       const existingField = sportCenter.fields.find(
         (field) => field.number === fieldData.number && !field.isDeleted,
@@ -174,29 +190,23 @@ export class Field_Service {
     try {
       const field: Field = await this.findById(id);
 
-      console.log('holaaaaaaa', field);
+        // Verificar si el campo tiene reservas activas
+    const activeReservations = await this.reservationRepository.find({
+      where: {
+        field: { id },
+        status: In([
+          ReservationStatus.ACTIVE,
+          // Añade otros estados considerados como activos
+        ]),
+      },
+    });
 
-      // Actualizar el estado de todas las reservas asociadas a 'CANCELED'
-      if (field.reservation && field.reservation.length > 0) {
-        console.log('holaa');
-
-        await Promise.all(
-          field.reservation.map(async (reservation) => {
-            return await this.reservationService.cancelReservation(
-              reservation.id,
-            );
-          }),
-        );
-      }
-
-      if (field.reservation.length > 0) {
-        throw new ApiError(
-          ApiStatusEnum.CANT_CANCEL_RESERVATIONS,
-          InternalServerErrorException,
-        );
-      }
-
-      console.log('se va a elimianr ');
+    if (activeReservations.length > 0) {
+      throw new ApiError(
+        ApiStatusEnum.CANT_DELETE_FIELD_WITH_ACTIVE_RESERVATIONS,
+        BadRequestException,
+      );
+    }
 
       //TODO Se tiene que enviar un mail aca avisando a los usuarios de la cancelacion
       const deletion_result: Field | undefined =

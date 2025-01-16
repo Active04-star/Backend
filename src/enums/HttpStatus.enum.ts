@@ -78,6 +78,8 @@ export enum ApiStatusEnum {
   SPORTCENTER_NEEDS_SCHEDULES_BEFORE = "Necesitas crear horarios para el centro antes de crear una cancha ",
   CANT_CANCEL_RESERVATIONS = "No se pudo cancelar las reservas al eliminar una cancha",
   FIELD_NUMBER_ALREADY_EXISTS="Ya existe una cancha con este numero",
+  USER_HAS_NOT_PAID_YET="Necesitas pasar a premium para poder crear mas de 2 canchas",
+  CANT_DELETE_FIELD_WITH_ACTIVE_RESERVATIONS="No se puede eliminar la cancha con reservas activas",
 
   // Payments
   SUBSCRIPTION_PAYMENT_FAILED = 'No se pudo crear el pago de la subscripcion',
