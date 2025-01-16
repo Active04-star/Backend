@@ -179,7 +179,7 @@ export class AuthService {
   }
 
 
-  async sendWelcomeMail(user: { name: string, email: string }): Promise<void> {
+  private async sendWelcomeMail(user: { name: string, email: string }): Promise<void> {
     console.log(this.mailService['transporter'].options);   //BORRAR SOLO ES PARA PRUEBA
     await this.mailService.sendMail({
       from: 'ActiveProject <activeproject04@gmail.com>',
