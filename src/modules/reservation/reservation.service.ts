@@ -26,8 +26,7 @@ export class Reservation_Service {
     private readonly reservationRepository: Reservation_Repository,
     @Inject(forwardRef(() => Field_Service)) private readonly field_service: Field_Service,
     private readonly userService: UserService,
-    @InjectRepository(Field_Block)
-    private fieldBlockRepository: Repository<Field_Block>
+    @InjectRepository(Field_Block) private fieldBlockRepository: Repository<Field_Block>
   ) { }
 
 
@@ -128,7 +127,12 @@ export class Reservation_Service {
       throw new ApiError(ApiStatusEnum.RESERVATION_NOT_FOUND, NotFoundException);
     }
 
-    return getReservation;
+    return getReservation.map((x) => {
+      const reservation = x;
+      reservation.date = new Date(x.fieldBlock.start_time);
+      return reservation;
+    });
+
   }
 
 

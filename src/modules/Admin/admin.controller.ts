@@ -40,7 +40,7 @@ export class AdminController {
   @Get('list/user')
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   @ApiQuery({
     name: 'search',
     required: false,
@@ -69,10 +69,21 @@ export class AdminController {
     return await this.adminService.getUsers(page, limit, search);
   }
 
+
+  @Get("users/total")
+  @ApiOperation({
+    summary: 'Consigue el total de usuarios registrados sin incluir admins',
+    description: "Util para verificacion de paginado"
+  })
+  async getTotalUsers(): Promise<{ total: number }> {
+    return await this.adminService.getTotalUsers();
+  }
+
+
   @Get('premiumUsers')
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   @ApiOperation({
     summary: 'Obtiene un array de usuarios premium',
     description: 'debe ser ejecutado por un usuario con rol admin',
@@ -84,7 +95,7 @@ export class AdminController {
   @Get('list/centersban')
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   @ApiQuery({
     name: 'page',
     required: true,
@@ -123,7 +134,7 @@ export class AdminController {
   @Put('ban-unban/user/:id')
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   @ApiOperation({
     summary: 'Banea o desbanea con un softdelete',
     description:
@@ -135,10 +146,11 @@ export class AdminController {
     return await this.adminService.banOrUnbanUser(id);
   }
 
+  
   @Put('ban-unban/sportcenter/:id')
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   @ApiOperation({
     summary: 'Banea o desbanea con un softdelete',
     description:
@@ -155,10 +167,11 @@ export class AdminController {
     return await this.adminService.banOrUnbanCenter(id, body.status);
   }
 
+
   @Put('force-ban/:id')
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   @ApiOperation({
     summary: 'fuerza el ban de un sportcenter',
     description:
@@ -170,10 +183,11 @@ export class AdminController {
     return await this.adminService.forceBan(id);
   }
 
+  
   @Get('list/reservation')
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   @ApiQuery({
     name: 'page',
     required: true,

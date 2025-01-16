@@ -21,7 +21,7 @@ export class UserController {
     @Put(':id')
     @ApiBearerAuth()
     @UseGuards(AuthGuard)
-    @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.USER, UserRole.MAIN_MANAGER)
+    @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.USER, UserRole.MAIN_MANAGER, UserRole.SUPER_ADMIN)
     @ApiParam({ name: "id", description: 'ID de usuario' })
     @ApiOperation({
         summary: 'actualiza la informacion de un usuario, por id y body',

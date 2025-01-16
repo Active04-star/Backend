@@ -1,6 +1,4 @@
-import {
-  Column,
-  Entity,
+import {  Column,  Entity,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -33,7 +31,7 @@ export class Field {
     precision: 10,
     scale: 2,
     nullable: false,
-    default: new Decimal('0.00'),
+    default: '0.00',
     transformer: {
       from: (value: string) =>
         value !== null ? new Decimal(value) : new Decimal('0.00'),

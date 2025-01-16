@@ -133,4 +133,16 @@ export class UserService {
     }
   }
 
+
+  async createAdmin(userObject: Omit<LocalRegister, 'confirm_password'> | AuthRegister): Promise<UserClean> {
+    try {
+      const created_user: User = await this.userRepository.createAdmin(userObject);
+      const { password, authtoken, ...filtered } = created_user;
+
+      return filtered;
+    } catch (error) {
+      throw new ApiError(error?.message, BadRequestException, error);
+    }
+  }
+
 }

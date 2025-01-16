@@ -4,6 +4,7 @@ import { ReservationList } from 'src/dtos/reservation/reservation-list.dto';
 import { UserList } from 'src/dtos/user/users-list.dto';
 import { Reservation } from 'src/entities/reservation.entity';
 import { User } from 'src/entities/user.entity';
+import { UserRole } from 'src/enums/roles.enum';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -14,10 +15,17 @@ export class AdminRepository {
     @InjectRepository(User) private userRepository: Repository<User>
   ) { }
 
+  
+  async getTotalUsers(): Promise<number | undefined> {
+    const total: [User[], number] = await this.userRepository.findAndCount();
+    const users: UserList = await this.getUsers(1, total[1]);
+
+    return users.items === 0 ? undefined : users.items;
+  }
+
 
   async getUsers(page: number, limit: number, keyword?: string): Promise<UserList> {
-    const queryBuilder = this.userRepository
-      .createQueryBuilder('users');
+    const queryBuilder = this.userRepository.createQueryBuilder('users');
 
     if (keyword) {
       queryBuilder.andWhere(
@@ -25,6 +33,9 @@ export class AdminRepository {
         { keyword: `%${keyword}%` },
       );
     }
+
+    queryBuilder.andWhere("users.role != :admin", { admin: UserRole.ADMIN });
+    queryBuilder.andWhere("users.role != :admin", { admin: UserRole.SUPER_ADMIN });
 
     const totalCount = await queryBuilder.getCount();
 
