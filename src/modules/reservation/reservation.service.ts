@@ -179,12 +179,18 @@ export class Reservation_Service {
     }
 
     return getReservation.map((x) => {
-      const reservation = x;
-      reservation.date = new Date(x.fieldBlock.start_time);
+      const reservation = { ...x };
+      if (x.fieldBlock && x.fieldBlock.start_time) {
+        reservation.date = new Date(x.fieldBlock.start_time);
+      } else {
+        // Handle the case where fieldBlock or start_time is missing
+        console.warn(`Reservation ${x.id} has no fieldBlock or start_time`);
+        reservation.date = x.createdAt; // Fallback to createdAt date
+      }
       return reservation;
     });
-
   }
+
 
   async getReservationById(id: string): Promise<Reservation> {
     const foundReservation =
