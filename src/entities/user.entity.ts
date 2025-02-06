@@ -15,6 +15,7 @@ import { Payment } from './payment.entity';
 import { Sport_Center_Managers } from './sport_center_managers.entity';
 import { Subscription } from './subscription.entity';
 import { Subscription_Payment } from './subscriptionPayment.entity';
+import { UserSettings } from './user_settings.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -68,7 +69,6 @@ export class User {
   @OneToMany(() => Payment, (payment) => payment.field, { nullable: true })
   payments: Payment[];
 
-
   @OneToMany(() => Review, (review) => review.user, { nullable: true })
   reviews: Review[];
 
@@ -82,13 +82,17 @@ export class User {
   })
   reservations: Reservation[];
 
-  @ManyToMany(
-    () => Sport_Center_Managers,
-    (Usermanagers) => Usermanagers.managers,
-    {
-      nullable: true,
-    },
-  )
+  @ManyToMany(() => Sport_Center_Managers, (Usermanagers) => Usermanagers.managers, {
+    nullable: true
+  })
   managers_list: Sport_Center_Managers[];
-}
 
+  @Column({ nullable: true, default: new Date(Date.UTC(2000, 9, 19, 23, 15, 30)), type: 'timestamp' })
+  last_login: Date;
+
+  @Column({ nullable: false, default: false })
+  account_verified: boolean;
+
+  @OneToOne(() => UserSettings, (settings) => settings.user_id, { cascade: true, nullable: false })
+  settings: UserSettings;
+}

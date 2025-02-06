@@ -281,6 +281,8 @@ export class AuthService {
         subscription_status: user.subscription_status,
         subscription: null,
         stripeCustomerId: user.stripeCustomerId,
+        last_login: user.last_login,
+        account_verified: user.account_verified,
       },
     };
   }

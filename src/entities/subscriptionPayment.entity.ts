@@ -1,7 +1,7 @@
 import Decimal from 'decimal.js';
 import { PaymentMethod } from 'src/enums/paymentMethod.enum';
 import { PaymentStatus } from 'src/enums/paymentStatus.enum';
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from './user.entity';
 import { Subscription } from './subscription.entity';
 

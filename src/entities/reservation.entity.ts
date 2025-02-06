@@ -20,10 +20,8 @@ export class Reservation {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
-
 
   @Column({ type: 'timestamp' })
   date: Date;
@@ -42,7 +40,6 @@ export class Reservation {
 
   @OneToOne(() => Review, (review) => review.reservation, { nullable:true })
   review: Review;
-
 
   @ManyToOne(() => User, (user) => user.reservations, { nullable: false })
   user: User;
